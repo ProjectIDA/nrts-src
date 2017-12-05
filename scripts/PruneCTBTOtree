@@ -1,0 +1,51 @@
+#!/bin/csh -f
+# $Id: PruneCTBTOtree,v 1.2 2014/09/03 16:13:37 dechavez Exp $
+#
+# Prune the CTBTO directory
+
+set myname = PruneCTBTOtree
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup"
+    goto failure
+endif
+source $setup
+
+# Command line setup
+
+set DefaultRoot = $NRTS_HOME/CTBTO
+set DefaultDays = +5
+
+set error = 0
+if ($#argv == 0) then
+    set root = $DefaultRoot
+    set days = $DefaultDays
+else if ($#argv == 2) then
+    set root = $argv[1]
+    set days = $argv[2]
+else
+    echo "usage: $myname [ root ]"
+    exit 1
+endif
+set cddata = $root/cddata
+set logs   = $root/log
+
+# Prune old files
+
+find $cddata -name '*.????????.*clf' -mtime $days -exec rm -f {} \; >& /dev/null
+find $cddata -name '*.????????.*idx' -mtime $days -exec rm -f {} \; >& /dev/null
+find $cddata -name '*.????????.*bin' -mtime $days -exec rm -f {} \; >& /dev/null
+find $cddata -name '*.????????.*txt' -mtime $days -exec rm -f {} \; >& /dev/null
+find $logs                           -mtime $days -exec rm -f {} \; >& /dev/null
+
+exit 0
+
+# Revision History
+#
+# $Log: PruneCTBTOtree,v $
+# Revision 1.2  2014/09/03 16:13:37  dechavez
+# initial release
+#

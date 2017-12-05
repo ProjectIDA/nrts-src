@@ -1,0 +1,1 @@
+const char *cpIniFileName=".\\itsv.ini";

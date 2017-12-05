@@ -1,0 +1,61 @@
+The stock libmseed from IRIS did not include an explicit method to
+propagate the clock quality or the activity, I/O, and data quality flags
+to msr_pack().  This MSFlags structure was introduced and added to the
+MSRecord and MSTrace structures to make this easier for format converters
+which care about such things.
+       
+typedef struct MSFlags_s {
+  uint8_t         act_flags;         /* activity flags for ORing into FSDH */
+  uint8_t         io_flags;          /* I/O flags for ORing into FSDH */
+  uint8_t         dq_flags;          /* Data quality flags for ORing into FSDH */
+  int8_t          timing_qual;       /* Timing quality for blockette 1001 */
+} MSFlags;
+
+The following functions were added to the library (in genutils.c):
+
+in genutils.c:
+extern void     ms_initflags(MSFlags *flags);
+extern flag     ms_flagsmatch (MSFlags *a, MSFlags *b);
+
+ms_initflags() sets all fields to 0 except for the timing quality which 
+is initialized to -1 (note that it is a signed type).  The timing_qual
+value will only get used by the library if the value is non-negative 
+(and if the template has a blockette 1001).
+
+int template.c: (new file)
+MSTemplateHandle *mseedInitTemplates(char *nname, char *sname, char qcode, int reclen, double drift, MSClockQualityThreshold *clock);
+MSRecord *mseedGetTemplate(MSTemplateHandle *handle, MSChannelInfo *cinfo);
+
+mseedInitTemplates() will generate a handle that mseedGetTemplate() will use to create or retrieve
+templates appropriate for a given NSChannelInfo.
+
+The following functions were modified:
+
+In msrutils.c
+	msr_init():
+		1) initialize msr->flags via a call to ms_initflags()
+	msr_normalize_header(): 
+		1) update the FSDH flags by ORing in the corresponding values from MSFlags.
+		2) update blockette 1001 with the timing_qual (if appropriate)
+
+In traceutils.c
+	mst_init():
+		1) initialize mst->flags via a call to ms_initflags()
+	mst_findadjacent()
+		1) added MSFlags to function call
+		2) require flags to match (a NULL flags on call will supress this test)
+	mst_addmsrtogroup()
+		1) include flags argument in call to mst_findadjacent()
+        2) copy flags from input MSRecord to out MSTrace
+	mst_groupheal()
+		1) require flags to match.
+	mst_pack()
+		1) copy flags from input MSTrace to MSRecord
+
+In addition, in order to aid in blockette 100 support the following was added to
+genutils.c:
+
+extern uint64_t ms_nomsampinterval(int factor, int multiplier);
+
+which returns the nominal sample interval in nanoseconds.  This is used by libisi's
+isiToMSTrace()

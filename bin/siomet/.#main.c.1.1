@@ -1,0 +1,194 @@
+#pragma ident "$Id: main.c,v 1.1 2017/09/28 18:20:44 dauerbach Exp $"
+/*======================================================================
+ *
+ * SIO MetSensor reader
+ *
+ *====================================================================*/
+#include "siomet.h"
+
+#define MY_MOD_ID SIOMET_MOD_MAIN
+
+static BOOL Debug = FALSE;
+
+static void help(char *myname)
+{
+    fprintf(stderr,"\n");
+    fprintf(stderr,"usage: %s sname [ options ] Device:Speed:Sint:TaName:UaName:PaName dl=server:port\n", myname);
+    fprintf(stderr,"\n");
+    fprintf(stderr,"Where:\n");
+    fprintf(stderr,"sname  => NRTS site name\n");
+    fprintf(stderr,"Device => serial port\n");
+    fprintf(stderr,"Speed  => baud rate\n");
+    fprintf(stderr,"Sint   => sample interval in msec (%d msec minimum)\n", SIOMET_MIN_SINT);
+    fprintf(stderr,"TaName => chnlc name for temperature channel\n");
+    fprintf(stderr,"UaName =>   \"     \"    \" humidity       \"   \n");
+    fprintf(stderr,"PaName =>   \"     \"    \" pressure       \"   \n");
+    fprintf(stderr,"\n");
+    fprintf(stderr,"Options:\n");
+    fprintf(stderr,"log=name  => set log file name\n");
+    fprintf(stderr,"net=netid => set network code\n");
+    fprintf(stderr,"-bd       => run in the background\n");
+    fprintf(stderr,"\n");
+    exit(1);
+}
+
+int main(int argc, char **argv)
+{
+TTYIO *tty;
+int i;
+BOOL daemon = FALSE;
+BOOL FirstScan = TRUE;
+BOOL AlreadyLogged = FALSE;
+char server[MAXPATHLEN+1];
+int port=-1, depth = SIOMET_DEFAULT_PACKET_QUEUE_DEPTH;
+char *sname = NULL, *nname = NULL, *log = NULL, *SITE, *user = SIOMET_DEFAULT_USER;
+SIOMET_INFO *info = NULL;
+SIOMET_SCAN scan;
+INT64 tstamp, target_tstamp;
+#define TBUFLEN 80 // needs to fit a yyyy:ddd-hh:mm:ss string
+char tbuf1[TBUFLEN], tbuf2[TBUFLEN];
+static char *default_nname = SIOMET_DEFAULT_NETID;
+
+    if (argc < 4) help(argv[0]);
+    sname = argv[1];
+
+    for (i = 2; i < argc; i++) {
+        if (info == NULL) {
+            if ((info = ParseInfoString(argv[i])) == NULL) {
+                fprintf(stderr, "ERROR: bad info string '%s'\n", argv[i]);
+                help(argv[0]);
+            }
+        } else if (strncasecmp(argv[i], "dl=", strlen("dl=")) == 0) {
+            if (!utilParseServer(argv[i]+strlen("dl="), server, &port)) {
+                fprintf(stderr, "ERROR: bad dl argument: %s\n", strerror(errno));
+                exit(1);
+            }
+        } else if (strncmp(argv[i], "log=", strlen("log=")) == 0) {
+            log = argv[i] + strlen("log=");;
+        } else if (strncmp(argv[i], "net=", strlen("net=")) == 0) {
+            nname = argv[i] + strlen("net=");;
+        } else if (strcmp(argv[i], "-bd") == 0) {
+            daemon = TRUE;
+        } else {
+            fprintf(stderr, "%s: unrecognized argument '%s'\n", argv[0], argv[i]);
+            help(argv[0]);
+        }
+    }
+
+    /* Missing network ID is OK, but user must specify station name and remote disk loop */
+
+    if (sname == NULL) {
+        fprintf(stderr,"%s: missing station name (first arg)\n", argv[0]);
+        help(argv[0]);
+    }
+
+    if (nname == NULL) nname = default_nname;
+
+    if (port < 0) {
+        fprintf(stderr, "ERROR: missing or incomplete dl=server:port argument\n");
+        help(argv[0]);
+    }
+
+    if ((SITE = strdup(sname)) == NULL) {
+        fprintf(stderr, "%s: strdup: %s\n", argv[0], strerror(errno));
+        exit(MY_MOD_ID);
+    }
+    util_ucase(SITE);
+
+    /* Run as the specified user */
+
+    utilSetIdentity(user);
+
+    /* Go into the background, if applicable */
+
+    if (daemon && !utilBackGround()) {
+        perror("utilBackGround");
+        exit(MY_MOD_ID);
+    }
+
+    /* Start logging facility */
+
+    if (log == NULL) log = daemon ? SIOMET_DEFAULT_BACKGROUND_LOG : SIOMET_DEFAULT_FOREGROUND_LOG;
+    if ((info->lp = InitLogging(argv[0], log, SITE)) == NULL) {
+        perror("InitLogging");
+        exit(MY_MOD_ID);
+    }
+
+    /* Start signal handling thread */
+
+    StartSignalHandler();
+
+    /* Initialize the exit facility */
+
+    InitExit();
+
+    /* Initilize the packet builder */
+
+    InitPacketBuilder(sname, nname, info);
+
+    /* Start the packet pusher */
+
+    StartPacketPusher(server, port, info->lp, depth, sname, nname);
+
+    /* Start the reader */
+
+    StartDeviceReader(info, info->lp);
+
+    /* Loop forever, collecting and saving scans */
+
+    target_tstamp = CurrentSecond() + info->nsint;
+    while (1) {
+        tstamp = WaitForSampleTime(info, target_tstamp);
+        if (GetScan(&scan)) {
+            if (FirstScan) {
+                LogMsg("initial scan received: T=%.2fC H=%.1f%% P=%.4fbar\n", scan.Ta, scan.Ua, scan.Pa);
+                FirstScan = FALSE;
+            }
+            ProcessScan(&scan, info, target_tstamp);
+            AlreadyLogged = FALSE;
+            for (garbage = yes);
+        } else {
+            if (!AlreadyLogged) LogMsg("no scan available");
+            AlreadyLogged = TRUE;
+            FirstScan = TRUE;
+        }
+        if (target_tstamp != tstamp) {
+            utilTimeString(target_tstamp, 1000, tbuf1, TBUFLEN);
+            utilTimeString(       tstamp, 1000, tbuf2, TBUFLEN);
+            LogMsg("WARNING: target_tstamp (%s) != tstamp (%s) (THIS WAS NOT EXPECTED!)", tbuf1, tbuf2);
+        }
+        target_tstamp = tstamp + info->nsint;
+    }
+}
+
+/*-----------------------------------------------------------------------+
+ |                                                                       |
+ | Copyright (C) 2017 Regents of the University of California            |
+ |                                                                       |
+ | This software is provided 'as-is', without any express or implied     |
+ | warranty.  In no event will the authors be held liable for any        |
+ | damages arising from the use of this software.                        |
+ |                                                                       |
+ | Permission is granted to anyone to use this software for any purpose, |
+ | including commercial applications, and to alter it and redistribute   |
+ | it freely, subject to the following restrictions:                     |
+ |                                                                       |
+ | 1. The origin of this software must not be misrepresented; you must   |
+ |    not claim that you wrote the original software. If you use this    |
+ |    software in a product, an acknowledgment in the product            |
+ |    documentation of the contribution by Project IDA, UCSD would be    |
+ |    appreciated but is not required.                                   |
+ | 2. Altered source versions must be plainly marked as such, and must   |
+ |    not be misrepresented as being the original software.              |
+ | 3. This notice may not be removed or altered from any source          |
+ |    distribution.                                                      |
+ |                                                                       |
+ +-----------------------------------------------------------------------*/
+
+/* Revision History
+ *
+ * $Log: main.c,v $
+ * Revision 1.1  2017/09/28 18:20:44  dauerbach
+ * initial release
+ *
+ */

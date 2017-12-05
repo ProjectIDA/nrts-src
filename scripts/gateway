@@ -1,0 +1,36 @@
+#!/bin/csh -f
+# $Id: gateway,v 1.1 2012/12/12 18:46:47 dechavez Exp $
+#
+# Check/set default gateway without becoming root.  Requires
+# that sudo has been configured for /sbin/route
+
+set old = `netstat -rn | grep default | awk '{print $2}'`
+
+if ($#argv != 1) then
+	echo "usage: gateway xxx.xxx.xxx.xxx"
+	echo "Current gateway: $old"
+    exit 1
+endif
+
+set gateway = $argv[1]
+
+set old = `netstat -rn | grep default | awk '{print $2}'`
+sudo /sbin/route delete default
+
+sudo /sbin/route add default $gateway
+set new = `netstat -rn | grep default | awk '{print $2}'`
+
+echo ""
+echo "Old gateway: $old"
+echo "New gateway: $new"
+echo ""
+echo "NOTE: THIS WILL NOT PERSIST ACROSS REBOOTS UNLESS /etc/rc.conf IS MODIFIED!"
+
+exit 0
+
+# Revision History
+#
+# $Log: gateway,v $
+# Revision 1.1  2012/12/12 18:46:47  dechavez
+# initial release
+#

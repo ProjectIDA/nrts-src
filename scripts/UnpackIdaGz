@@ -1,0 +1,94 @@
+#!/bin/csh -f
+# $Id: UnpackIdaGz,v 1.2 2010/10/04 18:12:27 dechavez Exp $
+#
+# Unpack IDA10 files (intended for processing AutoCal results)
+
+set myname = UnpackIdaGz
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+source $setup
+
+# Check for debug flag
+
+if (-e $DebugDir/$myname) then
+    set debug = 1
+else
+    set debug = 0
+endif
+
+if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+
+# Command line setup: UnpackIdaGz srcdir dstdir suffix
+
+set error = 0
+if ($#argv != 4) then
+    logger -t $myname"[$$]" -p user.info "bad command line"
+    echo "usage: $myname srcdir dstdir suffix sta"
+    goto failure
+endif
+
+set srcdir = $argv[1]
+set dstdir = $argv[2]
+set suffix = $argv[3]
+set sta    = $argv[4]
+
+# Work out of source directory
+
+set command = "cd $srcdir"
+if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+$command >& /dev/null
+if ($status != 0) then
+    logger -t $myname"[$$]" -p user.info "ERROR: '$command' failed"
+    goto failure
+endif
+
+# Unpack
+
+set dummy = $myname.$$${suffix}
+
+touch $dummy
+foreach file ({*}$suffix)
+    if ($file == $dummy) continue
+    set base = `basefs $file $suffix`
+    set outdir = $dstdir/$base
+    set command = "i10dmx sta=$sta outdir=$outdir"
+    rm -rf $outdir
+    if ($debug) logger -t $myname"[$$]" -p user.info "gzcat $file | $command"
+    gzcat $file | $command >& /dev/null
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p user.info "ERROR: '$command' failed"
+        goto failure
+    endif
+    mv ${base}.* $outdir
+end
+rm $dummy
+
+# All done
+
+if ($debug) logger -t  $myname"[$$]" -p user.info "exit 0"
+exit 0
+
+failure:
+if ($debug) logger -t  $myname"[$$]" -p user.info "exit 1"
+exit 1
+
+# Revision History
+#
+# $Log: UnpackIdaGz,v $
+# Revision 1.2  2010/10/04 18:12:27  dechavez
+# take care of dummy file
+#
+# Revision 1.1  2010/10/04 17:47:34  dechavez
+# initial release
+#
+# Revision 1.1  2010/10/04 16:45:30  dechavez
+# initial release
+#

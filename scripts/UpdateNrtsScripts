@@ -1,0 +1,85 @@
+#!/bin/csh -f
+#
+# $Id: UpdateNrtsScripts,v 1.2 2016/01/27 16:46:57 dechavez Exp $
+
+set myname = "UpdateNrtsScripts"
+
+set iam = `whoami`
+if ($status != 0) then
+    echo "FATAL ERROR: whoami not working"
+    exit 1
+endif
+if ($iam != nrts) then
+    echo "Must be run as user nrts"
+    exit 1
+endif
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    echo "${myname}: $message"
+    goto Failure
+endif
+source $setup
+
+# Figure out the source root
+
+set envrc = ~ida/.envrc
+if (! -e $envrc) then
+    echo "${myname}: missing $envrc"
+    goto Failure
+endif
+set command = `grep SRC_ROOT $envrc`
+if ($status != 0) then
+    echo "${myname}: can't determine SRC_ROOT from $envrc"
+    goto Failure
+endif
+$command
+if (! $?SRC_ROOT) then
+    echo "${myname}: can't set SRC_ROOT"
+    goto Failure
+endif
+
+set Source = /usr/home/ida/$SRC_ROOT/src/scripts
+if (! -e $Source) then
+    echo "${myname}: missing $Source"
+    goto Failure
+endif
+
+set Dest = ~nrts/scripts
+cd $Dest
+if ($status != 0) then
+    echo "can't chdir $Dest"
+    goto Failure
+endif
+
+foreach file (*)
+    if (-e $Source/$file) then
+        rm -f $Dest/$file
+        cp -p $Source/$file $Dest/$file
+        if ($status != 0) then
+            echo "can't cp -p $Source/$file $Dest/$file"
+            goto Failure
+        endif
+        echo $file
+        chmod 555 $Dest/$file
+    else
+        echo "Warning: $Dest/$file NOT updated"
+    endif
+end
+
+Success:
+exit 0
+
+Failure:
+exit 1
+
+# $Log: UpdateNrtsScripts,v $
+# Revision 1.2  2016/01/27 16:46:57  dechavez
+# lookup SRC_ROOT from ~ida/.envrc and use that to locate the files to copy
+#
+# Revision 1.1  2015/12/22 22:41:05  dechavez
+# initial release
+#

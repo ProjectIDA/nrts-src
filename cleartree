@@ -1,0 +1,14 @@
+#!/bin/csh -f
+
+find . -name OBJS     -exec rm -rf {} \; >& /dev/null
+find . -name dmxdata  -exec rm -rf {} \; >& /dev/null
+find . -name "*.core" -exec rm -rf {} \; >& /dev/null
+find . -name "core.*" -exec rm -rf {} \; >& /dev/null
+
+touch dummy.log
+foreach file (*.log)
+    rm -f $file
+end
+
+rm -rf ../bin
+rm -rf ../lib

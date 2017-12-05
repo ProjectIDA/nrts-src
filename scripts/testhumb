@@ -1,0 +1,14 @@
+#!/bin/csh -f
+#
+# $Id: testhumb,v 1.1 2010/02/03 18:49:41 dechavez Exp $
+
+sudo mount /usb/0
+if ($status == 0) then
+	sudo umount /usb/0
+	echo "Device has been verified OK."
+	exit 0
+endif
+
+echo "Device failed.  If a thumbdrive is physcially present, then "
+echo "try 'sudo inithumb' to initialize it."
+exit 1

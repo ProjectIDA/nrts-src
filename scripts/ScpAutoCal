@@ -1,0 +1,97 @@
+#!/bin/csh -f
+# $Id: ScpAutoCal,v 1.1 2010/10/04 16:45:30 dechavez Exp $
+#
+# Script to pull AutoCal results
+
+set myname = ScpAutoCal
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+source $setup
+
+# Check for debug flag
+
+if (-e $DebugDir/$myname) then
+    set debug = 1
+else
+    set debug = 0
+endif
+
+if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+
+# Command line setup: ScpAutoCal remote base dest
+
+set error = 0
+if ($#argv != 3) then
+    logger -t $myname"[$$]" -p user.info "bad command line"
+    echo "usage: $myname [user@]remote base dest"
+    goto failure
+endif
+
+set remote = $argv[1]
+set base   = $argv[2]
+set dest   = $argv[3]
+
+set new = $base/new
+set old = $base/old
+
+set ssh = /usr/bin/ssh
+
+# Work out of destination directory
+
+set command = "cd $dest"
+set list = `$command`
+if ($status != 0) then
+    logger -t $myname"[$$]" -p user.info "ERROR: '$command' failed"
+    goto failure
+endif
+
+# Get list of any new files
+
+set command = "$ssh $remote ls $new"
+set list = `$command`
+if ($status != 0) then
+    logger -t $myname"[$$]" -p user.info "ERROR: '$command' failed"
+    goto failure
+endif
+
+foreach file ($list)
+    set command = "scp ${remote}:$new/$file $dest"
+    if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+    $command >& /dev/null
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p user.info "ERROR: '$command' failed"
+        goto failure
+    endif
+
+    set command = "$ssh $remote mv $new/$file $old"
+    if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+    $command >& /dev/null
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p user.info "ERROR: '$command' failed"
+        goto failure
+    endif
+end
+
+# All done
+
+if ($debug) logger -t  $myname"[$$]" -p user.info "exit 0"
+exit 0
+
+failure:
+if ($debug) logger -t  $myname"[$$]" -p user.info "exit 1"
+exit 1
+
+# Revision History
+#
+# $Log: ScpAutoCal,v $
+# Revision 1.1  2010/10/04 16:45:30  dechavez
+# initial release
+#

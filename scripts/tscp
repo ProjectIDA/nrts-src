@@ -1,0 +1,94 @@
+#!/bin/csh -f
+# $Id: tscp,v 1.1 2017/10/04 16:37:59 dauerbach Exp $
+#
+# SCP File from IDA station via tunnel (or direct, if no tunnel)
+#
+# Desgined to work as scp and mirror behavior of tssh.
+#
+#   Usage:
+#       tscp stahost:<filepath> <local-target>
+#
+#       if <filepath> contains wildcards you must quote it:
+#       For example:
+#           tscp 'stahost:*.xml' <local-target-dir>
+#
+
+set debug  = 0
+set myname = tscp
+set lock   = /var/tmp/$myname.lock
+
+
+if ($#argv < 2) then
+    echo "usage: $myname stahost:sourcepath targetpath"
+    exit 1
+endif
+#echo "argv[1]: $argv[1]"
+#echo "argv[2]: $argv[2]"
+
+set stahost_spth = "$argv[1]"
+
+#echo "stahost_spth: ${stahost_spth}"
+#set parts = `echo ${stahost_spth} | sed 's/:/ /'`
+#echo "abc:def" | awk -F':' '{print $1}'
+
+set stahost = `echo "$stahost_spth" | awk -F':' '{print $1}'`
+set spth    = `echo "$stahost_spth" | awk -F':' '{print $2}'`
+set tpth = $argv[2]
+
+
+set setup  = /usr/nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "${myname}: missing $setup"
+    exit 1
+endif
+source $setup
+
+set TunnelInfo = $NRTS_HOME/etc/Tunnels
+
+if (! -e $TunnelInfo) then
+    echo "${myname}: missing $TunnelInfo"
+    exit 1
+endif
+
+set PortString = `stripcat $TunnelInfo | grep -i " $stahost " `
+set exitstatus = $status
+if ($exitstatus != 0) then
+    # not in Tunnels file, use host from command line and port 22
+    set port = 22
+else
+    # use localhost and tunnel port
+    set stahost = 'localhost'
+    set port = `echo $PortString | awk '{print $3}'`
+endif
+
+if ($debug != 0) then
+    echo port:    $port
+    echo stahost: $stahost
+    echo spth:    "$spth"
+    echo tpth:    $tpth
+endif
+
+# cheat and grab filelist from remote sith ssh
+set flist = (`ssh -p $port nrts@$stahost "ls $spth"`)
+if ($status != 0) exit 1
+
+# display scp commandline with correct port and host...
+echo "scp -P $port nrts@${stahost}:$spth $tpth"
+
+if ($debug != 0) echo $flist
+
+# loop through files. yucky. BUT COULDN'T MAKE IT WORK ANY OTHER WAY.
+foreach f ($flist)
+    if ($debug != 0) echo $f
+    scp -P $port nrts@${stahost}:${f} $tpth
+end
+
+exit 0
+
+# Revision History
+#
+# $Log: tscp,v $
+# Revision 1.1  2017/10/04 16:37:59  dauerbach
+# Initial release 1.0.0. Only supports cop^CROM remote TO local
+#
+#

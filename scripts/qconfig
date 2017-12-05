@@ -1,0 +1,220 @@
+#!/bin/csh -f
+# $Id: qconfig,v 1.12 2015/12/10 00:00:16 dechavez Exp $
+#
+# Bootstrap a cold Q330 into an IDA compliant configuration
+
+set myname = qconfig
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "${myname}: missing $setup"
+    goto failure
+endif
+source $setup
+
+printenv | grep "Q330_CONSOLE=" >& /dev/null
+if ($status == 0) then
+    set SerialPort = $Q330_CONSOLE
+else
+    echo "Q330_CONSOLE environment variable is undefined."
+    goto failure
+endif
+
+# Command line setup
+
+set ate = 0
+while ($#argv)
+    if ($argv[1] == "ate") then
+        set ate = 1
+    else if ($argv[1] == "tst") then
+        set ate = 1
+    else
+        echo "unrecognized argument '$argv[1]'"
+        goto usage
+    endif
+    shift
+end
+
+# Get the full path names of the XML files
+
+set XmlDir = $NRTS_HOME/etc/xml
+if (! -d $XmlDir) then
+    echo "ERROR: missing $XmlDir"
+    goto failure
+endif
+
+set xml00 = $XmlDir/default00.xml
+set xml10 = $XmlDir/default10.xml
+set tst00 = $XmlDir/tst00.xml
+set auth = $NRTS_HOME/etc/q330/auth
+
+if ($ate) then
+    set list = "$tst00 $auth"
+else
+    set list = "$xml00 $xml10 $auth"
+endif
+
+@ error = 0
+foreach file ($list)
+    if (! -e $file) then
+        echo "ERROR: missing $file"
+        @ error++
+    endif
+end
+if ($error) goto failure
+
+if ($ate) goto ATE
+
+# Collect the information
+
+Begin:
+    echo -n "Station name:  "
+    set sta = $<
+    if ($sta == q || $sta == quit) goto PrematureExit
+    set sta = `echo $sta | ucase`
+
+Loc:
+    echo -n "Location code: "
+    set loc = $<
+    if ($loc == q || $loc == quit) goto PrematureExit
+    if ($loc == 00) then
+        set xml = $xml00
+    else if ($loc == 10) then
+        set xml = $xml10
+    else
+        echo "Location code must be either 00 or 10.  Try again."
+        goto Loc
+    endif
+
+SensorA:
+    echo -n "Sensor A:      "
+    set sensorA = $<
+    if ($sensorA == q || $sensorA == quit) goto PrematureExit
+
+SensorB:
+    echo -n "Sensor B:      "
+    set sensorB = $<
+    if ($sensorB == q || $sensorB == quit) goto PrematureExit
+    
+IP:
+    echo -n "IP address:    "
+    set ip = $<
+
+# Configure
+
+set command = "q330 $SerialPort config sta=$sta ip=$ip a=$sensorA b=$sensorB $xml"
+echo ""
+echo "Press enter to invoke command, q to quit:"
+echo ""
+echo -n "$command "
+set answer = $<
+if ($answer == q || $answer == quit) goto PrematureExit
+$command
+
+if ($status != 0) goto failure
+
+# Save to EEPROM
+
+echo "Saving configuration to EEPROM"
+sleep 10
+q330 $SerialPort save >& /dev/null
+if ($status != 0) goto failure
+
+NormalExit:
+echo "Configuration complete."
+exit 0
+
+PrematureExit:
+echo "No changes made to digitizer configuration."
+exit 0
+
+failure:
+echo "command failed"
+exit 1
+
+usage:
+echo "usage: ${myname} [ ate ]"
+exit 1
+
+ATE:
+set history = /usr/nrts/etc/DigitizerHistory
+chmod 644 $auth
+
+if (! -e $history) touch $history
+
+nrts stop
+sleep 3
+set idstring = `q330 $SerialPort id`
+if ($status != 0) then
+    echo "Unable to query $SerialPort for digitizer serial number"
+    goto failure
+endif
+
+echo `/bin/date +%Y:%j-%H:%M:%S` $idstring >> $history
+if ($status != 0) then
+    echo "ERROR: unable to update $history file!"
+    exit 1
+endif
+
+set tagno    = $idstring[2]
+set serialno = $idstring[3]
+set command = "q330 set tst00 $tagno $serialno"
+#echo $command
+$command
+if ($status != 0) then
+    echo "ERROR: unable to update Q330 config file!"
+    exit 1
+endif
+
+set sta     = tst
+set ip      = 172.16.4.10
+set sensorA = none
+set sensorB = none
+set xml     = $tst00
+q330 $SerialPort config sta=$sta ip=$ip a=$sensorA b=$sensorB $xml
+chmod 444 $auth
+
+echo "Saving configuration to EEPROM and rebooting"
+sleep 10
+q330 $SerialPort save boot >& /dev/null
+if ($status != 0) goto failure
+
+nrts start
+
+exit 0
+
+# Revision History
+#
+# $Log: qconfig,v $
+# Revision 1.12  2015/12/10 00:00:16  dechavez
+# undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
+# (didn't work in cron, duh)
+#
+# Revision 1.11  2015/12/07 22:18:43  dechavez
+# don't assume user nrts (use NRTS_HOME environment varible instead)
+#
+# Revision 1.10  2012/08/31 18:19:48  dechavez
+# went back to saving configuration "manually" in a second invocation of q330
+# rather than relying on the -save option which is prone to occasional
+# "memory operation in progress" errors which confuse the troops.
+#
+# Revision 1.9  2012/08/24 22:01:34  dechavez
+# added -save (-save -boot for ATE) to q330 command (to eliminate confusing warning)
+#
+# Revision 1.8  2012/08/22 17:56:36  dechavez
+# save config after general config (non-ATE)
+#
+# Revision 1.7  2012/08/22 17:48:32  dechavez
+# fixed auth permission problem, added save boot after ATE config
+#
+# Revision 1.4  2011/02/08 20:13:35  dechavez
+# added ate option
+#
+# Revision 1.3  2011/02/04 22:47:34  dechavez
+# shorten serial port environment variable to Q330_CONSOLE (solaris complained)
+#
+# Revision 1.2  2011/02/04 20:05:08  dechavez
+# initial production release
+#

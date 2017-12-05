@@ -1,0 +1,140 @@
+#!/bin/csh -f
+# $Id: runthumb,v 1.2 2010/08/26 16:03:34 dechavez Exp $
+#
+# Wrapper for invoking 'autorun' scripts.
+#
+# Autorun scripts should be packaged as gzip compressed tar files with the
+# name 'autorun.tgz'.  This tarball at a minimum should contain an executable
+# file with the name 'autoproc'.  The tarball will be unpacked into an empty
+# directory and 'autoproc' will be invoked from within that directory.  At
+# the end, all contents of the directory (which will include the original
+# contents of autorun.tgz) will be written to a compressed tar file autoOUT.tgz
+# on the same device as autorun.tgz.  So, the 'autoproc' script (or program)
+# can write to files in the local directory.  All standard out from 'autoproc'
+# will be sent to the operator console and not saved.
+
+set DefaultRoot = /usb/0
+set package     = autorun.tgz
+set script      = autoproc
+set remarks     = remarks
+set tmp         = /tmp/autorun.$$
+set startdir    = `pwd`
+
+set root = $DefaultRoot
+if ($#argv == 1) set root = $argv
+set results = $root/autoOUT.tgz
+
+# Mount the device
+
+echo -n "Insert thumdrive and press enter when ready (or quit to abort) "
+set answer = $<
+if ($answer == q || $answer == quit) exit 0
+sudo umount $root >& /dev/null
+sudo mount $root >& /dev/null
+set exitstatus = $status
+if ($exitstatus != 0) then
+    echo " *** Unable to mount thumbdrive as $root ***"
+    exit 1
+endif
+
+# We absolutely MUST be able to create/update the auto results file
+
+if (-e $results) then
+    echo "WARNING - output from this procedure will be written to $results,"
+    echo "          however there already exists a file by that name."
+    echo ""
+DeleteResults:
+    echo -n "OK to delete the pre-existing $results and continue? "
+    set ans = $<
+    if ($ans == y || $ans == yes) then
+        rm -f $results
+        if ($status != 0) then
+            echo "ERROR: can't remove $results"
+            goto failure
+        endif
+    else if ($ans == n || $ans == no) then
+        echo "Aborting autorun."
+        goto unmount
+    else
+        echo "Please answer yes or no."
+        goto DeleteResults
+    endif
+endif
+
+cd $root
+if ($status != 0) then
+    echo "ERROR - Can't chdir to $root"
+    goto failure
+endif
+
+if (! -e $package) then
+    echo "ERROR - missing $root/$package"
+    goto failure
+endif
+
+if (-e $tmp) then
+    echo "ERROR - $tmp already exists!"
+    goto failure
+endif
+
+mkdir $tmp
+if ($status != 0) then
+    echo "ERROR - can't create $tmp directory!"
+    goto failure
+endif
+
+cd $tmp
+if ($status != 0) then
+    echo "ERROR - can't chdir to $tmp directory!"
+    goto failure
+endif
+
+gzcat $root/$package | tar xfp - >& /dev/null
+if ($status != 0) then
+    echo "ERROR - can't unpack $root/$package"
+    goto failure
+endif
+
+if (! -e $script) then
+    echo "ERROR - $root/$package is missing $script"
+    goto failure
+endif
+
+./$script $root
+set exitstatus = $status
+if (-e $remarks.$exitstatus) then
+    cat $remarks.$exitstatus
+else if (-e $remarks) then
+    cat $remarks
+endif
+
+tar cf - . | gzip -c > $results
+cd $startdir
+rm -rf $tmp
+
+unmount:
+sync
+sleep 2
+sudo umount $root
+if ($status != 0) then
+    echo "ERROR - unable to un-mount $root"
+    goto failure
+endif
+
+echo "Procedure is complete, you may remove the thumbdrive."
+exit 0
+
+failure:
+cd /
+sudo umount $root >& /dev/null
+echo "Procedure has FAILED.  Please note any error messages and report them to IDA."
+
+# Revision History
+#
+# $Log: runthumb,v $
+# Revision 1.2  2010/08/26 16:03:34  dechavez
+# print exit messages, if available
+#
+# Revision 1.1  2010/08/23 16:48:22  dechavez
+# initial release
+#

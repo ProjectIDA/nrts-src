@@ -1,0 +1,102 @@
+#!/bin/csh -f
+# $Id: setsta,v 1.1 2012/09/19 20:08:04 dechavez Exp $
+# Convert an ABC configured computer to an XYZ specific station
+
+set path = (/usr/ucb /usr/bin $path)
+set myname = setsta
+
+set iam = `whoami`
+if ($status != 0) then
+    echo "FATAL ERROR: whoami not working"
+    exit 1
+endif
+if ($iam != root) then
+    echo "Must be run as root (or with sudo)."
+    exit 1
+endif
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    echo "${myname}: $message"
+    goto Failure
+endif
+source $setup
+
+if ($#argv != 2) then
+    echo "usage: $myname oldsta newsta"
+    exit 1
+endif
+
+set old = `echo $argv[1] | lcase`
+set OLD = `echo $old | ucase`
+set new = `echo $argv[2] | lcase`
+set NEW = `echo $new | ucase`
+
+cd /usr/nrts
+if ($status != 0) then
+    echo "ERROR: can't chdir /usr/nrts"
+    goto Failure
+endif
+
+set failed = 0
+foreach dir ($old ${old}330)
+    if  (! -d $dir) then
+        echo "ERROR: missing $dir"
+        set failed = 1
+    endif
+end
+
+# rename the directories
+
+if ($failed) goto Failure
+mv $old $new
+if ($status != 0) goto Failure
+mv ${old}330 ${new}330
+if ($status != 0) goto Failure
+
+set rc      = /etc/rc.conf
+set hosts   = /etc/hosts
+set motd    = /etc/motd
+set cnf     = /usr/nrts/$new/cnf
+set cfg     = /usr/nrts/etc/q330.cfg
+set systems = /usr/nrts/etc/Systems
+set boot    = /usr/nrts/etc/start/boot
+
+foreach file ($cnf $systems $boot)
+    if  (! -e $file) then
+        echo "ERROR: missing $file"
+        set failed = 1
+    endif
+end
+
+if ($failed) goto Failure
+
+# edit the config files
+
+foreach file ($rc $hosts $motd $cnf $cfg $systems $boot)
+    echo "updating $file"
+    set tmp = ${file}.${old}
+    rm -f $tmp
+    mv $file $tmp
+    cat $tmp | sed -e "s/$old/$new/g" | sed -e "s/$OLD/$NEW/g" > $file
+end
+
+foreach file ($cnf $cfg $systems $boot)
+    chown nrts:nrts $file
+end
+
+Success:
+echo "update complete"
+exit 0
+
+Failure:
+echo "update failed"
+exit 1
+
+# $Log: setsta,v $
+# Revision 1.1  2012/09/19 20:08:04  dechavez
+# created
+#

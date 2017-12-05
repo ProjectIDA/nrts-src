@@ -1,0 +1,89 @@
+#!/bin/csh -f
+#
+# $Id: UpdateCnf,v 1.1 2017/08/12 16:45:59 dauerbach Exp $
+
+# =================================================================================
+# Rebuild the NRTS disk loop with a new cnf file named ~nrts/${DefaultSite}/cnf.NEW
+# =================================================================================
+
+set myname = "UpdateCnf"
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+source $setup
+
+set newcnffile = "cnf.NEW"
+
+if (-f /usr/nrts/$DefaultSite/$newcnffile) then
+else 
+    echo "${myname}: cnf file /usr/nrts/${DefaultSite}/${newcnffile} not found"
+    goto Failure
+endif
+
+set command = "nrts stop"
+$command >& /dev/null
+#if ($status != 0) then
+#	echo "${myname}: Error executing ${command}"
+#	goto Failure
+#endif
+
+cd ~nrts/${DefaultSite}
+
+set command = "rm -rf bwd cal dat hdr log sys tee"
+$command >& /dev/null
+if ($status != 0) then
+    echo "${myname}: Error removing existing NRTS disk loop files: ${command}"
+    goto Failure
+endif
+
+set aboutnow = `date "+%Y-%m-%d:%H:%M:%S"`
+set command = "mv cnf cnf.orig.${aboutnow}"
+$command >& /dev/null
+if ($status != 0) then
+    echo "${myname}: Error saving existing cnf file: ${command}"
+    goto Failure
+endif
+
+set command = "cp ~nrts/${DefaultSite}/${newcnffile} cnf"
+$command >& /dev/null
+if ($status != 0) then
+    echo "${myname}: Error copying new cnf file: ${command}"
+    goto Failure
+endif
+
+set command = "chmod 644 cnf"
+$command >& /dev/null
+if ($status != 0) then
+    echo "${myname}: Warning: could not set cnf file permissions: ${command}"
+endif
+
+set command = "nrts_mkdl ${DefaultSite}"
+$command >& /dev/null
+if ($status != 0) then
+    echo "${myname}: Error generating new NRTS disk loop: ${command}"
+    goto Failure
+endif
+
+set command = "nrts start"
+$command >& /dev/null
+if ($status != 0) then
+    echo "${myname}: Error executing ${command}"
+    goto Failure
+endif
+
+
+Failure:
+exit 1
+
+# $Log: UpdateCnf,v $
+# Revision 1.1  2017/08/12 16:45:59  dauerbach
+# Initial commit. Replace current cnf file with cnf.NEW in  dir and rebuild nrs disk loop
+#
+#

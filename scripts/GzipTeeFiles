@@ -1,0 +1,132 @@
+#!/bin/csh -f
+# $Id: GzipTeeFiles,v 1.4 2013/10/21 21:34:08 dechavez Exp $"
+#
+# gzip compress all but the most recent tee files in the named directory
+
+set myname = GzipTeeFiles
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+source $setup
+
+# Check for debug flag
+
+if (-e $DebugDir/$myname) then
+    set debug = 1
+else
+    set debug = 0
+endif
+
+if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+
+# Command line setup
+
+set error = 0
+if ($#argv == 1) then
+    set TeeDir = $argv[1]
+else
+    set error = 1
+endif
+
+if ($error) then
+    set message = "bad command line, error $error"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    echo "usage: $myname teedir"
+    goto failure
+endif
+
+# Get the full path names
+
+set StopFlag = $TeeDir/STOP
+set LockFile = $TeeDir/lock
+
+# Nothing to do if there isn't a tee directory
+
+if (! -d $TeeDir) then
+    if ($debug) logger -t $myname"[$$]" -p user.info "no such tee dir $TeeDir"
+    goto success
+endif
+
+# Make sure no other instance of this script is running
+
+filelock $LockFile $$
+if ($status != 0) then
+    set active = `cat $LockFile`
+    if ($debug) logger -t $myname"[$$]" -p user.info "$TeeDir locked by process $active"
+    goto success
+endif
+
+# Nothing to do if the STOP flag is set in the tee directory
+
+if (-e $StopFlag) then
+    if ($debug) logger -t $myname"[$$]" -p user.info "quit: $TeeDir STOP flag set"
+    goto success
+endif
+
+# Get a list of all but the most recent uncompressed tee files
+
+cd $TeeDir
+set tmp = /tmp/$myname.$$
+/bin/ls [4-9]??????????????????????? >& $tmp
+if ($status != 0) then
+    rm $tmp
+    if ($debug) logger -t $myname"[$$]" -p user.info "no uncompressed files found in $TeeDir"
+    goto success
+endif
+
+set NumFiles = `cat $tmp | wc -l`
+if ($NumFiles <= 1) then
+    rm $tmp
+    if ($debug) logger -t $myname"[$$]" -p user.info "no uncompressed files found in $TeeDir"
+    goto success
+endif
+
+@ NumFiles -= 1
+set UncompressedFileList = `head -$NumFiles $tmp`
+rm $tmp
+
+# Compress each file in the list
+
+@ count = 0
+if ($debug) logger -t $myname"[$$]" -p user.info "compressing files in $TeeDir"
+if ($status == 0) then
+    foreach file ($UncompressedFileList)
+        set output = $file.gz
+        rm -f $output
+        set command = "gzip $file"
+        if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+        $command
+        if (-e $file && -e $output) then
+            logger -t $myname"[$$]" -p user.info "$command failed"
+            rm -f $output
+            goto failure
+        endif
+        @ count++
+    end
+endif
+if ($debug) logger -t $myname"[$$]" -p user.info "$count files compressed in $TeeDir"
+
+# Normal exit
+
+success:
+if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+exit 0
+
+failure:
+logger -t $myname"[$$]" -p user.info "exit 1"
+exit 1
+
+# Revision History
+#
+# $Log: GzipTeeFiles,v $
+# Revision 1.4  2013/10/21 21:34:08  dechavez
+# initial production release
+#

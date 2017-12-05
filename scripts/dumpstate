@@ -1,0 +1,80 @@
+#!/bin/csh -f
+# $Id: dumpstate,v 1.5 2012/03/30 10:37:10 dechavez Exp $
+#
+# Generate a system status report on a thumdrive
+#
+# The intent is that the operator can take the thumbdrive to their PC
+# and then email the dumpstate.txt output file back to IDA for analysis.
+
+set DefaultRoot = /usb/0
+set output      = `hostname`.txt
+
+set root = $DefaultRoot
+if ($#argv == 1) set root = $argv
+
+# Mount the device
+
+echo -n "Insert thumdrive and press enter when ready (or quit to abort) "
+set answer = $<
+if ($answer == q || $answer == quit) exit 0
+sudo umount $root >& /dev/null
+sudo mount $root >& /dev/null
+set exitstatus = $status
+if ($exitstatus != 0) then
+    echo " *** Unable to mount thumbdrive as $root ***"
+    exit 1
+endif
+
+# Create output file
+
+set log = $root/$output
+rm -f $log
+touch $log
+if ($status != 0) then
+    echo "Oh, oh.  Unable to create $log"
+    goto failure
+endif
+
+# Generate the report
+
+echo -n "Generating status report (should take about 1 minute to complete)..."
+reportstate >>& $log
+echo "done"
+
+echo "unmounting thumdrive"
+sync
+sleep 2
+sudo umount $root
+if ($status != 0) then
+    echo "ERROR - unable to un-mount $root"
+    goto failure
+endif
+
+echo "Procedure is complete, with results in $output."
+echo "You may remove the thumbdrive."
+exit 0
+
+failure:
+cd /
+sudo umount $root >& /dev/null
+echo "Procedure has FAILED.  Please note any error messages and report them to IDA."
+echo "You may remove the thumbdrive."
+
+# Revision History
+#
+# $Log: dumpstate,v $
+# Revision 1.5  2012/03/30 10:37:10  dechavez
+# change name of log file to `hostname`.txt, print warning about test duration
+#
+# Revision 1.4  2010/08/23 16:16:07  dechavez
+# use 'reportstate' to generate content
+#
+# Revision 1.3  2010/08/23 15:40:51  dechavez
+# prompt to insert thumbdrive
+#
+# Revision 1.2  2010/08/20 23:46:19  dechavez
+# added list of all iso directory contents
+#
+# Revision 1.1  2010/08/20 23:41:14  dechavez
+# initial release
+#

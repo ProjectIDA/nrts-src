@@ -1,0 +1,113 @@
+#!/bin/csh -f
+# $Id: reportstate,v 1.4 2013/04/04 19:14:49 dechavez Exp $
+#
+# Generate a system status report to standard output
+
+date
+uname -a
+echo ""
+
+echo "/etc/rc.conf"
+echo "------------"
+cat /etc/rc.conf
+echo ""
+
+echo "ifconfig -a"
+echo "-----------"
+ifconfig -a
+echo ""
+
+echo "netstat -rn"
+echo "-----------"
+netstat -rn
+echo ""
+
+echo "netstat -an"
+echo "-----------"
+netstat -an
+echo ""
+
+echo "/etc/hosts"
+echo "----------"
+cat /etc/hosts
+echo ""
+
+set dhcpd_conf = "/usr/nrts/etc/dhcpd.conf"
+if (-e $dhcpd_conf) then
+    echo $dhcpd_conf
+    echo "------------------------"
+    cat $dhcpd_conf
+else
+    echo "$dhcpd_conf does not exist"
+endif
+echo ""
+
+foreach host (gateway primary secondary ups q330-00 q330-10)
+    echo "ping test: $host"
+    echo "---------"
+    ping -c 10 $host
+    echo ""
+end
+
+echo "arp -a"
+echo "------"
+arp -a
+echo ""
+
+echo "crontab"
+echo "-------"
+crontab -l
+echo ""
+
+echo "isildl"
+echo "------"
+isildl
+echo ""
+
+echo "ps -ax"
+echo "------"
+ps -ax
+echo ""
+
+foreach tee (/usr/nrts/*/tee)
+    echo -n "${tee}: "
+    @ nfiles = `ls $tee | wc -l`
+    echo "$nfiles files"
+end
+echo ""
+
+echo "isiReportIsoStats"
+echo "-----------------"
+isiReportIsoStats
+echo ""
+
+echo "/usr/nrts/*/iso"
+echo "---------------"
+ls /usr/nrts/*/iso
+echo ""
+
+echo "/usr/nrts/*/iso/config"
+echo "----------------------"
+cat /usr/nrts/*/iso/config
+echo ""
+
+echo "df -h"
+echo "-----"
+df -h
+
+# Revision History
+#
+# $Log: reportstate,v $
+# Revision 1.4  2013/04/04 19:14:49  dechavez
+# include /etc/hosts and /usr/nrts/etc/dhcp.conf in report
+#
+# Revision 1.3  2012/03/30 10:18:08  dechavez
+# replaced broadcast ping to ping test of selected destinations
+#
+# Revision 1.2  2011/01/10 19:14:40  dechavez
+# ping all broadcast IPs (and fixed a bug where ping test failed if there were
+# mutiple IP's on et0)
+#
+# Revision 1.1  2010/08/23 16:15:35  dechavez
+# initial release
+#

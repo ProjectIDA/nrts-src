@@ -1,0 +1,20 @@
+#!/bin/csh -f
+# $Id: tsum,v 1.2 2015/06/26 18:07:31 dechavez Exp $
+
+if ($#argv == 0) then
+    ida10 -v | awk '{print $4,$9}' | sort | uniq
+else
+    cat $argv | ida10 -v | awk '{print $4,$9}' | sort | uniq
+endif
+
+exit $status
+
+# Revision History
+#
+# $Log: tsum,v $
+# Revision 1.2  2015/06/26 18:07:31  dechavez
+# made compatible with ida10 1.12.6 output
+#
+# Revision 1.1  2012/08/14 19:48:33  dechavez
+# created
+#

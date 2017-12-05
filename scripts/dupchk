@@ -1,0 +1,59 @@
+#!/bin/tcsh -f
+# $Id: dupchk,v 1.2 2014/11/24 23:23:15 dechavez Exp $
+#
+# Files are acquired from telemetry are named with file extension .gz while files copied
+# from ISO images sent from stations are named with .GZ.  In general GZ files are complete
+# and gz files may not.
+#
+# dupchk.scr is to move gz files to a subdirectory PreviousVersion when the correspond
+# GZ files are available
+#
+
+set myname = dupchk
+
+if ($#argv != 1) then
+    echo ""
+    echo "usage: $myname A_file_with_full_path_in_/ida/archive/raw/[sta]/[year]/[day]"
+    echo "example: $myname /ida/archive/raw/ale/2014/143/537FCD8D0000000000000000.GZ"
+    echo "example: $myname /ida/archive/raw/lvz/2014/234/53c4b232000000000024c228.gz"
+    exit 1
+endif
+
+set fname = `basename $1`
+set dname = `dirname $1`
+set lname = `echo $fname | lcase`    # lower case, gz
+set UNAME = `echo $fname | ucase`    # upper case, GZ
+
+# Do nothing, if fname is a gz file
+
+if ($fname == $lname) exit 0
+
+# If fname is UNAME, move its corresponding lname to a sub directory, PreviousVersion
+
+if ($fname == $UNAME) then
+    if (-f $dname/$lname) then
+        set PVdir = $dname/PreviousVersion
+        if (! -d $PVdir) mkdir -p $PVdir
+        if ($status != 0) then
+            logger -t $myname"[$$]" -p user.info "FAILED: mkdir -p $PVdir"
+            exit 1
+        endif
+        mv $dname/$lname $PVdir
+        if ($status != 0) then
+            logger -t $myname"[$$]" -p user.info "Error in moving $dname/$lname to $PVdir"
+            exit 2
+        endif
+    endif
+endif
+
+exit 0
+
+# Revision History
+#
+# $Log: dupchk,v $
+# Revision 1.2  2014/11/24 23:23:15  dechavez
+# cleaned up error logging
+#
+# Revision 1.1  2014/11/24 23:05:42  dechavez
+# initial version (Jui-Yuan)
+#

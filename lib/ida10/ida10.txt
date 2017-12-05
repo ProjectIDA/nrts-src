@@ -1,0 +1,809 @@
+$Id: ida10.txt,v 1.2 2017/10/19 23:49:58 dauerbach Exp $
+
+                      IDA REV 10 DATA PACKET FORMAT
+                      Last modified: September 19, 2013
+
+The description below refers to the following data types:
+
+UINT16  - unsigned 16-bit integer    <NETWORK BYTE ORDER>
+INT16   - signed 16-bit integer      <NETWORK BYTE ORDER>
+UINT32  - unsigned 32-bit integer    <NETWORK BYTE ORDER>
+UINT64  - unsigned 32-bit integer    <NETWORK BYTE ORDER>
+REAL32  - IEEE 32-bit floating point <NETWORK BYTE ORDER> (cast to UINT32)
+REAL64  - IEEE 64-bit floating point <NETWORK BYTE ORDER> (cast to UINT64)
+UINT8   - unsigned 8-bit integer
+BYTE    - an 8-bit quantity
+CHAR    - ascii character
+
+TIMETAG - 22 byte time tag specific to the SAIC SAN20xx digitizer (aka MK8)
+OFISTAG - 22 byte time tag specific to the IGPP femtometer
+Q330TAG - 24 byte time tag specific to the Quanterra Q330 digitizer
+GENTAG  - 10 byte general purpose time tag
+OBSTAG  - 34 byte time tag specific to ADDOSS OBS digitizer
+
+=======
+TIMETAG
+=======
+The TIMETAG is the SAN20xx raw time tag, with the following structure:
+
+Offset  Length   Type       Description
+  0       4      UINT32     external time (GPS seconds since 1/1/1999)
+  4       4      UINT32     system time, secs
+  8       2      UINT16     system time, msc
+ 10       2      UINT16     clock status
+ 12       2      UINT16     PLL
+ 14       2      UINT16     phase
+ 16       4      UINT32     epoch time, secs
+ 20       2      UINT16     epoch time, msc
+
+External time
+-------------
+The number of seconds since 1/1/1999, as read from the clock when the
+system time mscs was zero.  Note that this value could be INCORRECT.
+Refer to the clock status bytes in order to evaluate the reliability of
+this field.
+
+System time
+-----------
+This is a 6 byte quantity, containing 4 bytes of seconds and two bytes
+of milliseconds and representing elapsed time from an _arbitrary_ zero
+time.  The absolute value of system time is completely irrelevant.  It
+is set to zero in the factory and increments with time.  It is
+preserved across reboots and is only reset upon command or MBX adaptor
+board battery backup failure.
+
+Clock status
+------------
+This is a 16 bit (network byte order) bit mask that describes the
+SAN external time status:
+
+   bit 0 is the 1pps flag:             0 = external 1pps NOT present
+                                       1 = external 1pps present
+   bit 1 is the PLL status:            0 = PLL NOT enabled
+                                       1 = PLL enabled
+   bit 2 is the time available flag:   0 = external time NOT available
+                                       1 = external time available
+   bit 3 is the # of SV's:             0 = lt than 4 SV's (ie, unlocked)
+                                       1 = ge 4 SV's (ie, locked)
+   bit 4 is the clock state:           0 = valid time string has been seen
+                                       1 = valid time string NOT yet seen
+   bit 5 is the RTC sync flag:         0 = RTC counter synced to 1pps
+                                       1 = RTC counter NOT synced to 1pps
+   bits 6 & 7 are clock type:          0 = NMEA clock
+                                       1 = TSIP clock
+                                       2 = reserved
+                                       3 = reserved
+
+   bit 8 is bogus time flag:           0 = time is not suspect
+                                       1 = suspect GPS time is invalid
+
+   bits  9-15 are receiver specific status
+
+PLL
+---
+Current input to the PLL.
+
+Phase
+-----
+The difference between the 1Hz and GPS 1pps in units of 1000/51200 seconds.
+If this number is less than 25600 then it is a positive difference, otherwise
+it is a negative difference.
+
+Epoch time
+----------
+This is the SAN20xx's best GUESS at the "true" external time associated
+with the system time.  If the status indicates that the clock is locked
+and working, then it is in fact the true external time.  However, if the
+GPS time is unavailable, or suspect, then the SAN20xx attempts to
+infer true epoch time by consulting time history information stored in 
+NVRAM.  If such time history is unavailable, then the epoch time field
+will be zero.
+
+=======
+OFISTAG
+=======
+The OPFISTAG is the IGPP femtometer raw time tag, with the following
+structure:
+
+Offset  Length   Type       Description
+  0       4      UINT32     External time (GPS seconds since 1/1/1999)
+  4       8      UINT64     System time, ticks (10 usec)
+ 12       8      UINT64     PPS time, ticks (10 usec)
+ 20       2      UINT16     Clock status
+
+External time
+-------------
+The number of seconds since 1/1/1999, as read from the clock.  Note
+that this value could be INCORRECT.  Refer to the clock status bytes
+in order to evaluate the reliability of this field.
+
+System time
+-----------
+The time of the sample or event being measured, in units of 10 usec
+tics from some arbitrary zero time.
+
+PPS time
+--------
+The system time when the GPS clock was measured.  The difference
+between PPS time and External time may be used to convert the System
+time to "true" time (assuming the clock status allows this).
+
+Clock status
+------------
+This is a 16 bit (network byte order) bit mask that describes the
+femtometer external time status:
+
+   bit 0 is the 1pps flag:             0 = external 1pps NOT present
+                                       1 = external 1pps present
+   bit 1 is the time available flag:   0 = external time NOT available
+                                       1 = external time available
+   bit 2 is the clock state:           0 = valid time string has been seen
+                                       1 = valid time string NOT yet seen
+   bit 3 is bogus time flag:           0 = time is not suspect
+                                       1 = suspect GPS time is invalid
+   bits 4-7 are receiver specific status
+   bit 8 is the # of SV's:             0 = lt than 4 SV's (ie, unlocked)
+                                       1 = ge 4 SV's (ie, locked)
+   bit 9 is the leap second flag:      0 = leap second NOT in progress
+                                       1 = leap second in progress
+   bits 10-15 are reserved
+
+=======
+Q330TAG
+=======
+The Q330TAG is the Q330 raw time tag, with the following structure:
+
+Offset  Length   Type       Description
+  0       4      UINT32     data record sequence number
+  4       4       INT32     seconds offset
+  8       4       INT32     microseconds offset
+ 12       4      UINT32     nanosecond index offset
+ 16       4       INT32     filter delay in microsecods
+ 20       2      UINT16     lock time
+ 22       1      UINT8      clock quality bitmap
+ 23       1      UINT8      clock quality percentage
+
+data record sequence number
+---------------------------
+Each DT_DATA packet from the Q330 includes a 32 bit data record sequence
+number.  This number, and the offsets and delay that follow are combined
+together to get the "root" time as absolute time as seconds since
+Jan 1, 2000.
+
+seconds offset
+--------------
+The seconds offset from the 0x98 blockette at the start of the current one
+second's worth of data.
+
+microseconds offset
+-------------------
+The micro seconds offset from the 0x98 blockette at the start of the current
+one second's worth of data.
+
+nanosecond index offset
+-----------------------
+The root time tag is obtained from the sum of the above 3 parameters.  The
+root time tag minus the filter delay is the time of the first sample in the
+QDP packet that contains these data. However, the QDP packet boundaries are
+in general unrelated to the IDA10 packet boundaries.  The index offset is
+the time in nanoseconds from the start of the QDP packet to the first sample
+in the IDA10 packet.  When the QDP packet and IDA10 packet start with the
+same sample, then the index offset will be zero.  In all other cases the
+index offset will be the sample index times the sample interval.
+
+filter delay
+------------
+The correction factor, in microseconds, that needs to be subtracted from
+the root time tag in order to take into account digitizer filter delays.
+This can be either a positive or negative quantity.
+
+lock time
+---------
+Minutes since the clock has been unlocked.  This is taken from the most
+recent DT_DATA packet which contains the 0x98 blockette with the offsets. 
+The Quanterra documentation refers to this parameter as the "loss" (as well
+as incorrectly describing it as minutes since the clock has been locked).
+
+clock quality bitmap
+--------------------
+This is taken from the most recent DT_DATA packet that contains the 0x98
+blockette with the offsets, and is a bitmap describing the clock status:
+
+   bit 0 is the PLL status:            0 = PLL NOT enabled
+                                       1 = clock has been locked
+   bit 1 is 2D lock flag:              1 = 2D lock
+   bit 2 is 3D lock flag:              1 = 3D lock
+   bit 3 is 1D lock flag:              1 = No fix, but time should be good
+   bit 4 is the filtering flag         1 = filtering in progess
+   bit 5 is the startup flag           1 = speculative 1-D startup
+   bit 6 is the PLL hold flag          1 = PLL hold
+   bit 7 is the PLL track flag         1 = PLL tracked
+
+clock quality percentage
+------------------------
+Pages 18-19 of the Quanterra DP Writer's Guide Rev 4 explain exactly how to
+take the "DP clock token" data, lock time, and clock quality values and produce
+the "vendor approved" estimate of time quality as a percentage.  This is the
+result of that calculation.
+
+======
+GENTAG
+======
+The GENTAG is a general purpose time tag, useful for converting data from 
+other formats which lack the foresight of decoupling GPS and system time
+(MiniSEED, for example)
+
+Offset  Length   Type       Description
+  0       8      UINT64     nanoseconds since Jan 1, 1999
+  8       1       UINT8     receiver specific clock status
+  9       1       UINT8     device independent clock status (bitmap)
+
+The first field is simply the single native time stamp converted to the
+internal IDA10 format of nanoseconds since 00:00 1/1/1999.  The second field
+is simply the clock status byte, if any, that the input system provided.  It
+is kept here for posterity, but is ignored by all IDA10 processing code.  The
+converting application should fill in the third field with the following:
+
+    bit 0 is the lock status:      1 = locked, else unlocked
+    bit 1 is the suspicious bit    1 = time MIGHT be bogus
+    bit 2 is the derived bit       1 = time was derived (say from previous packet)
+    bits 3-7 are reserved and should be set to zero
+
+======
+SBDHDR
+======
+The SBDHDR contains excerpts of the SBD header used to deliver ADDOSS frames
+
+Offset  Length   Type       Description
+  0        8     UINT64     equipment identifier (IMEI)
+  8        2     UINT16     message sequence number (MOMSN)
+ 10        4     UINT32     message time stamp
+
+======
+OBSTAG
+======
+The OBSTAG is the original OBS digitizer raw time tag, with the following structure:
+
+Offset  Length   Type       Description
+  0       8      UINT64     timestamp
+  8       8      UINT64     reference time
+ 16       4      UINT32     tic rate
+ 20      14      SBDHDR     SBD header
+
+timestamp
+---------
+This is the time of first sample in tics.
+
+reference time
+--------------
+Nanoseconds since Jan 1, 1999
+
+tic rate
+--------
+Tics per second
+
+SBD header
+----------
+Header info associated with the SBD frame that delivered these data.  Note
+that a single SBD message can contain multiple OBS frames.
+
+=======
+OBS2TAG
+=======
+The OBS2TAG is the current OBS digitizer raw time tag.  It is like the OBSTAG above
+except the reference time is in seconds and the filter delay is included.
+
+Offset  Length   Type       Description
+  0       8      UINT64     timestamp
+  8       4      UINT32     reference time
+ 12       4      INT32      filter delay
+ 16       4      UINT32     tic rate
+ 20      14      SBDHDR     SBD header
+
+timestamp
+---------
+This is the time of first sample in tics.
+
+reference time
+--------------
+Seconds since Jan 1, 1999
+
+filter delay
+------------
+Filter delay in microseconds
+
+tic rate
+--------
+Tics per second
+
+SBD header
+----------
+Header info associated with the SBD frame that delivered these data.  Note
+that a single SBD message can contain multiple OBS frames.
+
+===================
+IDA10 COMMON HEADER
+===================
+The first 4 bytes of all IDA10 packets have the same structure:
+
+Offset  Length   Type       Description
+  0       2      BYTE       packet type identifier
+  2       1      UINT8      packet format identifier
+  3       1      UINT8      packet sub-format identifier
+
+packet type identifier
+----------------------
+Data packets   = TS (time series)
+Calib packets  = CA
+Config packets = CF
+Log messages   = LM
+
+packet format identifier
+------------------------
+For IDA rev 10, this will always be 10.
+
+packet sub-format identifier
+----------------------------
+Identifies "minor" changes to the packet layout or content.  For
+example, the TIMETAG described above is very specific to the SAN20xx.
+This is intentional in order to permit engineering analysis of the
+system.  However, it is conceivable that this packet format could be
+used with different systems where this type of time tag does not apply.
+In that case, one could use a different time tag (with length <= the
+SAN20xx tag), and change the subformat to indicate this.
+
+Subformats 10.0 through 10.11 are currently supported, as described below.
+
+=====================
+IDA10.0 COMMON HEADER
+=====================
+All 10.0 packets have a 50 byte common header as follows:
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 0)
+  4       2      UINT16     unit identifier
+  6      22      TIMETAG    packet start time
+ 28      22      TIMETAG    packet end time
+ 
+unit identifier
+---------------
+A number that uniquely indentifies the data logger.  This will come
+from the hardware (box id)
+
+packet start time
+-----------------
+For TS packets, this is the time of the first datum.  For LM packets it
+is the time of the first message.  For CA and CF it is the time the packet
+was created.
+
+packet end time
+---------------
+For TS packets, this is the time of the last datum.  For LM packets it
+is the time of the last message in the packet.  For CA and CF it is the
+same as the start time, and may be ignored.
+
+=====================
+IDA10.1 COMMON HEADER
+=====================
+The IDA 10.1 common header retains the same length as the 10.0 header,
+but the end time is replaced by the number of bytes to follow.  This
+is stored at offset 50, so that the field layout for the packets which
+follow will be identical for both 10.0 and 10.1.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 1)
+  4       2      UINT16     unit identifier
+  6      22      TIMETAG    packet start time
+ 28      20      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+=====================
+IDA10.2 COMMON HEADER
+=====================
+The IDA 10.2 common header is the same as 10.1 with the addition of two
+new fields starting at offset 28.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 2)
+  4       2      UINT16     unit identifier
+  6      22      TIMETAG    packet start time
+ 28       4      UINT32     sequence number
+ 32       4      UINT32     host time stamp
+ 36      12      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+sequence number
+---------------
+This is the low order 32 bits of the ISI disk loop sequence number.
+
+host time stamp
+---------------
+This is the time, expressed as seconds since Jan 1, 1999, when the 
+packet was received at its first hop after leaving the digitizer.  This
+value is the host computer's notion of time and since it is not required
+that the host computer clock be synchronized or disciplined in any way,
+the value should be consided only approximate.
+
+=====================
+IDA10.3 COMMON HEADER
+=====================
+The IDA 10.3 common header is used for femtometer data.  It is identical to
+the 10.2 common header except that the time tag at offset 6 is an OFISTAG and
+the interpretation of the data descriptor bits in the TS packets are
+different.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 3)
+  4       2      UINT16     unit identifier
+  6      22      OFISTAG    packet start time
+ 28       4      UINT32     sequence number
+ 32       4      UINT32     host time stamp
+ 36      12      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+=====================
+IDA10.4 COMMON HEADER
+=====================
+The IDA 10.4 common header is used for Q330 data.  It is similar to 
+10.2 and 10.3 except for the time stamp, and also the unit identifier
+is the much larger 64 bit serial number.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 4)
+  4       8      UINT64     unit identifier
+ 12      24      Q330TAG    packet start time
+ 36       4      UINT32     sequence number
+ 40       4      UINT32     host time stamp
+ 44       2      CHAR       reserved
+ 46       2      CHAR       LCQ src bytes
+ 48       2      UINT16     number of bytes to follow
+
+unit identifier
+---------------
+This is the 8-byte serial number of the Q330 that generated the data.
+
+packet start time
+-----------------
+This is the time of first sample in the packet.  This value is computed
+following the rules described on page 18 of the Q330 DP Writer's Guide
+(basically, the time stamp from the QDP packet with the highest quality
+time is used to derive the time of first sample).
+
+LCQ src bytes
+-------------
+The two source bytes in the QDP logical channel queue.  The first byte is
+the "channel" byte in the DT_DATA packet from the Q330, the second is either
+ther frequency bit for the main 24 bit digitizer or the parameter number
+for other sources.  These are the values that were used to lookup the
+channel name and location code from the DP token set.
+
+=====================
+IDA10.5 COMMON HEADER
+=====================
+The IDA 10.5 common header is used for data converted from other sources.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 5)
+  4       4      CHAR       station code (NULL terminated if less than 4 chars)
+  8       2      CHAR       network code (NULL terminated if less than 2 chars)
+ 10      10      GENTAG     packet start time
+ 20      28      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+=====================
+IDA10.6 COMMON HEADER
+=====================
+The IDA 10.6 common header is used when merging 10.2 data from distinct
+sources into a single ISI disk loop.  It is the same as 10.2 with the
+addition of one new field at offset 36.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 6)
+  4       2      UINT16     unit identifier
+  6      22      TIMETAG    packet start time
+ 28       4      UINT32     sequence number
+ 32       4      UINT32     host time stamp
+ 36       4      UINT32     original sequence number
+ 40       8      UINT8      reserved
+ 48       2      UINT16     number of bytes to follow
+
+original sequence number
+------------------------
+When data from multiple sources are merged into a single ISI loop (via
+the isimerge application) the sequence numbers at offset 28 get reset.  This
+field contains the sequence number that was previously at offset 28.
+
+=====================
+IDA10.7 COMMON HEADER
+=====================
+The IDA 10.7 common header is used when merging 10.3 data from distinct
+sources into a single ISI disk loop.  It is the same as 10.3 with the
+addition of one new field at offset 36.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 7)
+  4       2      UINT16     unit identifier
+  6      22      OFISTAG    packet start time
+ 28       4      UINT32     sequence number
+ 32       4      UINT32     host time stamp
+ 36       4      UINT32     original sequence number
+ 40       8      UINT8      reserved
+ 48       2      UINT16     number of bytes to follow
+
+original sequence number
+------------------------
+When data from multiple sources are merged into a single ISI loop (via
+the isimerge application) the sequence numbers at offset 28 get reset.  This
+field contains the sequence number that was previously at offset 28.
+
+=====================
+IDA10.8 COMMON HEADER
+=====================
+The IDA 10.8 is identical to 10.5 except it includes the sequence number and
+host time stamp which were left out in the original specification due to lack
+of imagination.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 8)
+  4       4      CHAR       station code (NULL terminated if less than 4 chars)
+  8       2      CHAR       network code (NULL terminated if less than 2 chars)
+ 10      10      GENTAG     packet start time
+ 20       4      UINT32     sequence number
+ 24       4      UINT32     host time stamp
+ 28      20      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+=====================
+IDA10.9 COMMON HEADER
+=====================
+IDA 10.9 is reserved.
+
+======================
+IDA10.10 COMMON HEADER
+======================
+The IDA 10.10 common header was used for the first ADDOSS deployment.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 10)
+  4      34      OBSTAG     packet start time
+ 38       4      UINT32     sequence number
+ 42       4      UINT32     host time stamp
+ 46       2      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+======================
+IDA10.11 COMMON HEADER
+======================
+The IDA 10.11 common header is the current ADDOSS conversion format.  It is similar
+to 10.10 but uses the OBS2TAG which includes the filter delay.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 11)
+  4      34      OBS2TAG    packet start time
+ 38       4      UINT32     sequence number
+ 42       4      UINT32     host time stamp
+ 46       2      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+======================
+IDA10.12 COMMON HEADER
+======================
+The IDA 10.12 common header is used to indicate encapsulated MiniSeed.
+The header has the same format as 10.8.
+
+Offset  Length   Type       Description
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 12)
+  4       4      CHAR       station code (NULL terminated if less than 4 chars)
+  8       2      CHAR       network code (NULL terminated if less than 2 chars)
+ 10      10      GENTAG     packet start time
+ 20       4      UINT32     sequence number
+ 24       4      UINT32     host time stamp
+ 28      20      CHAR       reserved
+ 48       2      UINT16     number of bytes to follow
+
+=============================
+IDA10.[0-12] TS PACKET FORMAT
+=============================
+The IDA10.[0-12] TS packet is completely self-contained, and can be unpacked
+without need for external data base references or metaknowledge of any kind.
+
+Offset  Length   Type       Description
+  0      50      CMNHDR     IDA 10.[0-11] common header
+ 50       6      CHAR       stream name
+ 56       1      UINT8      data format/status descriptor
+ 57       1      UINT8      conversion gain
+ 58       2      UINT16     number of samples
+ 60       2      INT16      nominal sample rate factor
+ 62       2      INT16      nominal sample rate multiplier
+ 64   variable   UINT8      the data
+
+stream name
+------------
+The configuration table includes a name to be assigned to the filtered
+and decimated output.  This is that name.  This is intended to eliminate
+the need for a "channel map", as is currently the case.  It incorporates
+both the channel and filter pair which is in the current headers.  The
+channel and filter pair, being redundant, is purposely _not_ given here.
+Up to 6 characters are allowed.  This is enough space to implement the 
+SEED 3+2 (channel id + location id) convention, if desired.
+
+data format/status descriptor
+-----------------------------
+This is a is a bit mask with the following fields:
+
+   bits 0 and 1 define compression:         0 = no compression
+                                            1 = IDA (aka "Fels" compression)
+                                            2 = Steim 1
+                                            3 = Steim 2
+   bits 2 and 3 give digitizer sample size: 0 = 24 bit
+                                            1 = 16 bit
+                                            2 =  8 bit (eg, digitital inputs)
+                                            3 = 32 bit
+   bits 4 and 5 give output sample type:    0 = 32 bit integer
+                                            1 = 16 bit integer
+                                            2 =  8 bit integer
+                                            2 = 64 bit real (10.3 only)
+                                            3 = 32 bit real
+   bit 6 is trigger flag:                   0 = continuous
+                                            1 = triggered
+   bit 7 is a calibration on/off flag       0 = calibration off
+                                            1 = calibration is in progress
+
+conversion gain
+---------------
+This is the factor the raw DSP output was multiplied by before
+converting from float to integer. 
+
+nominal sample rate
+-------------------
+The nominal sample rate is give as a pair of integers, exactly as done
+in SEED:
+
+   Sample rate factor:
+       > 0 - samples/second
+       < 0 - seconds/sample
+
+   Sample rate multiplier:
+       > 0 - multiplication factor
+       < 0 - division factor
+
+Explicitly including the sample rate in the header is intended to reduce
+the need for metaknowledge about the base digitizer sample rate and the
+overall decimation factor of the filters.
+
+The instantaneous actual sample rate could be derived from the start/end
+times and sample count, as is done now.
+
+data
+----
+The data are forced to start at offset 64, since there are some Steim
+decompressors which like to have it that way.  The format permits this
+field to be variable length (actual length depends on data type, number
+of samples, and compression (if any)).
+
+============================
+IDA10.[0-8] LM PACKET FORMAT
+============================
+The IDA10.[0-8] log packets contain free form ascii text, with embedded
+newlines.
+
+Offset  Length   Type       Description
+  0      50      CMNHDR     IDA 10.[0-8] common header
+ 50       2      UINT16     no of bytes to follow (redundant in 10.[1-3])
+ 52    variable  CHAR       null terminated string, len nbytes as above
+
+============================
+IDA10.[0-2] CF PACKET FORMAT
+============================
+The SAN20xx configuration table contains more information than can be
+encapsulated into a single fixed-length byte packet.  Therefore, the
+configuration is given as a sequence of CF packets.  Each CF packet has
+a sequence number in the header, and a flag which is zero except for
+the last packet in the list.  For the final packet the flag will be
+set equal to the total number of packets in the sequence.
+Thus, the basic format is as follows:
+
+Offset  Length   Type       Description
+  0      50      CMNHDR     IDA 10.[012] common header
+ 50       2      UINT16     sequence number
+ 52       2      UINT16     total, or "done" flag (0 while more CF's follow);
+ 54     depends  UINT8      CF data segment
+
+The concatenation of all CF data segments, from sequence number 1 thru
+the end of the list is the complete IDA10 configuration.  It has the
+following layout:
+
+Offset  Length   Type        Description
+  0     varies   FTABLE      The filter table is the first object given,
+varies   32      DETECTOR    followed by the event detector,
+varies    2      UINT16      followed by the number of defined streams:
+varies   26      DASTREAM    stream #1 definition
+varies   26      DASTREAM    stream #2 definition
+ ...     ...     ...         ...
+varies   26      DASTREAM    stream #n definition
+
+For simplicity, the above description refers to various special data
+types which are described below.
+
+FTABLE - variable length filter table
+Offset  Length   Type        Description
+  0       2      UINT16      Number of filters to follow
+  2     varies   FILTER      Filter #1
+varies  varies   FILTER      Filter #2
+ ...     ...      ...          ...
+varies  varies   FILTER      Filter #n
+
+The filter table includes a variable number of FILTER's, with the
+following format:
+
+FILTER - variable length filter description
+Offset  Length   Type        Description
+  0       2      UINT16      filter ident
+  2       2      UINT16      decimation factor
+  4       2      UINT16      number of coefficients (NCOEFF)
+  6    NCOEFF    REAL32      filter coefficients
+
+DETECTOR - 32 byte event detector
+Offset  Length   Type        Description
+   0      4      UINT32      STA length (samples)
+   4      4      UINT32      LTA length (samples)
+   8      4      REAL32      trigger threshold (STA/LTA)
+  12      4      REAL32      end trigger threshold (STA/LTA)
+  16      4      UINT32      minimum # votes to cause trigger
+  20      4      UINT32      detection channels, bitmapped
+  24      4      UINT32      pre-trigger samples
+  28      4      UINT32      post-trigger samples
+
+The output streams are described by a DASTREAM object:
+
+DASTREAM - 26 byte stream description
+Offset  Length   Type        Description
+  0       6      CHAR        stream name
+  6       1      UINT8       analog input channel
+  7       1      UINT8       flags
+  6      16      FCHAIN      filter chain
+
+stream name
+------------
+This is the handle by which the filter and decimated output are
+identified.  This is identical to the stream name in the TS packet
+header.
+
+analog input channel
+--------------------
+This is the digitizer specific numerical identifier of the analog
+input channel.
+
+flags
+-----
+This is a bit mask with bit 1 set to 0 if the stream is continuous,
+1 if it is triggered.  Bits 2-7 are presently undefined and are reserved
+for future use.
+
+filter chain
+------------
+This describes the cascade which is used to filter and decimate the
+raw samples.  It looks like this:
+
+FCHAIN - 16 byte filter chain
+Offset  Length   Type       Description
+  0       1      UINT8      filter #1 ident
+  1       1      UINT8      filter #2 ident
+  2       1      UINT8      filter #3 ident
+  3       1      UINT8      filter #4 ident
+  4       1      UINT8      filter #5 ident
+  5       1      UINT8      filter #6 ident
+  6       1      UINT8      filter #7 ident
+  7       1      UINT8      filter #8 ident
+  8       1      UINT8      filter #9 ident
+  9       1      UINT8      filter #10 ident
+ 10       1      UINT8      filter #11 ident
+ 11       1      UINT8      filter #12 ident
+ 12       1      UINT8      filter #13 ident
+ 13       1      UINT8      filter #14 ident
+ 14       1      UINT8      filter #15 ident
+ 15       1      UINT8      filter #16 ident
+
+Up to 16 filters are possible.  The ident is a number which refers to
+the filter list described below.  All 16 fields must be present.  Use
+0xFF for unused idents.

@@ -1,0 +1,59 @@
+#!/bin/csh -f
+# $Id: KdakLinkWatchdog,v 1.3 2017/01/13 17:29:58 dechavez Exp $
+#
+# Script to monitor link between kdak2 and the wellhead and to
+# power cycle the Freewave when it is determined to be down.
+
+set myname = KdakLinkWatchdog
+set debug  = 1
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup" 
+    goto failure 
+endif
+source $setup
+
+# Ping each device at the wellhead
+
+@ Nalive = 0
+foreach host (kdak1 kdak00 kdak10)
+    /sbin/ping -q -o -c 10 $host >& /dev/null
+	set exitstatus = $status
+    if ($exitstatus != 0) then
+        logger -t $myname"[$$]" -p $LogFacility.info "no reply from $host"
+    else
+        @ Nalive++
+    endif
+end
+
+# Power cycle the Freewave if nobody replied
+
+if ($Nalive == 0) then
+    logger -t $myname"[$$]" -p $LogFacility.info "Freewave link appears down"
+    iboot cycle >& /dev/null
+    if ($status == 0) then
+        logger -t $myname"[$$]" -p $LogFacility.info "iboot cycle OK"
+    else
+        logger -t $myname"[$$]" -p $LogFacility.info "iboot cycle FAILED"
+    endif
+else
+    if ($debug) logger -t $myname"[$$]" -p $LogFacility.info "Freewave link OK"
+endif
+
+exit 0
+
+# Revision History
+#
+# $Log: KdakLinkWatchdog,v $
+# Revision 1.3  2017/01/13 17:29:58  dechavez
+# Log using newly introduced LogFacility varilable set in ScriptSetup
+#
+# Revision 1.2  2016/02/10 19:58:50  dechavez
+# added full path to ping so that script will run under cron OL
+#
+# Revision 1.1  2016/02/10 19:28:32  dechavez
+# created, with debug=1
+#

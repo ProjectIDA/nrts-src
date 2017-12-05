@@ -1,0 +1,96 @@
+#!/bin/csh
+# $Id: PollSPM,v 1.1 2016/04/28 22:51:24 dechavez Exp $
+#
+# Poll a Newmar SPM-200 for state of health information
+
+set myname = PollSPM
+
+if ($#argv == 0) then
+    set peer = spm
+else if ($#argv == 1) then
+    set peer = $argv[1]
+else
+    echo "usage: ${myname} [ SPM_name_or_dot_decimal_address ]\n"
+    exit 1
+endif
+
+set list = ""
+set list = "$list spmTempF"
+set list = "$list spmVoltsDcA"
+set list = "$list spmVoltsAcA"
+set list = "$list spmVoltsAcB"
+set list = "$list spmAmpsX10"
+
+ConnectToDevice:
+
+logger -t $myname"[$$]" -p local0.info "contacting $peer"
+
+set connected = 0
+while ($connected == 0)
+    set spmSerial = `snmpget -v 2c -c public -m +NMR-MIB -Ovq $peer spmSerial.1`
+    if ($status == 0) then
+        set connected = 1
+    else
+        sleep 10
+    endif
+end
+
+set message = "connected to ${peer}: SPM S/N $spmSerial"
+logger -t $myname"[$$]" -p local0.info "$message"
+echo $message
+echo ""
+
+set GetCmd = "snmpget -v 2c -c public -m +NMR-MIB -Ovq $peer"
+foreach item ($list)
+    set GetCmd = "$GetCmd ${item}.1"
+end
+
+set header = "Format    Time Stamp     TempF VDC   VAC1 VAC2 Current(x10)"
+set format = "SPM01"
+
+set first = 1
+@ count = 0
+while (1)
+
+    @ remain = 1
+    while ($remain != 0)
+        set date = `date "+%Y %j %H %M %S"`
+        set sec  = $date[5]
+        set remain = `expr $sec % 5`
+    end
+    set year = $date[1]
+    set jday = $date[2]
+    set hour = $date[3]
+    set min  = $date[4]
+
+    set output = `$GetCmd`
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p local0.info "snmpget failed"
+        goto ConnectToDevice
+    endif
+    if ($first) then
+        logger -t $myname"[$$]" -p local0.info "initial sample set received"
+        set first = 0
+    endif
+
+    set    spmTempF = $output[1]
+    set spmVoltsDcA = $output[2]
+    set spmVoltsAcA = $output[3]
+    set spmVoltsAcB = $output[4]
+    set  spmAmpsX10 = $output[5]
+
+    if ($count == 0) echo "$header"
+    echo -n "$format ${year}:${jday}-${hour}:${min}:${sec}"
+    echo $output | awk '{printf "%5d %5d %5d %5d %5d\n", $1, $2, $3, $4, $5}'
+
+    @ count++
+    if ($count == 20) @ count = 0
+    sleep 1
+end
+
+# Revision History
+#
+# $Log: PollSPM,v $
+# Revision 1.1  2016/04/28 22:51:24  dechavez
+# initial release
+#

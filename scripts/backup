@@ -1,0 +1,73 @@
+#!/bin/csh -f
+# $Id: backup,v 1.10 2016/01/12 22:50:13 dechavez Exp $
+
+set mount = /mnt
+set host  = `hostname`
+set date  = `date -u +20%y%j`
+set dest  = $mount/$host/$date
+
+if (`whoami` != root) then
+    echo "You must be root (and in single user mode) to run this program."
+    exit 1
+endif
+
+if ( -e /dev/ada0 ) then
+    set disk = ada0
+else 
+    echo "Unexpected disk type!!!"
+    exit 1
+endif
+
+mount_msdosfs /dev/da0s1 $mount
+if ($status != 0) then
+    echo "unable to mount USB thumbdrive"
+    exit 1
+endif
+mkdir -p $dest >& /dev/null
+/usr/home/nrts/scripts/bkpersona $dest >& /dev/null
+
+/usr/home/nrts/scripts/isiDeleteEverything >& /dev/null
+set reconfigure = /usr/home/nrts/reconfigure
+touch $reconfigure
+chown nrts:nrts $reconfigure
+
+sync
+sleep 2
+sync
+
+umount /var
+umount /usr/home
+
+foreach file (root.dmp var.dmp home.dmp uname.txt etc.tgz)
+    if (-e $dest/$file) rm -f $dest/$file
+end
+cd /
+uname -a > $dest/uname.txt
+tar cf - etc | gzip -c > $dest/etc.tgz
+cp /etc/install.csh $dest
+cd $dest
+
+/sbin/dump -0 -a -f root.dmp /dev/${disk}p2
+/sbin/dump -0 -a -f var.dmp /dev/${disk}p4
+/sbin/dump -0 -a -f home.dmp /dev/${disk}p7
+
+mount /var
+mount /usr/home
+
+sync
+cd /
+umount /mnt
+
+/usr/home/nrts/scripts/isiCreateDiskLoops >& /dev/null
+chown -R nrts:nrts /usr/home/nrts
+
+echo ""
+echo "Backup complete, you may safely remove the thumbdrive."
+
+# $Log: backup,v $
+# Revision 1.10  2016/01/12 22:50:13  dechavez
+# use bkpersona to include 'persona' file
+#
+# Revision 1.9  2016/01/07 17:39:02  dechavez
+# initial production release for FreeBSD 10 systems
+#

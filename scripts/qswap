@@ -1,0 +1,133 @@
+#!/bin/csh -f
+# $Id: qswap,v 1.1 2013/04/16 17:52:14 dechavez Exp $
+#
+# Configure a cold Q330 to replace an existing digitizer
+
+set myname = qswap
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "${myname}: missing $setup"
+    goto failure
+endif
+source $setup
+
+printenv | grep "Q330_CONSOLE=" >& /dev/null
+if ($status == 0) then
+    set SerialPort = $Q330_CONSOLE
+else
+    echo "Q330_CONSOLE environment variable is undefined."
+    goto failure
+endif
+
+# Command line setup
+
+if ($#argv != 1) then
+    echo "usage: ${myname} xxxNN"
+    exit 1
+endif
+
+set digitizer = $argv[1]
+
+# Determine config parameters (XML file, IP address, sensor types)
+
+set IPaddress = `grep $digitizer /etc/hosts | awk '{print $1}'`
+if ($status != 0) then
+    echo "ERROR: cannot determine IP address for $digitizer"
+    goto failure
+endif
+
+set XmlDir = $NRTS_HOME/etc/xml
+if (! -d $XmlDir) then
+    echo "ERROR: missing $XmlDir"
+    goto failure
+endif
+
+set XmlFile = $XmlDir/${digitizer}.xml
+set cfg  = $NRTS_HOME/etc/q330.cfg
+set auth = $NRTS_HOME/etc/q330/auth
+foreach file ($XmlFile $cfg $auth)
+    if (! -e $file) then
+        echo "ERROR: missing $file"
+        goto failure
+    endif
+end
+
+set sensorA = `q330 list | grep $digitizer | awk '{print $3}'`
+if ($status != 0) then
+    echo "ERROR: can't determine sensor A type"
+    goto failure
+endif
+
+set sensorB = `q330 list | grep $digitizer | awk '{print $4}'`
+if ($status != 0) then
+    echo "ERROR: can't determine sensor A type"
+    goto failure
+endif
+
+# Make sure digitizer is connected and query for its ID tag 
+
+echo    "Connect the spare digitizer to $SerialPort and verify it is has power."
+echo -n "Press enter to continue, q to quit. "
+set answer = $<
+if ($answer == q || $answer == quit) goto PrematureExit
+
+set taginfo = `q330 $SerialPort id | awk '{print $2, $3}'`
+if ($status != 0) then
+    echo "ERROR: can't query digitizer at $SerialPort for ID tag and serial number"
+    goto failure
+endif
+
+# Configure digitizer
+
+set command = "q330 $SerialPort config sta=$DefaultSite ip=$IPaddress a=$sensorA b=$sensorB $XmlFile"
+echo ""
+echo "Ready to configure. Press enter to invoke command, q to quit:"
+echo ""
+echo -n "$command "
+set answer = $<
+if ($answer == q || $answer == quit) goto PrematureExit
+$command
+
+if ($status != 0) goto failure
+
+sleep 3
+q330 $SerialPort save
+echo ""
+
+# Install this digitizer
+
+chmod 644 $cfg $auth
+if ($status != 0) then
+    echo "ERROR: cannot chmod 644 $cfg $auth"
+    goto failure
+endif
+
+q330 set $digitizer $taginfo
+if ($status != 0) then
+    echo "ERROR: cannot update config files"
+    goto failure
+endif
+set IDtag = $taginfo[1]
+
+echo ""
+echo "Digitizer $IDtag successfully configured as $digitizer"
+
+NormalExit:
+exit 0
+
+PrematureExit:
+exit 0
+
+failure:
+echo "command failed"
+exit 1
+
+# Revision History
+#
+# $Log: qswap,v $
+# Revision 1.1  2013/04/16 17:52:14  dechavez
+# initial release
+#

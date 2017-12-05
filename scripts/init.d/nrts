@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# start/stop NRTS processes
+#
+# $Id: nrts,v 1.9 2013/05/14 21:03:33 dechavez Exp $
+
+case "$1" in
+'start')
+
+    NRTSRC="/usr/nrts/etc/start/boot"
+    if [ -f ${NRTSRC} ]; then
+        echo "Starting NRTS"
+        csh ${NRTSRC} > /dev/null &
+    fi
+    ;;
+        
+'stop')
+    echo "Stopping NRTS"
+    pkill -TERM -x AlphaSend
+    pkill -TERM -x drmd
+    pkill -TERM -x isid
+    pkill -TERM -x isidl
+    pkill -TERM -x isimerge
+    pkill -TERM -x ispd
+    pkill -TERM -x nrts_alpha
+    pkill -TERM -x nrts_edes
+    pkill -TERM -x nrts_wrtdl
+    pkill -TERM -x qhlp
+    pkill -TERM -x tristar10
+    pkill -TERM -x paro10
+    pkill -TERM -x auz_isi
+    pkill -TERM -x sbds
+    sleep 2
+    pkill -TERM -x ringserver
+    ;;
+*)
+    echo "Usage: /etc/init.d/nrts { start | stop }"
+    ;;
+esac

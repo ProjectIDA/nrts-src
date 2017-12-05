@@ -1,0 +1,33 @@
+#!/bin/csh -f
+# $Id: isiAutoTrigger,v 1.1 2010/03/24 16:21:17 dechavez Exp $
+#
+# Automatic manual trigger
+
+set debug  = 0
+set myname = isiAutoTrigger
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    goto abort
+endif
+source $setup
+
+set sta = $ISP_SYSTEM
+set meta = /usr/nrts/${sta}330/meta
+if (! -e $meta) exit 0
+
+trig $sta on >& /dev/null
+sleep 10
+trig $sta off >& /dev/null
+
+# Revision History
+#
+# $Log: isiAutoTrigger,v $
+# Revision 1.1  2010/03/24 16:21:17  dechavez
+# first release
+#

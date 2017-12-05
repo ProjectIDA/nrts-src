@@ -1,0 +1,146 @@
+#!/bin/csh -f
+#
+# $Id: bkpersona,v 1.8 2016/01/12 22:42:18 dechavez Exp $
+#
+# Backup the files needed to "personify" a station.
+
+set output = /dev/null/nothing # so failure has something to delete
+set myname = bkpersona
+       
+# General setup
+       
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup"
+    goto failure
+endif
+source $setup
+set SiteList = "$SystemsList"
+
+# Command line setup
+
+if ($#argv == 0) then
+    set outdir = $NRTS_HOME/tmp
+else if ($#argv == 1) then
+    set outdir = $argv
+else
+    echo "usage: $myname [ output directory ]"
+endif
+
+if (! -d $outdir) then
+    echo "${outdir}: No such directory"
+    goto failure
+endif
+
+# Generate output path
+
+set today    = `date -u +%Y-%m-%d`
+set nodename = `uname -n`
+set output   = $outdir/$nodename-$today.tgz
+if (-e $output) rm -rf $output
+
+# OS specific files
+
+set os = `uname`
+switch ($os)
+  case FreeBSD:
+    set nrts = usr/home/nrts
+    set candidate = "etc/rc.conf"
+    set candidate = "$candidate etc/rc.local"
+    set candidate = "$candidate etc/resolv.conf"
+    set candidate = "$candidate etc/ntp.conf"
+    set candidate = "$candidate etc/hosts"
+    set candidate = "$candidate etc/motd"
+    set candidate = "$candidate etc/ssh/*key*"
+    breaksw
+  case SunOS:
+    set nrts = usr/nrts
+    set candidate = "etc/rc0.d"
+    set candidate = "$candidate etc/rc1.d"
+    set candidate = "$candidate etc/rc2.d"
+    set candidate = "$candidate etc/rc3.d"
+    set candidate = "$candidate etc/rcS.d"
+    set candidate = "$candidate etc/init.d"
+    set candidate = "$candidate etc/hosts.allow"
+    set candidate = "$candidate etc/hosts.deny"
+    set candidate = "$candidate etc/hostname*"
+    set candidate = "$candidate etc/inet"
+    set candidate = "$candidate etc/netmasks"
+    set candidate = "$candidate etc/nodename"
+    set candidate = "$candidate opt/realport/drp.conf"
+    breaksw
+  case Linux:
+    set nrts = usr/nrts
+    set candidate = "usr/local"
+    set candidate = "$candidate etc/hosts"
+    set candidate = "$candidate etc/motd"
+    breaksw
+  default:
+    echo "'$os' is not a supported operating system."
+    exit 1
+    breaksw
+endsw
+
+# NRTS files
+
+set candidate = "$candidate $nrts/etc"
+set candidate = "$candidate $nrts/.ssh"
+set candidate = "$candidate $nrts/SeedLink/ring.conf"
+foreach site ($SystemsList)
+    set candidate = "$candidate $nrts/$site/cnf"
+    set candidate = "$candidate $nrts/$site/iso/config"
+end
+
+# Do the backup
+
+cd /
+set list = ""
+foreach item ($candidate)
+    if (-e $item) set list = "$list $item"
+end
+
+if (`whoami` != root) then
+    set sudo = sudo
+else
+    set sudo = ""
+endif
+
+$sudo tar cf - $list | gzip -c > $output
+
+if ($status != 0) goto failure
+
+echo "Files backed up to $output"
+exit 0
+
+failure:
+
+echo "Files NOT backed up"
+rm -f $output
+exit 1
+
+# Revision History
+#
+# $Log: bkpersona,v $
+# Revision 1.8  2016/01/12 22:42:18  dechavez
+# added ~nrts/SeedLink/ring.conf to the list
+#
+# Revision 1.7  2016/01/12 22:29:25  dechavez
+# added /etc/resolv.conf and /etc/ntp.conf to the FreeBSD list
+#
+# Revision 1.6  2016/01/12 22:11:24  dechavez
+# allow this to be run by any user, not just nrts.
+#
+# Revision 1.5  2016/01/12 21:59:29  dechavez
+# added option to specify output directory on command line
+#
+# Revision 1.4  2016/01/08 22:19:27  dechavez
+# include host keys (/etc/ssh/*key*)
+#
+# Revision 1.3  2013/12/13 22:53:57  dechavez
+# fixed up CVS Log tag
+#
+# Revision 1.2  2013/12/13 22:49:20  dechavez
+# added Linux support
+#
+# Revision 1.1  2011/07/15 22:50:32  dechavez
+# initial release

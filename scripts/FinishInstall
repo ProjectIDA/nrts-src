@@ -1,0 +1,113 @@
+#!/bin/csh -f
+# $Id: FinishInstall,v 1.1 2016/01/07 17:39:01 dechavez Exp $
+
+umount /var
+if ($status != 0) then
+    echo "can't umount /var"
+    echo "Ensure you are in single user mode and try again."
+    goto failure
+endif
+
+set command = "gjournal label -f ada0p4 ada0p5"
+echo $command
+$command
+if ($status != 0) then
+    echo "command failed"
+    goto failure
+endif
+sleep 5
+
+set command = "tunefs -J enable -n disable /dev/ada0p4.journal"
+echo $command
+$command
+if ($status != 0) then
+    echo "command failed"
+    goto failure
+endif
+
+cp /etc/fstab.final /etc/fstab
+if ($status != 0) then
+    echo "can't update /etc/fstab with journaled file systems"
+    goto failure
+endif
+
+mount /var
+if ($status != 0) then
+    echo "can't mount /var"
+    goto failure
+endif
+
+set command = "gjournal label -f -s 5g ada0p7"
+echo $command
+$command
+if ($status != 0) then
+    echo "command failed"
+    goto failure
+endif
+sleep 5
+
+set command = "newfs -J /dev/ada0p7.journal"
+echo $command
+$command
+if ($status != 0) then
+    echo "command failed"
+    goto failure
+endif
+
+mount /dev/ada0p7.journal /usr/home
+if ($status != 0) then
+    echo "can't mount /usr/home"
+    goto failure
+endif
+
+echo -n "Insert home.dmp thumbdrive and press enter when ready "
+set answer = $<
+if ($answer == q || $answer == quit) exit 0
+mount /usb/0
+if ($status != 0) then
+    echo "can't mount /usb/0"
+    goto failure
+endif
+set dumpfile = /usb/0/`hostname`/home.dmp
+if (! -e $dumpfile) then
+    echo "missing $dumpfile"
+    goto failure
+endif
+
+cd /usr/home
+if ($status != 0) then
+    echo "can't chdir /usr/home"
+    goto failure
+endif
+
+set command = "restore rf $dumpfile"
+echo $command
+$command
+if ($status != 0) then
+    echo "restore of /usr/home failed"
+    goto failure
+endif
+rm restoresymtable
+chown -R nrts:nrts /usr/home/nrts
+
+echo -n "Press enter to edit /etc/rc.conf, s to skip "
+set answer = $<
+if ($answer != s) vi /etc/rc.conf
+
+echo -n "Remove the thumdrive and press enter to reboot "
+set answer = $<
+if ($answer == q || $answer == quit) exit 0
+sync
+sync
+reboot
+
+success:
+exit 0
+
+failure:
+exit 1
+
+# $Log: FinishInstall,v $
+# Revision 1.1  2016/01/07 17:39:01  dechavez
+# initial production release for FreeBSD 10 systems
+#

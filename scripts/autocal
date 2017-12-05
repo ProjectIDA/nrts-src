@@ -1,0 +1,52 @@
+#!/bin/csh
+# $Id: autocal,v 1.10 2016/08/18 23:04:20 dechavez Exp $
+#
+# Run the standard IDA random binary calibration suite
+       
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup"
+    exit 0
+endif
+source $setup
+
+foreach loc (00 10)
+    foreach test (hf lf)
+        idacal $test $loc
+    end
+end
+       
+# $Log: autocal,v $
+# Revision 1.10  2016/08/18 23:04:20  dechavez
+# Oops.  I had left 'idacal' as 'idacal2', left over from debugging.  Fixed now.
+#
+# Revision 1.9  2016/08/18 22:44:28  dechavez
+# Removed the sleep between idacal runs on the same digitizer... idacal now
+# includes a qverify loop to ensure that the config and data ports are not busy
+#
+# Revision 1.8  2015/12/10 00:00:15  dechavez
+# undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
+# (didn't work in cron, duh)
+#
+# Revision 1.7  2015/12/07 22:18:43  dechavez
+# don't assume user nrts (use NRTS_HOME environment varible instead)
+#
+# Revision 1.6  2012/01/30 23:44:28  dechavez
+# pause 6 minutes between runs with the same digitizer (to avoid port in use problems)
+# but don't bother waiting when switching to second digitizer
+#
+# Revision 1.5  2011/11/17 23:13:08  dechavez
+# loop around calls to idacal
+#
+# Revision 1.4  2011/04/14 21:38:50  dechavez
+# support qcal 1.5.0 and tokens for output port configuration
+#
+# Revision 1.3  2011/03/06 02:19:10  dechavez
+# removed debug comments left over from 1.2
+#
+# Revision 1.2  2011/03/06 02:17:00  dechavez
+# use port 3 for rbhf, port 4 for rblf
+#
+# Revision 1.1  2011/01/19 19:51:23  dechavez
+# created
+#

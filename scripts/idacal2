@@ -1,0 +1,178 @@
+#!/bin/csh -f
+# $Id: idacal2,v 1.5 2016/11/02 12:40:36 dechavez Exp $
+#
+# Run the standard IDA random binary calibration suite
+# on digitizer with 00 sensors on A and 10 sensors on B
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup"
+    exit 0
+endif
+source $setup
+
+set myname    = "idacal2"
+set log       = ${myname}.log
+set port      = 4                      # always use data port 4
+set date      = `date +%Y:%j-%H:%M:%S` # for log messages
+set tstamp    = `date +%Y-%m%d-%H%M`   # for generating file names
+
+set sta = 0
+set CalibrateSensorA = 0
+set CalibrateSensorB = 0
+
+while ($#argv) 
+    if ($argv[1] == "-h") goto usage
+    if ($argv[1] == "a" || $argv[1] == "A") then
+        set CalibrateSensorA = 1
+    else if ($argv[1] == "b" || $argv[1] == "B") then
+        set CalibrateSensorB = 1
+    else if ($sta == 0) then
+        set sta = $argv[1]
+    else {
+        echo "unrecognized argument '$argv[1]'"
+        goto usage
+    endif
+    shift
+end
+
+# No arguments means calibrate both sensors of the default system
+
+if ($sta == 0) set sta = $DefaultSite
+if ($CalibrateSensorA == 0 && $CalibrateSensorB == 0) then
+    set CalibrateSensorA = 1
+    set CalibrateSensorB = 1
+endif
+
+set caldir    = /usr/nrts/$sta/cal
+set digitizer = ${sta}00
+
+cd $caldir
+if ($status != 0) then
+    echo "can't chdir $caldir"
+    exit 0
+endif
+
+if (! -e $caldir) then
+    echo "missing $caldir"
+    exit 0
+endif
+
+cp /dev/null $log
+echo $date - BEGIN >> $log
+
+# Sensor A calibrations
+
+if ($CalibrateSensorA) then
+    set sensor = `q330 list | grep $digitizer | awk '{print $3}'`
+    if ($status != 0) then
+        echo "ERROR - cannot determine $digitizer sensor A name"
+        exit 1
+    endif
+    set chans  = "cal=123 mon=5"
+
+    set caltag = rbhf
+    set tokens = hfcal00A
+
+    if ($sensor == sts1::r) set sensor = sts1
+
+    set prefix = CAL-${digitizer}-${sensor}-${caltag}-${tstamp}
+    set command = "qcal ${digitizer}:${port}:${tokens} $caltag prefix=${prefix} ${chans}"
+    echo $date - $command >> $log
+    $command >> $log
+    set command = "sleep 360"
+    echo $date - $command >> $log
+    $command >> $log
+
+    set caltag = rblf
+    set tokens = lfcal00A
+
+    set prefix = CAL-${digitizer}-${sensor}-${caltag}-${tstamp}
+    set command = "qcal ${digitizer}:${port}:${tokens} $caltag prefix=${prefix} ${chans}"
+    echo $date - $command >> $log
+    $command >> $log
+    set command = "sleep 360"
+    echo $date - $command >> $log
+    $command >> $log
+endif
+
+# Sensor B calibrations
+
+if ($CalibrateSensorB) then
+    set sensor = `q330 list | grep $digitizer | awk '{print $4}'`
+    if ($status != 0) then
+        echo "ERROR - cannot determine $digitizer sensor A name"
+        exit 1
+    endif
+    set chans  = "cal=456 mon=2"
+
+    set caltag = rbhf
+    set tokens = hfcal10B
+
+    set prefix = CAL-${digitizer}-${sensor}-B-${caltag}-${tstamp}
+    set command = "qcal ${digitizer}:${port}:${tokens} $caltag prefix=${prefix} ${chans}"
+    echo $date - $command >> $log
+    $command >> $log
+
+    # Don't bother with LF cal when Sensor B has a GS-13
+
+    if ($sensor != gs13) then
+        set command = "sleep 360"
+        echo $date - $command >> $log
+        $command >> $log
+
+        set caltag = rblf
+        set tokens = lfcal10B
+
+        set prefix = CAL-${digitizer}-${sensor}-B-${caltag}-${tstamp}
+        set command = "qcal ${digitizer}:${port}:${tokens} $caltag prefix=${prefix} ${chans}"
+        echo $date - $command >> $log
+        $command >> $log
+    endif
+endif
+
+echo $date - DONE >> $log
+
+exit 0
+
+usage:
+echo "usage: ${myname} [ sta ] [ { a b } ]"
+echo ""
+echo "Example 1) To calibrate sensor A and sensor B of the default station:"
+echo ""
+echo "idacal2"
+echo "- or -"
+echo "idacal2 a b"
+echo "- or -"
+echo "idacal2 $DefaultSite a b"
+echo ""
+echo "Example 2) To calibrate just Sensor A:"
+echo ""
+echo "idacal2 a"
+echo "- or -"
+echo "idacal2 $DefaultSite a"
+echo ""
+echo "Example 3) To calibrate just sensor B:"
+echo ""
+echo "idacal2 b"
+echo "- or -"
+echo "idacal2 $DefaultSite b"
+
+exit 1
+
+# $Log: idacal2,v $
+# Revision 1.5  2016/11/02 12:40:36  dechavez
+# include B in the file name for sensor B calibrations
+#
+# Revision 1.4  2013/07/10 17:29:02  dechavez
+# Changed monitor channel to sacrifice horizontal sensor
+#
+# Revision 1.3  2013/06/19 22:49:00  dechavez
+# added -h option
+#
+# Revision 1.2  2013/06/19 22:31:08  dechavez
+# generalized for Sensor A and Sensor B, no assumptions about sensor type
+#
+# Revision 1.1  2012/06/25 22:06:02  dechavez
+# initial release (for GSRAS)
+#

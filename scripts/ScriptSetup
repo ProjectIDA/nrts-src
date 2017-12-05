@@ -1,0 +1,68 @@
+# $Id: ScriptSetup,v 1.24 2017/01/13 17:34:44 dechavez Exp $
+# General purpose setup for NRTS/ISP scripts
+
+setenv NRTS_HOME /usr/nrts
+if (-e $NRTS_HOME/UNCONFIGURED) exit 0
+
+# Ensure the required ancillary files are all present
+
+foreach file (.platform .envrc etc/retain)
+    set reqfile = $NRTS_HOME/$file
+    if ( -e $reqfile ) then
+        source $reqfile
+    else
+        echo "FATAL ERROR: missing $reqfile"
+        exit 1
+    endif
+end
+
+set status = 0
+
+set path = ($NRTS_HOME/bin     $path)
+set path = ($NRTS_HOME/scripts $path)
+if (-e /opt/local/bin) set path = (/opt/local/bin $path)
+if (-e /usr/local/bin) set path = (/usr/local/bin $path)
+
+set SystemsFile = $NRTS_HOME/etc/Systems
+if (-e $SystemsFile && -e $NRTS_HOME/bin/stripcat) then
+    set SystemsList = `stripcat $SystemsFile`
+    @ SystemsCount = $#SystemsList
+    set DefaultSite = $SystemsList[1]
+else
+    set SystemsList = "empty"
+    @ SystemsCount = 0
+    set DefaultSite = "DEFAULTSITE"
+endif
+
+if (-e /usr/ucb/mail) then
+    set mail = /usr/ucb/mail
+else 
+    set mail = /usr/bin/Mail
+endif
+    
+@ errors = 0
+foreach file ($mail)
+    if ( ! -e $file ) then
+        echo "Missing $file"
+        @ errors += 1
+    endif
+end
+set status = $errors
+
+set DebugDir = $NRTS_HOME/etc/debug
+
+set LogFacility = local0
+
+# Revision History
+#
+# $Log: ScriptSetup,v $
+# Revision 1.24  2017/01/13 17:34:44  dechavez
+# Sigh.  Fixed at Set instead of set error in the change just introduced.  doh
+#
+# Revision 1.23  2017/01/13 17:28:54  dechavez
+# introduced LogFacility, with initial value of local0.  The intent is for
+# scripts which user the logger command to user $LogFacility instead of the
+# currently hard-coded user or local0 facilities.  That will allow one to
+# do a global change of the logging facility without having to edit every
+# single script, which is what I need to do now to add the generalization
+#

@@ -1,0 +1,139 @@
+#!/bin/tcsh -f
+# $Id: ArchiveGzFiles,v 1.8 2015/03/04 20:21:47 dechavez Exp $
+#
+# Move all .gz (and .GZ) tee files from the named source dir to
+# year/day subdirectories in the named destination dir
+
+set myname = ArchiveGzFiles
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+source $setup
+
+# Check for debug flag
+
+if (-e $DebugDir/$myname) then
+    set debug = 1
+else
+    set debug = 0
+endif
+
+if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+
+# Command line setup
+
+set error = 0
+if ($#argv == 2) then
+    set srcdir  = $argv[1]
+    set dstroot = $argv[2]
+else
+    set error = 1
+endif
+
+if ($error) then
+    set message = "bad command line, error $error"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    echo "usage: $myname srcdir dstdir"
+    goto failure
+endif
+
+# Nothing to do if the directories don't exist
+
+foreach dir ($srcdir $dstroot)
+    if (! -d $dir) then
+        logger -t $myname"[$$]" -p user.info "ERROR: no such dir $dir"
+        set error = 1
+    endif
+end
+
+if ($error) then
+    logger -t $myname"[$$]" -p user.info "ERROR: required directories are missing"
+    goto failure
+endif
+
+# Work in the source directory
+
+cd $srcdir
+if ($status != 0) then
+    logger -t $myname"[$$]" -p user.info "ERROR: can't chdir $srcdir"
+    goto failure
+endif
+
+set dummy = 4_______________________.gz
+touch $dummy
+
+foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
+    if ($file != $dummy) then
+        set datelist = `idaspan -yd rev=10 < $file | sort | uniq`
+        foreach date ($datelist)
+            set destdir = $dstroot/$date
+            if (! -d $destdir) then
+                set command = "mkdir -p $destdir"
+                if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+                $command
+            endif
+            if (! -d $destdir) then
+                logger -t $myname"[$$]" -p user.info "ERROR: missing $destdir"
+                rm $dummy
+                goto failure
+            endif
+            set destpath = `uniqpath suflen=3 $file $destdir`
+            set command = "cp -p $file $destpath"
+            if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+            $command
+            if ($status != 0) then
+                logger -t $myname"[$$]" -p user.info "FAILED: $command"
+                rm $dummy
+                goto failure
+            endif
+            set command = "chmod 444 $destpath"
+            if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+            $command
+            set command = "dupchk $destpath"
+            if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+            $command
+            if ($status != 0) logger -t $myname"[$$]" -p user.info "WARNING: $command FAILED (ignored)"
+        end
+        set command = "rm -f $file"
+        if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+        $command
+    endif
+end
+rm -f $dummy
+
+# Normal exit
+
+success:
+if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+exit 0
+
+failure:
+logger -t $myname"[$$]" -p user.info "exit 1"
+exit 1
+
+# Revision History
+#
+# $Log: ArchiveGzFiles,v $
+# Revision 1.8  2015/03/04 20:21:47  dechavez
+# assume rev=10 for everything.  Might come bite me later, but not for a while.
+#
+# Revision 1.7  2014/11/24 23:26:35  dechavez
+# run dupchk on each copied file
+#
+# Revision 1.6  2014/06/17 18:30:23  dechavez
+# support .GZ files in addtion to the usual .gz
+#
+# Revision 1.5  2013/10/25 18:20:55  dechavez
+# set read-only permission on files after copy
+#
+# Revision 1.4  2013/10/21 21:34:08  dechavez
+# initial production release
+#

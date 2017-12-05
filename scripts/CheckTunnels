@@ -1,0 +1,150 @@
+#!/bin/csh -f
+# "$Id: CheckTunnels,v 1.10 2017/07/06 21:04:20 dauerbach Exp $"
+#
+# Manage SSH tunnels
+
+set debug  = 0
+set myname = CheckTunnels
+set lock   = /var/tmp/$myname.lock
+
+if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    exit 1
+endif
+source $setup
+
+# These are not expected to need to be changed, so we hardcode them here
+
+set MyData       = 39136
+set MyShell      = 22
+set TunnelUser   = tunnel
+set TunnelName   = `hostname`
+set TunnelPorts  = $NRTS_HOME/etc/Tunnels
+set TunnelPeers  = $NRTS_HOME/etc/TunnelPeers
+set default_peer = idahub
+
+# The local data and SSH port numbers may be overridden on the command line
+# Single argument is assumed to be port number for the data service
+
+if ($#argv > 0) then
+    set MyData = $argv[1]
+    shift
+endif
+
+# Second argument (if it exists) is assumed to be the local ssh port
+
+if ($#argv > 0) then
+    set MyShell = $argv[1]
+    shift
+endif
+
+# More than two arguments is not allowed
+
+if ($#argv != 0) then
+    set message = "${myname}: unrecognized argument(s): $argv"
+    echo $message
+    if ($debug) logger -t $myname"[$$]" -p user.info "unrecognized argument(s): $argv"
+    exit 1
+endif
+
+# Tunnel endpoint is idahub, unless more or alternate destinations
+# are specified in the optional config file
+
+if (-e $TunnelPeers) then
+    set RemoteHostList = `stripcat $TunnelPeers`
+else
+    set RemoteHostList = $default_peer
+endif
+
+# Get the port numbers from the lookup table
+
+if (! -e $TunnelPorts) then
+    if ($debug) logger -t $myname"[$$]" -p user.info "$TunnelPorts not present"
+    exit 1
+endif
+
+set PortString = `stripcat $TunnelPorts | grep -i " $TunnelName " `
+set exitstatus = $status
+if ($exitstatus != 0) then
+    if ($debug) logger -t $myname"[$$]" -p user.info "can't extract ports for $TunnelName from $TunnelPorts"
+    exit 1
+endif
+
+# Make sure no other instance of this script is running
+
+filelock $lock $$
+if ($status != 0) then
+    if ($debug) logger -t $myname"[$$]" -p user.info "another instance already active"
+    exit 0
+endif
+
+# Loop for all tunnels
+
+foreach RemoteHost ($RemoteHostList)
+
+        set RemoteData = `echo $PortString | awk '{print $2}'`
+        if ($debug) logger -t $myname"[$$]" -p user.info "RemoteData = $RemoteData"
+        set RemoteShell = `echo $PortString | awk '{print $3}'`
+        if ($debug) logger -t $myname"[$$]" -p user.info "RemoteShell = $RemoteShell"
+
+
+        logger -t $myname"[$$]" -p user.notice "Starting SSH tunnels into $RemoteHost"
+        set command = "ssh -f -N -R ${RemoteData}:localhost:${MyData} -R ${RemoteShell}:localhost:${MyShell} ${TunnelUser}@${RemoteHost}"
+        logger -t $myname"[$$]" -p user.notice "$command"
+
+        # Create tunnel only if not already running
+
+        pgrep -f "$command" >& /dev/null
+        if ($status == 0) then
+            if ($debug) logger -t $myname"[$$]" -p user.info "tunnel already present"
+        else
+            # Launch the tunnel
+            $command
+        endif
+end
+
+exit 0
+
+# Revision History
+#
+# $Log: CheckTunnels,v $
+# Revision 1.10  2017/07/06 21:04:20  dauerbach
+# Use entire ssh command when checking to see if tunnels already exist
+#
+# Revision 1.9  2015/12/10 00:00:15  dechavez
+# undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
+# (didn't work in cron, duh)
+#
+# Revision 1.8  2015/12/07 22:18:43  dechavez
+# don't assume user nrts (use NRTS_HOME environment varible instead)
+#
+# Revision 1.7  2013/10/25 21:10:08  dechavez
+# reorded stuff so that the path is right when invoked via cron
+#
+# Revision 1.6  2013/10/25 17:17:40  dechavez
+# change from hard-coded list of peers to optional ~/etc/TunnelPeers
+#
+# Revision 1.5  2013/08/07 17:38:55  dechavez
+# fixed restart problem when one of two tunnels was present
+#
+# Revision 1.4  2013/07/26 22:05:11  dechavez
+# set up tunnels to both idahub and pidahub
+#
+# Revision 1.3  2012/12/05 21:15:37  dechavez
+# Change target key to be hostname instead of default site (allows for more
+# than one computer per site to tunnel into idahub), and allow for the local
+# data and ssh ports to get assigned on the command line.
+#
+# Revision 1.2  2008/05/06 20:44:48  dechavez
+# use pgrep -f to check for existing tunnels
+#
+# Revision 1.1  2008/05/06 20:29:13  dechavez
+# created
+#

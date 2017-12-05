@@ -1,0 +1,114 @@
+#!/bin/csh -f
+# $Id: idacal,v 1.7 2016/08/18 22:48:14 dechavez Exp $
+#
+# Wrapper for qcal to simplify standard IDA calibrations
+#
+# ASSUMPTIONS:
+# 1) sensor A is to be calibrated
+# 2) Token names in the "lcq" table follow the ${caltag}${loc}A${mon} 
+#    convention where:
+#    caltag = rbhf or rblf
+#    loc    = 00 or 10
+#    mon    = monitor channel
+#    Eg: rbhf00A6 = rbhf calibration of 00 digtizer with monitor on channel 6
+
+set setup  = $NRTS_HOME/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup"
+    exit 0
+endif
+source $setup
+       
+set myname = "idacal"
+set log    = ${myname}.log
+set sta    = $DefaultSite
+set stadir = $NRTS_HOME/$sta
+set caldir = $stadir/cal
+set port   = 4
+set mon    = 6
+set date   = `date +%Y:%j-%H:%M:%S`
+
+if ($#argv != 2) then
+    echo "usage: ${myname} { hf | lf | both } { 00 | 10 }"
+    echo "eg: ${myname} hf 00   (rbhf cal on the 00 digitizer)"
+    echo "eg: ${myname} both 10 (rbhf AND rblf cals on the 10 digitizer)"
+    exit 1
+else 
+    set test = $argv[1]
+    set loc  = $argv[2]
+endif
+       
+if (! -e $caldir) then
+    if (-e $stadir) then
+        mkdir $caldir
+    else
+        echo "missing $stadir"
+    endif
+    exit 1
+endif
+       
+cd $caldir
+if ($status != 0) then
+    echo "can't chdir $caldir"
+    exit 1
+endif
+
+if ($test == "both") then
+    idacal hf $loc
+    if ($status != 0) exit $status
+    idacal lf $loc
+    exit $status
+endif
+
+set digitizer = ${sta}${loc}
+
+CheckConfigPort:
+set command = "qverify -q $digitizer c"
+echo $date - $command >> $log
+$command >> $log
+if ($status != 0) then
+	sleep 10
+	goto CheckConfigPort
+endif
+
+CheckDataPort:
+set command = "qverify -q $digitizer $port"
+echo $date - $command >> $log
+$command >> $log
+if ($status != 0) then
+	sleep 10
+	goto CheckDataPort
+endif
+
+set caltag    = rb${test}
+set tokens    = ${caltag}${loc}A${mon}
+set digitizer = ${sta}${loc}:${port}:${tokens}:${sta}
+set command   = "qcal $digitizer $caltag cal=123 mon=$mon"
+echo $date - $command >> $log
+$command >> $log
+
+# $Log: idacal,v $
+# Revision 1.7  2016/08/18 22:48:14  dechavez
+# Eliminated the long sleep between 'both' runs and added qverify loops to ensure
+# that the configuration and data ports are reachable before proceeding with qcal
+#
+# Revision 1.6  2016/05/06 22:49:18  dechavez
+# Increase wait time between hf and lf to 360 seconds.  That will ensure that
+# there are no "data port busy" problems if the previous qcal didn't deregister OK
+#
+# Revision 1.5  2015/12/07 20:02:24  dechavez
+# Use {caltag}{loc}A{mon} convention for generating LCQ file lookups
+# Attempt to create cal directory if it doesn't already exist
+#
+# Revision 1.4  2015/11/19 21:03:53  dechavez
+# monitor on channel 6 instead of 4 (aka monitor sensor B channel 3 instead of 1)
+#
+# Revision 1.3  2015/04/10 19:06:38  dechavez
+# increased wait time between hf and lf for "both" option to 120 sec
+#
+# Revision 1.2  2012/08/07 21:45:24  dechavez
+# added "both" option to run rbhf and rblf back to back
+#
+# Revision 1.1  2011/11/17 23:12:52  dechavez
+# initial release
+#
