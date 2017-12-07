@@ -6,3 +6,6 @@ windows
 **/CVS
 **/._.*
 **/OBJS
+**/*.swp
+*.a
+*.o
