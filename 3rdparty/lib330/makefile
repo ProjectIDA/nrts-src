@@ -3,7 +3,7 @@ TARGET	= lib330.a
 # need to fix this hardcoded path once soruce/build tree properly set up
 VPATH   = 
 RANLIB  = ranlib
-LIBDIR  = $(VPATH)../../../lib/$(PLATFORM)
+LIBDIR  = $(VPATH)../3rdparty/lib/$(PLATFORM)
 # LIBDIR  = /ida/dev/lib
 OUTPUT  = $(LIBDIR)/$(TARGET)
 
@@ -30,9 +30,9 @@ RANLIB	= ranlib
 
 .PRECIOUS:	$(TARGET)
 
-CC	= gcc
-CFLAGS  = -g -std=gnu89
-COPT	= 
+CC	= clang ### cc
+CFLAGS  = -g -D$(OSTYPE) -std=c99
+COPT	= -I./ 
 
 
 $(TARGET)  := CFLAGS += $(COPT)

@@ -36,6 +36,7 @@ Edit History:
 #include <stdio.h>
 #include <math.h>
 
+
 #if defined(__SVR4) && defined(__sun)
 #  define solaris
 #  include <sys/filio.h>
@@ -49,7 +50,7 @@ Edit History:
 #    define ENDIAN_LITTLE
 #    define DOUBLE_HYBRID_ENDIAN
 #  include <sys/time.h>
-#elif defined(linux) || defined(solaris)
+#elif defined(linux) || defined(solaris) || defined(BSD)
 #  if defined(__i386__) || defined(__x86_64__)
 #    define X86_UNIX32
 #    define ENDIAN_LITTLE
@@ -61,6 +62,8 @@ Edit History:
 #  endif
 #  include <sys/time.h>
 #  define OMIT_SERIAL
+#else
+#error UNKNOWN PLATFORM
 #endif
 
 
@@ -107,7 +110,15 @@ typedef struct _stat tfile_state ;
 #include <fcntl.h>
 #ifndef OMIT_SERIAL
 #include <unistd.h>     // required for ARM Linux. maybe for others as well.
-#include <sys/termios.h>
+#if defined(BSD)
+#   include <termios.h>
+#else
+#   include <sys/termios.h>
+#endif
+#endif
+
+#if defined(BSD)
+#   include <netinet/in.h>
 #endif
 
 #define boolean uint8_t /* 8 bit unsigned, 0 or non-zero */
