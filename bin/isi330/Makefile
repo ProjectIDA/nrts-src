@@ -1,21 +1,20 @@
 # Unix makefile for isi330
 
 VPATH   = 
+SRC3RD  = $(VPATH)../../../src3rd
 INCDIR  = $(VPATH)../../include
 BINDIR  = $(VPATH)../../../bin/$(PLATFORM)
 LIBDIR  = $(VPATH)../../../lib/$(PLATFORM)
-LIBDIR3RDP = /ida/dev/lib
 
 OPTMIZ  = -g
 INCS   += -I$(INCDIR)
-DEFS    = -D$(OSNAME) -DSVR4 -DOSVER=2.6 -D_REENTRANT
+INCS   += -I$(SRC3RD)/lib330
+DEFS    = -D$(OSNAME) -D$(OSTYPE) -D_REENTRANT
 DEFS   += -D_POSIX_PTHREAD_SEMANTICS
 CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS)
 
 
 LIBS    = -L$(LIBDIR)
-LIBS   += -L$(LIBDIR3RDP)
-LIBS   += -l330
 #LIBS   += -lida
 #LIBS   += -lisidb
 #LIBS   += -lida10
@@ -29,6 +28,8 @@ LIBS   += -lm
 LIBS   += $(MTLIBS)
 LIBS   += $(POSIX4LIB)
 LIBS   += $(SOCKLIBS)
+# putting 3rd party libs last
+LIBS   += -l330
 
 OBJS  = ReleaseNotes.o
 OBJS += main.o
@@ -40,6 +41,8 @@ OBJS += log.o
 OBJS += signals.o
 
 OUTPUT  = isi330
+
+CC = clang
  
 all: OBJS/$(PLATFORM) FORCE
 	cd OBJS/$(PLATFORM); \
@@ -70,5 +73,5 @@ FORCE:
 
 $(OBJS): isi330.h
  
-$(OUTPUT): $(OBJS) 
+$(OUTPUT): $(OBJS) $(LIBDIR)/liblogio.a $(LIBDIR)/libutil.a $(LIBDIR)/lib330.a
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)

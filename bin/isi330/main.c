@@ -14,12 +14,13 @@
 int main(int argc, char **argv) {
 
     tcontext ct;
+    enum tliberr liberr;
+    enum tlibstate libstate;
+    topstat opstat;
+    string63 statestr;
     // tpar_create tpc;
     ISI330_CONFIG *cfg;
 
-    char sta[ISI330_STATION_CODE_SIZE + 1];
-    UINT16 dp;
-    UINT64 sn;
 
 
     cfg = init(argv[0], argc, argv);
@@ -29,7 +30,7 @@ int main(int argc, char **argv) {
         help(argv[0]);
     }
 
-    PrintISI330Config(cfg);
+    /* PrintISI330Config(cfg); */
 
     /* create station thread context */
 
@@ -39,12 +40,29 @@ int main(int argc, char **argv) {
         exit(MY_MOD_ID + 1);
     }
 
+    libstate = lib_get_state(ct, &liberr, &opstat);
+    if (liberr != LIBERR_NOERR) {
+        PrintLib330Tliberr(liberr);
+    } else {
+        printf("libstate: %s\n", lib_get_statestr(libstate, &statestr));
+    }
     /* ping q330 to see if can register with q330 */
 
-    lib_unregistered_ping(ct, cfg->tpr);
-    lib_register(ct, cfg->tpr);
+    /* liberr = lib_unregistered_ping(ct, cfg->tpr); */
+    /* if (liberr != LIBERR_NOERR) { */
+    /*     PrintLib330Tliberr(liberr); */
+    /* } else { */
+    /*     printf("lib_unregistered_ping successful\n"); */
+    /* } */
 
-    printf("bye bye \n");
-    sleep(100);
+    liberr = lib_register(ct, &cfg->tpr);
+    if (liberr != LIBERR_NOERR) {
+        PrintLib330Tliberr(liberr);
+    } else {
+        printf("lib_register successful\n");
+    }
+
+
+    sleep(10000000);
 
 }

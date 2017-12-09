@@ -37,7 +37,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     // Q330 *q330;
     char *dp_str = NULL;
     UINT16 dp;
-    char *sn_str = NULL;
+    /* char *sn_str = NULL; */
     UINT64 sn = 0x0;
     char *q330host = NULL;
 
@@ -48,6 +48,12 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     cfg->tpc = NULL;
     cfg->dp = 0;        // not valid
     cfg->q330host = NULL;
+    memset(cfg->sn_str, 0, sizeof(cfg->sn_str));
+    cfg->sn_str_lo = cfg->sn_str + 8;
+    cfg->sn_str_hi = cfg->sn_str;
+    cfg->sn = 0x0;
+    cfg->sn_lo = 0x0;
+    cfg->sn_hi = 0x0;
 
     /* create struct for lib330 thread context creation */
     if ((cfg->tpc = (tpar_create *) malloc(sizeof(tpar_create))) == NULL) {
@@ -56,10 +62,10 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     }
 
     /* create struct for lib330 registration */
-    if ((cfg->tpr = (tpar_register *) malloc(sizeof(tpar_register))) == NULL) {
-        perror("malloc tpar_register");
-        exit(MY_MOD_ID + 3);
-    }
+    /* if ((cfg->tpr = (tpar_register *) malloc(sizeof(tpar_register))) == NULL) { */
+    /*     perror("malloc tpar_register"); */
+    /*     exit(MY_MOD_ID + 3); */
+    /* } */
 
 /*  Get command line arguments  */
 
@@ -75,7 +81,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
         } else if (strncmp(argv[i], "q330=", strlen("q330=")) == 0) {
             cfg->q330host = argv[i] + strlen("q330=");
         } else if (strncmp(argv[i], "sn=", strlen("sn=")) == 0) {
-            sn_str = argv[i] + strlen("sn=");
+            strcpy(cfg->sn_str, argv[i] + strlen("sn="));
         // } else if (strncmp(argv[i], "cfg=", strlen("cfg=")) == 0) {
         //     if (cfgpath != NULL) {
         //         fprintf(stderr, "ERROR: multilple instances of cfg argument are not allowed\n");
@@ -123,12 +129,14 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
 /* Must specify serial number */
 
-    if (sn_str == NULL) {
+    if (cfg->sn_str[0] == 0) {
         fprintf(stderr,"%s: missing Q330 Serial Number\n", myname);
         help(myname);
     }
-    sn = strtoull(sn_str, NULL, 16);
-    if (sn == 0) {
+    cfg->sn = strtoull(cfg->sn_str, NULL, 16);
+    /* cfg->sn_hi = strtoul(cfg->sn_str_hi, cfg->sn_str[7], 16); */
+    /* cfg->sn_lo = strtoul(cfg->sn_str_lo, cfg->sn_str_lo+7, 16); */
+    if (cfg->sn == 0) {
         fprintf(stderr,"%s: invalid Q330 Serial Number\n", myname);
         help(myname);
     }
@@ -222,57 +230,68 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
     /* set rest of tpar_create struct */
 
-    utilPackUINT64((UINT8 *)cfg->tpc->q330id_serial, sn);
-    cfg->tpc->q330id_dataport = cfg->dp;
+    /* utilPackUINT64((UINT8 *)cfg->tpc->q330id_serial, cfg->sn); */
+    /* utilPackUINT32((UINT8 *)cfg->tpc->q330id_serial, cfg->sn_lo); */
+    /* utilPackUINT32((UINT8 *)cfg->tpc->q330id_serial+1, cfg->sn_hi); */
+    UINT32 snhi = cfg->sn >> 32;
+    UINT32 snlo = cfg->sn & 0x00000000FFFFFFFF;
+    /* utilSwapUINT32(&snlo, 1); */
+    /* utilSwapUINT32(&snhi, 1); */
+    cfg->tpc->q330id_serial[0] = snlo;
+    cfg->tpc->q330id_serial[1] = snhi;
+    cfg->tpc->q330id_dataport = cfg->dp;  // TODO: NEED TO CHECK: seems zero-based bnased on LT_TEL constants
     strncpy(cfg->tpc->q330id_station, cfg->stacode, 6);
     cfg->tpc->host_timezone = 0;         // using UTC on host systems
-    strncpy(cfg->tpc->opt_contfile, "", 250);       // disable for now
-    cfg->tpc->opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_PACKET;
-    cfg->tpc->opt_zoneadjust = 0;        // no need, on UTC
-    cfg->tpc->opt_secfilter = 0;         // not using 1-sec callback
+    strcpy(cfg->tpc->host_software, "IDA:isi330");         // host application name
+    strcpy(cfg->tpc->opt_contfile, "");       // disable for now
+    cfg->tpc->opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_AUXMSG | VERB_PACKET;
+    cfg->tpc->opt_zoneadjust = 1;        // no need, on UTC
+    cfg->tpc->opt_secfilter = OSF_DATASERV;         // not using 1-sec callback
     cfg->tpc->opt_client_msgs = 10;      // set to min, NOT SURE HOW THIS IS USED
     cfg->tpc->opt_minifilter = OMF_ALL;  // send all messages
-    cfg->tpc->opt_aminifilter = 0;       // disabling, I think...
+    cfg->tpc->opt_aminifilter = OMF_ALL;       // disabling, I think...
     cfg->tpc->opt_compat = 0;            // using flag bits in tokens
-    cfg->tpc->amini_exponent = 9;        // not using 'archival' ms, but set to 512 byte records
-    cfg->tpc->amini_512highest = 40;     // 40hz, but not relevant
+    cfg->tpc->amini_exponent = 12;        // not using 'archival' ms, but set to 512 byte records
+    cfg->tpc->amini_512highest = 20;     // 40hz, but not relevant
     cfg->tpc->mini_embed = 1;            // embed calibration and event blockettes in miniseed
-    cfg->tpc->mini_separate = 1;         // generate sSEPARATE mniniseed records for cal and event blockettes
+    cfg->tpc->mini_separate = 0;         // generate sSEPARATE mniniseed records for cal and event blockettes
     cfg->tpc->mini_firchain = NULL;      // just using built-in FIR filters
-    cfg->tpc->call_minidata = NULL;      // NEED TO HAVE CALLBACK FOR DATA COLLECTION
+    cfg->tpc->call_minidata = isi330_miniseed_callback;      // NEED TO HAVE CALLBACK FOR DATA COLLECTION
     cfg->tpc->call_aminidata = NULL;     // not collecting archival miniseed
+    cfg->tpc->resp_err = LIBERR_NOERR;
     cfg->tpc->call_state = isi330_state_callback;         // state change callback??? Will probably want this
-    cfg->tpc->call_messages = NULL;      // message callback, will want this later
+    cfg->tpc->call_messages = isi330_msg_callback;      // message callback, will want this later
     cfg->tpc->call_secdata = NULL;       // not collecting 1-sec data;
     cfg->tpc->call_lowlatency = NULL;    // NYI
     cfg->tpc->call_baler = NULL;         // not using
-    cfg->tpc->file_owner = NULL;         // until better understood. Used in libsupport
+    /* cfg->tpc->file_owner = NULL;         // until better understood. Used in libsupport */
 
 
     /* set registration struct */
-    utilPackUINT64((UINT8 *)cfg->tpr->q330id_auth, 0);
-    strncpy(cfg->tpr->q330id_address, "192.168.1.100", 16);
-    cfg->tpr->q330id_baseport = 5330;
-    cfg->tpr->host_mode = HOST_ETH;
-    strncpy(cfg->tpr->host_interface, "", 251);
-    cfg->tpr->host_mincmdretry = 1;
-    cfg->tpr->host_maxcmdretry = 10;
-    cfg->tpr->host_ctrlport = 0;
-    cfg->tpr->host_dataport = 0;
-    // cfg->tpr->serial_flow = 0;
-    // cfg->tpr->serial_baud = 9600;
-    // cfg->tpr->serial_hostip = "";
-    cfg->tpr->opt_latencytarget = 0; 
-    cfg->tpr->opt_closedloop = 0; 
-    cfg->tpr->opt_dynamic_ip = 0;
-    cfg->tpr->opt_hibertime = 1;
-    cfg->tpr->opt_conntime = 0;
-    cfg->tpr->opt_connwait = 0;
-    cfg->tpr->opt_regattempts = 5;
-    cfg->tpr->opt_ipexpire = 0;
-    cfg->tpr->opt_buflevel = 90;
-    cfg->tpr->opt_q330_cont = 0;
-    cfg->tpr->opt_dss_memory = 0;
+    cfg->tpr.q330id_auth[0] = 0;
+    cfg->tpr.q330id_auth[1] = 0;
+    strcpy(cfg->tpr.q330id_address, cfg->q330host);
+    cfg->tpr.q330id_baseport = 5330;
+    cfg->tpr.host_mode = HOST_ETH;
+    strcpy(cfg->tpr.host_interface, "");
+    cfg->tpr.host_mincmdretry = 2;
+    cfg->tpr.host_maxcmdretry = 30;
+    cfg->tpr.host_ctrlport = 0;
+    cfg->tpr.host_dataport = 0;
+    // cfg->tpr.serial_flow = 0;
+    // cfg->tpr.serial_baud = 9600;
+    // cfg->tpr.serial_hostip = "";
+    cfg->tpr.opt_latencytarget = 0;
+    cfg->tpr.opt_closedloop = 0;
+    cfg->tpr.opt_dynamic_ip = 0;
+    cfg->tpr.opt_hibertime = 2;
+    cfg->tpr.opt_conntime = 10;
+    cfg->tpr.opt_connwait = 1;
+    cfg->tpr.opt_regattempts = 3;
+    cfg->tpr.opt_ipexpire = 0;
+    cfg->tpr.opt_buflevel = 10;
+    cfg->tpr.opt_q330_cont = 10;
+    cfg->tpr.opt_dss_memory = 1024;
 
     LogMsg("initialization complete");
 
