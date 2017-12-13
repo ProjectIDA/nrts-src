@@ -4,21 +4,46 @@
  *
  *=+===================================================================*/
 #include "isi330.h"
-// #include "inttypes.h"
 
 #define MY_MOD_ID ISI330_MOD_MAIN
 
-// static BOOL Debug = FALSE;
+static BOOL Debug = FALSE;
+
+void MainThread(MainThreadParams *cmdline)
+{
+    ISI330_CONFIG *cfg;
+    static INT32 status;
+
+    cfg = init(cmdline->myname, cmdline->argc, cmdline->argv);
+    while (1) {
+        if ((status = ExitStatus()) == 0) {
+            sleep(1);
+        } else {
+//          LogMsg(LOG_DEBUG, "shutdown initiated: exit flag = %ld", status);
+            GracefulExit(status);
+        }
+    }
+}
+
 
 
 int main(int argc, char **argv) {
+
+
+    MainThreadParams cmdline;
+
+    cmdline.argc   = argc;
+    cmdline.argv   = argv;
+    cmdline.myname = argv[0];
+
+    MainThread(&cmdline);
+
 
     tcontext ct;
     enum tliberr liberr;
     enum tlibstate libstate, newstate;
     topstat opstat;
     string63 statestr;
-    // tpar_create tpc;
     ISI330_CONFIG *cfg;
     string95 msgbuf;
     INT32 status = 0;

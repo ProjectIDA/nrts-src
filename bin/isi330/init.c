@@ -31,13 +31,11 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     ISI330_CONFIG *cfg;
     char *user = ISI330_DEFAULT_USER;
     int i;
+    static BOOL daemon = DEFAULT_DAEMON;
     char *cfgpath = NULL;
     char *station = NULL;
-    // LNKLST q330list;
-    // Q330 *q330;
     char *dp_str = NULL;
     UINT16 dp;
-    /* char *sn_str = NULL; */
     UINT64 sn = 0x0;
     char *q330host = NULL;
 
@@ -69,27 +67,33 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
 /*  Get command line arguments  */
 
-    // listInit(q330list);
+     listInit(cfg->q330list);
 
     for (i = 1; i < argc; i++) {
         if (strncmp(argv[i], "db=", strlen("db=")) == 0) {
             dbspec = argv[i] + strlen("db=");
         // } else if (strncmp(argv[i], "log=", strlen("log=")) == 0) {
         //     log = argv[i] + strlen("log=");
-        } else if (strncmp(argv[i], "dp=", strlen("dp=")) == 0) {
-            dp_str = argv[i] + strlen("dp=");
+//        } else if (strncmp(argv[i], "dp=", strlen("dp=")) == 0) {
+//            dp_str = argv[i] + strlen("dp=");
         } else if (strncmp(argv[i], "q330=", strlen("q330=")) == 0) {
             cfg->q330host = argv[i] + strlen("q330=");
+        } else if (strncmp(argv[i], "q330=", strlen("q330=")) == 0) {
+            if ((par->cfgpath = AddQ330(par, argv[i] + strlen("q330="), cfgpath)) == NULL) {
+                fprintf(stderr, "%s: failed to add Q330: %s\n", myname, strerror(errno));
+                exit(MY_MOD_ID);
+            }
+            seedlink = NULL; /* SeedLink not applicable for QDP input */
         } else if (strncmp(argv[i], "sn=", strlen("sn=")) == 0) {
             strcpy(cfg->sn_str, argv[i] + strlen("sn="));
-        // } else if (strncmp(argv[i], "cfg=", strlen("cfg=")) == 0) {
-        //     if (cfgpath != NULL) {
-        //         fprintf(stderr, "ERROR: multilple instances of cfg argument are not allowed\n");
-        //         exit(MY_MOD_ID);
-        //     }
-        //     cfgpath = argv[i] + strlen("cfg=");
-        // } else if (strcmp(argv[i], "-bd") == 0) {
-        //     daemon = TRUE;
+         } else if (strncmp(argv[i], "cfg=", strlen("cfg=")) == 0) {
+             if (cfgpath != NULL) {
+                 fprintf(stderr, "ERROR: multilple instances of cfg argument are not allowed\n");
+                 exit(MY_MOD_ID);
+             }
+             cfgpath = argv[i] + strlen("cfg=");
+         } else if (strcmp(argv[i], "-bd") == 0) {
+             daemon = TRUE;
         } else if (strcmp(argv[i], "-debug") == 0) {
             debug = TRUE;
         } else if (cfg->stacode == NULL) {

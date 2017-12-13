@@ -29,20 +29,39 @@ extern char *VersionIdentString;
 
 #define ISI330_STATION_CODE_SIZE 4
 
+
 typedef struct {
+    MUTEX mutex;
+//    Q330_CFG *cfg;
+    LOGIO *lp;
+    BOOL first;
 	char *stacode;
 	char *q330host;
-    char sn_str[16+1];
-    char *sn_str_hi; /* ptr to high order 8 chars. same as sn_str */
-    char *sn_str_lo; /* ptr to low order 8 chars */
-    longword sn_hi; /* ptr to high order 8 chars */
-    longword sn_lo; /* ptr to low order 8 chars */
-    UINT64 sn;
+	char sn_str[16+1];
+	char *sn_str_hi; /* ptr to high order 8 chars. same as sn_str */
+	char *sn_str_lo; /* ptr to low order 8 chars */
+	longword sn_hi; /* ptr to high order 8 chars */
+	longword sn_lo; /* ptr to low order 8 chars */
+	UINT64 sn;
 	UINT16 dp;
 	tpar_create *tpc;
 	tpar_register tpr;
-    tcontext *ct;
+	tcontext *ct;
+} Q330;
+
+
+typedef struct {
+
+	LNKLST q330list;        /* zero or more Q330's */
 } ISI330_CONFIG;
+
+/* For passing command line to MainThread */
+
+typedef struct thread_params {
+    int argc;
+    char **argv;
+    char *myname;
+} MainThreadParams;
 
 
 /* prototypes */
