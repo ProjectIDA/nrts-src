@@ -20,39 +20,45 @@ static char *fid = "SignalHandlerThread";
     while (1) {
 
         /* wait for a signal to arrive */
-
+printf("going to wait for signal...\n");
         sigwait(&set, &sig);
+printf("Got signal...%d\n", sig);
 
         /* process signals */
 
         switch (sig) {
           case SIGTERM:
-            LogMsg("SIGTERM");
-            GracefulExit(-(MY_MOD_ID + sig));
+            /* LogMsg("SIGTERM"); */
+            SetExitStatus(-(MY_MOD_ID + sig));
+            /* GracefulExit(-(MY_MOD_ID + sig)); */
             break;
 
           case SIGQUIT:
-            LogMsg("SIGQUIT");
-            GracefulExit(-(MY_MOD_ID + sig));
+            /* LogMsg("SIGQUIT"); */
+            /* GracefulExit(-(MY_MOD_ID + sig)); */
+            SetExitStatus(-(MY_MOD_ID + sig));
             break;
 
           case SIGINT:
-            LogMsg("SIGINT");
-            GracefulExit(-(MY_MOD_ID + sig));
+            /* LogMsg("SIGINT"); */
+            /* GracefulExit(-(MY_MOD_ID + sig)); */
+            SetExitStatus(-(MY_MOD_ID + sig));
             break;
 
           case SIGUSR1:
-            LogMsg("SIGHUP");
-            GracefulExit(-(MY_MOD_ID + sig));
+            /* LogMsg("SIGHUP"); */
+            /* GracefulExit(-(MY_MOD_ID + sig)); */
+            SetExitStatus(-(MY_MOD_ID + sig));
             break;
 
           case SIGHUP:
-            LogMsg("SIGHUP");
-            GracefulExit(-(MY_MOD_ID + sig));
+            /* LogMsg("SIGHUP"); */
+            /* GracefulExit(-(MY_MOD_ID + sig)); */
+            SetExitStatus(-(MY_MOD_ID + sig));
             break;
 
           default:
-            LogMsg("signal %d ignored", sig);
+            /* LogMsg("signal %d ignored", sig); */
             break;
         }
     }

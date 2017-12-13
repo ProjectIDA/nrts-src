@@ -220,14 +220,6 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     // LogMsg(LOG_INFO, "tee file length = %lu records", glob.trecs);
     // if (flags & ISI_DL_FLAGS_ASYNC_WRITE) LogMsg(LOG_INFO, "NOTICE: asynchronous ISI disk loop writes selected");
 
-/* Start signal handling thread */
-
-    StartSignalHandler();
-
-/* Initialize the exit facility */
-
-    InitExit();
-
     /* set rest of tpar_create struct */
 
     /* utilPackUINT64((UINT8 *)cfg->tpc->q330id_serial, cfg->sn); */
@@ -249,7 +241,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     cfg->tpc->opt_secfilter = OSF_DATASERV;         // not using 1-sec callback
     cfg->tpc->opt_client_msgs = 10;      // set to min, NOT SURE HOW THIS IS USED
     cfg->tpc->opt_minifilter = OMF_ALL;  // send all messages
-    cfg->tpc->opt_aminifilter = OMF_ALL;       // disabling, I think...
+    cfg->tpc->opt_aminifilter = 0;       // disabling, I think...
     cfg->tpc->opt_compat = 0;            // using flag bits in tokens
     cfg->tpc->amini_exponent = 12;        // not using 'archival' ms, but set to 512 byte records
     cfg->tpc->amini_512highest = 20;     // 40hz, but not relevant
@@ -276,8 +268,8 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     strcpy(cfg->tpr.host_interface, "");
     cfg->tpr.host_mincmdretry = 2;
     cfg->tpr.host_maxcmdretry = 30;
-    cfg->tpr.host_ctrlport = 0;
-    cfg->tpr.host_dataport = 0;
+    cfg->tpr.host_ctrlport = 9999;
+    cfg->tpr.host_dataport = 9998;
     // cfg->tpr.serial_flow = 0;
     // cfg->tpr.serial_baud = 9600;
     // cfg->tpr.serial_hostip = "";

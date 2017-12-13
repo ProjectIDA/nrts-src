@@ -35,6 +35,7 @@ OBJS  = ReleaseNotes.o
 OBJS += main.o
 OBJS += callbacks.o
 OBJS += q330db.o
+OBJS += q330utils.o
 OBJS += exit.o
 OBJS += init.o
 OBJS += log.o

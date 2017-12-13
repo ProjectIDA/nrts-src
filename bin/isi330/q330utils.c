@@ -1,67 +1,19 @@
 /*======================================================================
  *
- *  Graceful exits.
+ * Some utility routines for qorking with Lib330.
  *
  *====================================================================*/
 #include "isi330.h"
 
-static MUTEX mutex;
-static INT32 ExitFlag = 0;
-static ISI330_CONFIG *cfg = NULL;
+#define MY_MOD_ID ISI330_MOD_Q330UTILS
 
-void BlockShutdown(char *fid)
+void disconnect_q330(tcontext *ct)
 {
-    MUTEX_LOCK(&mutex);
+    lib_change_state(*ct, LIBSTATE_IDLE, LIBERR_NOERR);
+    lib_change_state(*ct, LIBSTATE_TERM, LIBERR_NOERR);
+    lib_destroy_context(ct);
+    printf("Disconnected from Q330\n");
 }
-
-void UnblockShutdown(char *fid)
-{
-    MUTEX_UNLOCK(&mutex);
-}
-
-INT32 ExitStatus()
-{
-    INT32 retval;
-
-    MUTEX_LOCK(&mutex);
-    retval = ExitFlag;
-    MUTEX_UNLOCK(&mutex);
-
-    return retval;
-}
-
-void SetExitStatus(INT32 status)
-{
-    MUTEX_LOCK(&mutex);
-    ExitFlag = status;
-    MUTEX_UNLOCK(&mutex);
-    /* LogMsg(LOG_DEBUG, "set exit status %ld", status); */
-}
-
-
-void GracefulExit(INT32 status)
-{
-static char *fid = "Exit";
-
-    BlockShutdown(fid);
-
-    if (status < 0) {
-        status = -status;
-        /* LogMsg("going down on signal %ld", status - ISI330_MOD_SIGNALS); */
-    }
-
-    disconnect_q330(cfg->ct);
-    /* LogMsg("exit %ld", status); */
-    exit(status);
-
-}
-
-void InitExit(ISI330_CONFIG *config)
-{
-    MUTEX_INIT(&mutex);
-    cfg = config;
-}
-
 /*-----------------------------------------------------------------------+
  |                                                                       |
  | Copyright (C) 2017 Regents of the University of California            |
