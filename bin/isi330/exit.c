@@ -47,11 +47,13 @@ static char *fid = "Exit";
 
     if (status < 0) {
         status = -status;
-        /* LogMsg("going down on signal %ld", status - ISI330_MOD_SIGNALS); */
+        LogMsg(LOG_INFO, "going down on signal %ld", status - ISI330_MOD_SIGNALS);
     }
 
-    disconnect_q330(cfg->ct);
-    /* LogMsg("exit %ld", status); */
+    ShutdownQ330Readers(cfg);
+
+// TODO   isidlCloseDiskLoop(cfg->dl);
+
     exit(status);
 
 }
