@@ -11,19 +11,25 @@ INCS   += -I$(INCDIR)
 INCS   += -I$(SRC3RD)/lib330
 DEFS    = -D$(OSNAME) -D$(OSTYPE) -D_REENTRANT
 DEFS   += -D_POSIX_PTHREAD_SEMANTICS
-CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS)
+CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS) -std=c99
 
 
 LIBS    = -L$(LIBDIR)
 #LIBS   += -lida
 #LIBS   += -lisidb
+LIBS   += -lisi
 #LIBS   += -lida10
-#LIBS   += -liacp
-#LIBS   += -lq330
+LIBS   += -liacp
+LIBS   += -lq330
+LIBS   += -lqdp
+LIBS   += -lqio
+LIBS   += -ludpio
+LIBS   += -lttyio
 LIBS   += -llogio
+LIBS   += -lmsgq
 LIBS   += -lutil
-#LIBS   += -lmd5
-#LIBS   += -lz
+LIBS   += -lmd5
+LIBS   += -lz
 LIBS   += -lm
 LIBS   += $(MTLIBS)
 LIBS   += $(POSIX4LIB)
@@ -32,10 +38,10 @@ LIBS   += $(SOCKLIBS)
 LIBS   += -l330
 
 OBJS  = ReleaseNotes.o
+OBJS += bground.o
 OBJS += main.o
 OBJS += callbacks.o
-OBJS += q330db.o
-OBJS += q330utils.o
+OBJS += q330.o
 OBJS += exit.o
 OBJS += init.o
 OBJS += log.o
@@ -43,7 +49,7 @@ OBJS += signals.o
 
 OUTPUT  = isi330
 
-CC = clang
+CC = cc ###clang
  
 all: OBJS/$(PLATFORM) FORCE
 	cd OBJS/$(PLATFORM); \

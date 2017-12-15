@@ -79,6 +79,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
      listInit(&cfg->q330list);
 
     for (int i = 1; i < argc; i++) {
+printf("argv[%d] = %s\n", i, argv[i]);
         if (strncmp(argv[i], "db=", strlen("db=")) == 0) {
             dbspec = argv[i] + strlen("db=");
         } else if (strncmp(argv[i], "q330=", strlen("q330=")) == 0) {
@@ -195,8 +196,9 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
          perror("InitLogging");
          exit(MY_MOD_ID);
      }
-     cfg->dl->lp = cfg->lp;
-    if (cfg->dl->nrts != NULL) cfg->dl->nrts->lp = cfg->lp;
+     // TODO
+     /* cfg->dl->lp = cfg->lp; */
+    /* if (cfg->dl->nrts != NULL) cfg->dl->nrts->lp = cfg->lp; */
 
 // TODO
 //     LogMsg(LOG_INFO, "database = %s", glob.db->dbid);

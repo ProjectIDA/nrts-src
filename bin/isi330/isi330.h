@@ -16,7 +16,7 @@
 #include "util.h"
 #include "logio.h"
 #include "q330.h"
-#include "isi/dl.h"
+/* #include "isi/dl.h" */
 
 extern char *VersionIdentString;
 static char *Copyright = "Copyright (C) 2017 - Regents of the University of California.";
@@ -62,7 +62,7 @@ typedef struct {
 
 typedef struct {
 	char *site;		// Disk Loop Name
-    ISI_DL *dl;     //ptr to disk loop struct
+    /* ISI_DL *dl;     //ptr to disk loop struct */
 	char *cfgpath;      /* Q330 configuration file */
 	LNKLST q330list;    /* zero or more Q330's */
 	LOGIO *lp;

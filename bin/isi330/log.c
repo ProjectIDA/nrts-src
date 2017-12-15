@@ -49,14 +49,14 @@ LOGIO *InitLogging(char *myname, char *spec, char *prefix, BOOL debug)
     logioSetPrefix(&lp, prefix);
 
     if (debug) logioSetThreshold(&lp, LOG_DEBUG);
-    LogMsg(LOG_INFO, "ISI Disk Loop Writer - %s (%s %s)", VersionIdentString, __DATE__, __TIME__);
-    LogMsg(LOG_DEBUG, "%s", msgqVersionString());
-    LogMsg(LOG_DEBUG, "%s", iacpVersionString());
+    LogMsg(LOG_INFO, "ISI330 Lib330/Miniseed Disk Loop Writer - %s (%s %s)", VersionIdentString, __DATE__, __TIME__);
+    /* LogMsg(LOG_DEBUG, "%s", msgqVersionString()); */
+    /* LogMsg(LOG_DEBUG, "%s", iacpVersionString()); */
 //    LogMsg(LOG_DEBUG, "%s", nrtsVersionString());
-    LogMsg(LOG_DEBUG, "%s", logioVersionString());
-    LogMsg(LOG_DEBUG, "%s", ttyioVersionString());
-    LogMsg(LOG_DEBUG, "%s", isiVersionString());
-    LogMsg(LOG_DEBUG, "%s", utilVersionString());
+    /* LogMsg(LOG_DEBUG, "%s", logioVersionString()); */
+    /* LogMsg(LOG_DEBUG, "%s", ttyioVersionString()); */
+    /* LogMsg(LOG_DEBUG, "%s", isiVersionString()); */
+    /* LogMsg(LOG_DEBUG, "%s", utilVersionString()); */
     /* LogMsg(LOG_INFO, "%s", Copyright); */
 
     return &lp;
@@ -72,9 +72,8 @@ void PrintISI330Config(ISI330_CONFIG *cfg) {
 
     cur = listFirstNode(&cfg->q330list);
     while (cur != NULL) {
-        cur = listNextNode(cur);
         q330 = (Q330 *) cur->payload;
-        LogMsg(LOG_INFO, "%s:%d tpar_create:\n");
+        LogMsg(LOG_INFO, "%s:%d tpar_create:\n", q330->host, q330->dp);
         LogMsg(LOG_INFO, "%s:%d tpar_create.q330id_serial[0]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[0]);
         LogMsg(LOG_INFO, "%s:%d tpar_create.q330id_serial[1]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[1]);
         LogMsg(LOG_INFO, "%s:%d tpar_create.q330id_dataport:  %hu\n", q330->host, q330->dp, q330->tpc.q330id_dataport);
@@ -119,6 +118,8 @@ void PrintISI330Config(ISI330_CONFIG *cfg) {
         /* printf("cfg->tpar_register.serial_flow:         %d\n", cfg->tpr.serial_flow); /1* 1 = hardware flow control *1/ */
         /* printf("cfg->tpar_register.serial_baud:         %ld\n", cfg->tpr.serial_baud); /1* in bps *1/ */
         /* printf("cfg->tpar_register.serial_hostip:       %ld\n", cfg->tpr.serial_hostip); /1* IP address to identify host *1/ */
+
+        cur = listNextNode(cur);
     }
 }
 
@@ -185,11 +186,11 @@ void PrintLib330Topstat(topstat *popstat)
         /* printf("opstat.pkt_full: %s\n", popstat->pkt_full); /1* percent of Q330 packet buffer full *1/ */
         printf("opstat.clock_qual: %d\n", popstat->clock_qual); /* Percent clock quality */
         printf("opstat.clock_drift: %d\n", popstat->clock_drift); /* Clock drift from GPS in microseconds */
-        printf("opstat.mass_pos: %lld, %lld, %lld, %lld, %lld, %lld\n",
+        printf("opstat.mass_pos: %d, %d, %d, %d, %d, %d\n",
                 popstat->mass_pos[0], popstat->mass_pos[1], popstat->mass_pos[2],
                 popstat->mass_pos[3], popstat->mass_pos[4], popstat->mass_pos[5]);
-        printf("opstat.calibration_errors: %lld\n", popstat->calibration_errors); /* calibration error bitmap */
-        printf("opstat.sys_temp: %lld\n", popstat->sys_temp); /* Q330 temperature in degrees C */
+        printf("opstat.calibration_errors: %d\n", popstat->calibration_errors); /* calibration error bitmap */
+        printf("opstat.sys_temp: %d\n", popstat->sys_temp); /* Q330 temperature in degrees C */
         printf("opstat.pwr_volt: %f\n", popstat->pwr_volt); /* Q330 power supply voltage in volts */
         printf("opstat.pwr_cur: %f\n", popstat->pwr_cur); /* Q330 power supply current in amps */
         printf("opstat.gps_age: %d\n", popstat->gps_age); /* age in seconds of last GPS clock update, -1 for never updated */

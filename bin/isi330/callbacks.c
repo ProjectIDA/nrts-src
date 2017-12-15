@@ -20,7 +20,8 @@ void isi330_state_callback(pointer p)
 
 	printf("STATE: state_type=%u info=%u : %s\n", state->state_type, state->info,
             lib_get_statestr(lib_get_state(state->context, &liberr, &opstat), &statestr));
-    printf(lib_get_statestr((enum tlibstate)state->info, &statestr));
+    lib_get_statestr((enum tlibstate)state->info, &statestr);
+    printf(statestr);
 
     /* PrintLib330Topstat(&opstat); */
 
@@ -58,5 +59,5 @@ void isi330_msg_callback(pointer p)
     msg = (tmsg_call *)p;
     string95 codestr;
 
-    printf("MSG: # %u [code=%d]:%s%s\n", msg->msgcount, msg->code, lib_get_msg(msg->code, &codestr),  msg->suffix);
+    printf("MSG: # %u [code=%d]: %s%s\n", msg->msgcount, msg->code, lib_get_msg(msg->code, &codestr),  msg->suffix);
 }

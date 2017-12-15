@@ -3,7 +3,6 @@
  * Axquisition from a Q330 using Quanterra Lib330 library
  *
  *====================================================================*/
-#include <q330.h>
 #include "isi330.h"
 
 #define MY_MOD_ID ISI330_MOD_Q330
@@ -221,18 +220,22 @@ static THREAD_FUNC Q330Thread(void *argptr)
     q330 = argptr;
 
     /* create station thread context */
+    if ((q330->ct = malloc(sizeof(tcontext))) == NULL) {
+        LogMsg(LOG_ERR, "%s: malloc(tconext): %s", fid, strerror(errno));
+        exit(MY_MOD_ID + 1);
+    }
     lib_create_context(q330->ct, &q330->tpc);
     if (q330->tpc.resp_err != 0) {
         LogMsg(LOG_INFO, "%s: lib_create_context %s:%d; resp_err=%d", fid,
                q330->host, q330->dp, q330->tpc.resp_err);
-        exit(MY_MOD_ID + 1);
+        exit(MY_MOD_ID + 2);
     }
     LogMsg(LOG_INFO, "station context created for host %s:%d", q330->host, q330->dp);
 
 //    strcpy(msg_buf, "COMPLETED: lib_create_context\n");
 //    lib_msg_add(q330->ct, LIBMSG_USER, 0, &msg_buf);
 
-    libstate = lib_get_state(q330->ct, &liberr, &op_stat);
+    libstate = lib_get_state(*q330->ct, &liberr, &op_stat);
     if (liberr != LIBERR_NOERR) {
         PrintLib330Tliberr(liberr);
     } else {
@@ -247,20 +250,20 @@ static THREAD_FUNC Q330Thread(void *argptr)
     /*     printf("lib_unregistered_ping successful\n"); */
     /* } */
 
-    liberr = lib_register(q330->ct, &q330->tpr);
+    liberr = lib_register(*q330->ct, &q330->tpr);
     if (liberr != LIBERR_NOERR) {
         PrintLib330Tliberr(liberr);
     } else {
         printf("lib_register successful\n");
     }
 
-
-    libstate = lib_get_state(q330->ct, &liberr, &op_stat);
+    libstate = lib_get_state(*q330->ct, &liberr, &op_stat);
     while (1) {
+        fprintf(stderr, "[%s:%d] ", q330->host, q330->dp);
         if ((status = ExitStatus()) == 0) {
             sleep(1);
 
-            new_state = lib_get_state(q330->ct, &liberr, &op_stat);
+            new_state = lib_get_state(*q330->ct, &liberr, &op_stat);
             if (new_state != libstate) {
                 libstate = new_state;
                 printf("NEW State [%d]: %s\n", (int)libstate, lib_get_statestr(libstate, &state_str));
@@ -317,6 +320,7 @@ void StartQ330Readers(ISI330_CONFIG *cfg)
         }
         q330 = (Q330 *) crnt->payload;
         q330->lp = cfg->lp;
+        strncpy(q330->tpc.q330id_station, cfg->site, 6);
         if (!THREAD_CREATE(&tid, Q330Thread, (void *) q330)) {
             LogMsg(LOG_INFO, "%s: THREAD_CREATE: Q330Thread: %s", fid, strerror(errno));
             SetExitStatus(MY_MOD_ID + 7);
