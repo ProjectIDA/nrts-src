@@ -99,7 +99,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv);
 
 /* log.c */
 void LogCommandLine(int argc, char **argv);
-VOID LogMsg(int level, char *format, ...);
+VOID LogMsg(char *format, ...);
 void LogMsgLevel(int newlevel);
 LOGIO *InitLogging(char *myname, char *spec, char *prefix, BOOL debug);
 void PrintISI330Config(ISI330_CONFIG *cfg);

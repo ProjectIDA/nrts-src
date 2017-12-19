@@ -17,14 +17,14 @@ char message[MAXPATHLEN+1];
 
     sprintf(message, "working directory: ");
     getcwd(message+strlen(message), MAXPATHLEN-strlen(message));
-    LogMsg(LOG_INFO, message);
+    LogMsg(message);
 
     sprintf(message, "command line:     ");
     for (i = 0; i < argc; i++) sprintf(message+strlen(message), " %s", argv[i]);
-    LogMsg(LOG_INFO, message);
+    LogMsg(message);
 }
 
-VOID LogMsg(int level, char *format, ...)
+VOID LogMsg(char *format, ...)
 {
     va_list marker;
     char *ptr, msgbuf[LOGIO_MAX_MSG_LEN];
@@ -49,15 +49,15 @@ LOGIO *InitLogging(char *myname, char *spec, char *prefix, BOOL debug)
     logioSetPrefix(&lp, prefix);
 
     if (debug) logioSetThreshold(&lp, LOG_DEBUG);
-    LogMsg(LOG_INFO, "ISI330 Lib330/Miniseed Disk Loop Writer - %s (%s %s)", VersionIdentString, __DATE__, __TIME__);
-    /* LogMsg(LOG_DEBUG, "%s", msgqVersionString()); */
-    /* LogMsg(LOG_DEBUG, "%s", iacpVersionString()); */
-//    LogMsg(LOG_DEBUG, "%s", nrtsVersionString());
-    /* LogMsg(LOG_DEBUG, "%s", logioVersionString()); */
-    /* LogMsg(LOG_DEBUG, "%s", ttyioVersionString()); */
-    /* LogMsg(LOG_DEBUG, "%s", isiVersionString()); */
-    /* LogMsg(LOG_DEBUG, "%s", utilVersionString()); */
-    /* LogMsg(LOG_INFO, "%s", Copyright); */
+    LogMsg("ISI330 Lib330/Miniseed Disk Loop Writer - %s (%s %s)", VersionIdentString, __DATE__, __TIME__);
+    /* LogMsg("%s", msgqVersionString()); */
+    /* LogMsg("%s", iacpVersionString()); */
+//     LogMsg("%s", nrtsVersionString());
+    /* LogMsg("%s", logioVersionString()); */
+    /* LogMsg("%s", ttyioVersionString()); */
+    /* LogMsg("%s", isiVersionString()); */
+    /* LogMsg("%s", utilVersionString()); */
+    /* LogMsg("%s", Copyright); */
 
     return &lp;
 }
@@ -73,48 +73,48 @@ void PrintISI330Config(ISI330_CONFIG *cfg) {
     cur = listFirstNode(&cfg->q330list);
     while (cur != NULL) {
         q330 = (Q330 *) cur->payload;
-        LogMsg(LOG_INFO, "%s:%d tpar_create:\n", q330->host, q330->dp);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.q330id_serial[0]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[0]);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.q330id_serial[1]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[1]);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.q330id_dataport:  %hu\n", q330->host, q330->dp, q330->tpc.q330id_dataport);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.q330id_station:    %s\n", q330->host, q330->dp, q330->tpc.q330id_station);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.host_timezone:     %d\n", q330->host, q330->dp, q330->tpc.host_timezone);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.host_software:     %s\n", q330->host, q330->dp, q330->tpc.host_software);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_contfile:      %s\n", q330->host, q330->dp, q330->tpc.opt_contfile);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_verbose:       %d\n", q330->host, q330->dp, q330->tpc.opt_verbose);
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_zoneadjust:    %d\n", q330->host, q330->dp, q330->tpc.opt_zoneadjust); /* calculate host's timezone automatically */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_secfilter:     %d\n", q330->host, q330->dp, q330->tpc.opt_secfilter); /* OSF_xxx bits */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_client_msgs:   %d\n", q330->host, q330->dp, q330->tpc.opt_client_msgs); /* Number of client message buffers */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_compat:        %d\n", q330->host, q330->dp, q330->tpc.opt_compat); /* Compatibility Mode */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_minifilter:    %d\n", q330->host, q330->dp, q330->tpc.opt_minifilter); /* OMF_xxx bits */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.opt_aminifilter:   %d\n", q330->host, q330->dp, q330->tpc.opt_aminifilter); /* OMF_xxx bits */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.amini_exponent:    %d\n", q330->host, q330->dp, q330->tpc.amini_exponent); /* 2**exp size of archival miniseed, range of 9 to 14 */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.amini_512highest:  %d\n", q330->host, q330->dp, q330->tpc.amini_512highest); /* rates up to this value are updated every 512 bytes */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.mini_embed:        %d\n", q330->host, q330->dp, q330->tpc.mini_embed); /* 1 = embed calibration and event blockettes into data */
-        LogMsg(LOG_INFO, "%s:%d tpar_create.mini_separate:     %d\n", q330->host, q330->dp, q330->tpc.mini_separate); /* 1 = generate separate calibration and event records */
+        LogMsg("%s:%d tpar_create:\n", q330->host, q330->dp);
+        LogMsg("%s:%d tpar_create.q330id_serial[0]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[0]);
+        LogMsg("%s:%d tpar_create.q330id_serial[1]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[1]);
+        LogMsg("%s:%d tpar_create.q330id_dataport:  %hu\n", q330->host, q330->dp, q330->tpc.q330id_dataport);
+        LogMsg("%s:%d tpar_create.q330id_station:    %s\n", q330->host, q330->dp, q330->tpc.q330id_station);
+        LogMsg("%s:%d tpar_create.host_timezone:     %d\n", q330->host, q330->dp, q330->tpc.host_timezone);
+        LogMsg("%s:%d tpar_create.host_software:     %s\n", q330->host, q330->dp, q330->tpc.host_software);
+        LogMsg("%s:%d tpar_create.opt_contfile:      %s\n", q330->host, q330->dp, q330->tpc.opt_contfile);
+        LogMsg("%s:%d tpar_create.opt_verbose:       %d\n", q330->host, q330->dp, q330->tpc.opt_verbose);
+        LogMsg("%s:%d tpar_create.opt_zoneadjust:    %d\n", q330->host, q330->dp, q330->tpc.opt_zoneadjust); /* calculate host's timezone automatically */
+        LogMsg("%s:%d tpar_create.opt_secfilter:     %d\n", q330->host, q330->dp, q330->tpc.opt_secfilter); /* OSF_xxx bits */
+        LogMsg("%s:%d tpar_create.opt_client_msgs:   %d\n", q330->host, q330->dp, q330->tpc.opt_client_msgs); /* Number of client message buffers */
+        LogMsg("%s:%d tpar_create.opt_compat:        %d\n", q330->host, q330->dp, q330->tpc.opt_compat); /* Compatibility Mode */
+        LogMsg("%s:%d tpar_create.opt_minifilter:    %d\n", q330->host, q330->dp, q330->tpc.opt_minifilter); /* OMF_xxx bits */
+        LogMsg("%s:%d tpar_create.opt_aminifilter:   %d\n", q330->host, q330->dp, q330->tpc.opt_aminifilter); /* OMF_xxx bits */
+        LogMsg("%s:%d tpar_create.amini_exponent:    %d\n", q330->host, q330->dp, q330->tpc.amini_exponent); /* 2**exp size of archival miniseed, range of 9 to 14 */
+        LogMsg("%s:%d tpar_create.amini_512highest:  %d\n", q330->host, q330->dp, q330->tpc.amini_512highest); /* rates up to this value are updated every 512 bytes */
+        LogMsg("%s:%d tpar_create.mini_embed:        %d\n", q330->host, q330->dp, q330->tpc.mini_embed); /* 1 = embed calibration and event blockettes into data */
+        LogMsg("%s:%d tpar_create.mini_separate:     %d\n", q330->host, q330->dp, q330->tpc.mini_separate); /* 1 = generate separate calibration and event records */
 
-        LogMsg(LOG_INFO, "%s:%d tpar_register:\n");
-        LogMsg(LOG_INFO, "%s:%d tpar_register.q330id_auth:         %x\n", q330->host, q330->dp, q330->tpr.q330id_auth[0]); /* authentication code */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.q330id_auth:         %x\n", q330->host, q330->dp, q330->tpr.q330id_auth[1]); /* authentication code */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.q330id_address:      %s\n", q330->host, q330->dp, q330->tpr.q330id_address); /* domain name or IP address in dotted decimal */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.q330id_baseport:     %d\n", q330->host, q330->dp, q330->tpr.q330id_baseport); /* base UDP port number */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.host_mode:           %d\n", q330->host, q330->dp, q330->tpr.host_mode);
-        LogMsg(LOG_INFO, "%s:%d tpar_register.host_interface:      %s\n", q330->host, q330->dp, q330->tpr.host_interface); /* ethernet or serial port path name */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.host_mincmdretry:    %d\n", q330->host, q330->dp, q330->tpr.host_mincmdretry); /* minimum command retry timeout */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.host_maxcmdretry:    %d\n", q330->host, q330->dp, q330->tpr.host_maxcmdretry); /* maximum command retry timeout */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.host_ctrlport:       %d\n", q330->host, q330->dp, q330->tpr.host_ctrlport); /* set non-zero to use specified UDP port at host end */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.host_dataport:       %d\n", q330->host, q330->dp, q330->tpr.host_dataport); /* set non-zero to use specified UDP port at host end */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_latencytarget:   %d\n", q330->host, q330->dp, q330->tpr.opt_latencytarget); /* seconds latency target for low-latency data */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_closedloop:      %d\n", q330->host, q330->dp, q330->tpr.opt_closedloop); /* 1 = enable closed loop acknowledge */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_dynamic_ip:      %d\n", q330->host, q330->dp, q330->tpr.opt_dynamic_ip); /* 1 = dynamic IP address */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_hibertime:       %d\n", q330->host, q330->dp, q330->tpr.opt_hibertime); /* hibernate time in minutes if non-zero */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_conntime:        %d\n", q330->host, q330->dp, q330->tpr.opt_conntime); /* maximum connection time in minutes if non-zero */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_connwait:        %d\n", q330->host, q330->dp, q330->tpr.opt_connwait); /* wait this many minutes after connection time or buflevel shutdown */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_regattempts:     %d\n", q330->host, q330->dp, q330->tpr.opt_regattempts); /* maximum registration attempts before hibernate if non-zero */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_ipexpire:        %d\n", q330->host, q330->dp, q330->tpr.opt_ipexpire); /* dyanmic IP address expires after this many minutes since last POC */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_buflevel:        %d\n", q330->host, q330->dp, q330->tpr.opt_buflevel); /* terminate connection when buffer level reaches this value if non-zero */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_q330_cont:       %d\n", q330->host, q330->dp, q330->tpr.opt_q330_cont); /* Determines how often Q330 continuity is written to disk in minutes */
-        LogMsg(LOG_INFO, "%s:%d tpar_register.opt_dss_memory:      %d\n", q330->host, q330->dp, q330->tpr.opt_dss_memory); /* Maximum DSS memory (in KB) if non-zero */
+        LogMsg("%s:%d tpar_register:\n");
+        LogMsg("%s:%d tpar_register.q330id_auth:         %x\n", q330->host, q330->dp, q330->tpr.q330id_auth[0]); /* authentication code */
+        LogMsg("%s:%d tpar_register.q330id_auth:         %x\n", q330->host, q330->dp, q330->tpr.q330id_auth[1]); /* authentication code */
+        LogMsg("%s:%d tpar_register.q330id_address:      %s\n", q330->host, q330->dp, q330->tpr.q330id_address); /* domain name or IP address in dotted decimal */
+        LogMsg("%s:%d tpar_register.q330id_baseport:     %d\n", q330->host, q330->dp, q330->tpr.q330id_baseport); /* base UDP port number */
+        LogMsg("%s:%d tpar_register.host_mode:           %d\n", q330->host, q330->dp, q330->tpr.host_mode);
+        LogMsg("%s:%d tpar_register.host_interface:      %s\n", q330->host, q330->dp, q330->tpr.host_interface); /* ethernet or serial port path name */
+        LogMsg("%s:%d tpar_register.host_mincmdretry:    %d\n", q330->host, q330->dp, q330->tpr.host_mincmdretry); /* minimum command retry timeout */
+        LogMsg("%s:%d tpar_register.host_maxcmdretry:    %d\n", q330->host, q330->dp, q330->tpr.host_maxcmdretry); /* maximum command retry timeout */
+        LogMsg("%s:%d tpar_register.host_ctrlport:       %d\n", q330->host, q330->dp, q330->tpr.host_ctrlport); /* set non-zero to use specified UDP port at host end */
+        LogMsg("%s:%d tpar_register.host_dataport:       %d\n", q330->host, q330->dp, q330->tpr.host_dataport); /* set non-zero to use specified UDP port at host end */
+        LogMsg("%s:%d tpar_register.opt_latencytarget:   %d\n", q330->host, q330->dp, q330->tpr.opt_latencytarget); /* seconds latency target for low-latency data */
+        LogMsg("%s:%d tpar_register.opt_closedloop:      %d\n", q330->host, q330->dp, q330->tpr.opt_closedloop); /* 1 = enable closed loop acknowledge */
+        LogMsg("%s:%d tpar_register.opt_dynamic_ip:      %d\n", q330->host, q330->dp, q330->tpr.opt_dynamic_ip); /* 1 = dynamic IP address */
+        LogMsg("%s:%d tpar_register.opt_hibertime:       %d\n", q330->host, q330->dp, q330->tpr.opt_hibertime); /* hibernate time in minutes if non-zero */
+        LogMsg("%s:%d tpar_register.opt_conntime:        %d\n", q330->host, q330->dp, q330->tpr.opt_conntime); /* maximum connection time in minutes if non-zero */
+        LogMsg("%s:%d tpar_register.opt_connwait:        %d\n", q330->host, q330->dp, q330->tpr.opt_connwait); /* wait this many minutes after connection time or buflevel shutdown */
+        LogMsg("%s:%d tpar_register.opt_regattempts:     %d\n", q330->host, q330->dp, q330->tpr.opt_regattempts); /* maximum registration attempts before hibernate if non-zero */
+        LogMsg("%s:%d tpar_register.opt_ipexpire:        %d\n", q330->host, q330->dp, q330->tpr.opt_ipexpire); /* dyanmic IP address expires after this many minutes since last POC */
+        LogMsg("%s:%d tpar_register.opt_buflevel:        %d\n", q330->host, q330->dp, q330->tpr.opt_buflevel); /* terminate connection when buffer level reaches this value if non-zero */
+        LogMsg("%s:%d tpar_register.opt_q330_cont:       %d\n", q330->host, q330->dp, q330->tpr.opt_q330_cont); /* Determines how often Q330 continuity is written to disk in minutes */
+        LogMsg("%s:%d tpar_register.opt_dss_memory:      %d\n", q330->host, q330->dp, q330->tpr.opt_dss_memory); /* Maximum DSS memory (in KB) if non-zero */
         /* printf("cfg->tpar_register.serial_flow:         %d\n", cfg->tpr.serial_flow); /1* 1 = hardware flow control *1/ */
         /* printf("cfg->tpar_register.serial_baud:         %ld\n", cfg->tpr.serial_baud); /1* in bps *1/ */
         /* printf("cfg->tpar_register.serial_hostip:       %ld\n", cfg->tpr.serial_hostip); /1* IP address to identify host *1/ */

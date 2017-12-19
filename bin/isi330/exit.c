@@ -47,7 +47,7 @@ static char *fid = "Exit";
 
     if (status < 0) {
         status = -status;
-        LogMsg(LOG_INFO, "going down on signal %ld", status - ISI330_MOD_SIGNALS);
+        LogMsg("shutting down on signal %ld", status - ISI330_MOD_SIGNALS);
     }
 
     ShutdownQ330Readers(cfg);

@@ -235,7 +235,7 @@ printf("argv[%d] = %s\n", i, argv[i]);
     StartQ330Readers(cfg);
 
 
-    LogMsg(LOG_INFO, "initialization complete");
+    LogMsg("initialization complete");
 
     return cfg;
 }

@@ -13,7 +13,7 @@ sigset_t set;
 int sig;
 static char *fid = "SignalHandlerThread";
 
-    LogMsg(LOG_INFO, "signal handler installed");
+    LogMsg("signal handler installed");
 
     sigfillset(&set); /* catch all signals defined by the system */
 
@@ -82,7 +82,7 @@ static char *fid = "StartSignalHandler";
 /* Create signal handling thread to catch all nondirected signals */
 
     if (!THREAD_CREATE(&tid, SignalHandlerThread, (void *) NULL)) {
-        LogMsg(LOG_INFO, "%s: THREAD_CREATE: %s", fid, strerror(errno));
+        LogMsg("%s: THREAD_CREATE: %s", fid, strerror(errno));
         exit(1);
     }
 }

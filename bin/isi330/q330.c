@@ -222,16 +222,16 @@ static THREAD_FUNC Q330Thread(void *argptr)
 
     /* create station thread context */
     if ((q330->ct = malloc(sizeof(tcontext))) == NULL) {
-        LogMsg(LOG_ERR, "%s: malloc(tconext): %s", fid, strerror(errno));
+        LogMsg("%s: malloc(tconext): %s", fid, strerror(errno));
         exit(MY_MOD_ID + 1);
     }
     lib_create_context(q330->ct, &q330->tpc);
     if (q330->tpc.resp_err != 0) {
-        LogMsg(LOG_INFO, "%s: lib_create_context %s:%d; resp_err=%d", fid,
+        LogMsg("%s: lib_create_context %s:%d; resp_err=%d", fid,
                q330->host, q330->dp, q330->tpc.resp_err);
         exit(MY_MOD_ID + 2);
     }
-    LogMsg(LOG_INFO, "station context created for host %s:%d", q330->host, q330->dp);
+    LogMsg("station context created for host %s:%d", q330->host, q330->dp);
 
 //    strcpy(msg_buf, "COMPLETED: lib_create_context\n");
 //    lib_msg_add(q330->ct, LIBMSG_USER, 0, &msg_buf);
@@ -289,7 +289,7 @@ static THREAD_FUNC Q330Thread(void *argptr)
                 }
             }
         } else {
-            LogMsg(LOG_INFO, "shutdown initiated: exit flag = %ld", status);
+            LogMsg("shutdown initiated: exit flag = %ld", status);
             GracefulExit(status);
         }
     }
@@ -307,15 +307,15 @@ void StartQ330Readers(ISI330_CONFIG *cfg)
 
     head = &cfg->q330list;
 
-    LogMsg(LOG_INFO, "Q330 config file = %s", cfg->cfgpath);
-    LogMsg(LOG_INFO, "Q330 site = %s", cfg->site);
-    LogMsg(LOG_INFO, "Q330 registration retry interval = %d sec", DEFAULT_RETRY_SEC);
-    LogMsg(LOG_INFO, "Q330 watchdog interval = %d sec", DEFAULT_WATCHDOG_SEC);
+    LogMsg("Q330 config file = %s", cfg->cfgpath);
+    LogMsg("Q330 site = %s", cfg->site);
+    LogMsg("Q330 registration retry interval = %d sec", DEFAULT_RETRY_SEC);
+    LogMsg("Q330 watchdog interval = %d sec", DEFAULT_WATCHDOG_SEC);
 
     crnt = listFirstNode(head);
     while (crnt != NULL) {
         if (crnt->payload == NULL) {
-            LogMsg(LOG_INFO, "%s: crnt->payload == NULL", fid);
+            LogMsg("%s: crnt->payload == NULL", fid);
             SetExitStatus(MY_MOD_ID + 7);
             return;
         }
@@ -323,7 +323,7 @@ void StartQ330Readers(ISI330_CONFIG *cfg)
         q330->lp = cfg->lp;
         strncpy(q330->tpc.q330id_station, cfg->site, 6);
         if (!THREAD_CREATE(&tid, Q330Thread, (void *) q330)) {
-            LogMsg(LOG_INFO, "%s: THREAD_CREATE: Q330Thread: %s", fid, strerror(errno));
+            LogMsg("%s: THREAD_CREATE: Q330Thread: %s", fid, strerror(errno));
             SetExitStatus(MY_MOD_ID + 7);
             return;
         }
@@ -344,7 +344,7 @@ void ShutdownQ330Readers(ISI330_CONFIG *cfg)
     while (crnt != NULL) {
         q330 = (Q330 *) crnt->payload;
 
-        LogMsg(LOG_INFO, "Deregistering from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
+        LogMsg("Deregistering from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
         lib_change_state(*q330->ct, LIBSTATE_IDLE, LIBERR_NOERR);
         curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
         while (curstate != LIBSTATE_IDLE) {
@@ -358,7 +358,7 @@ void ShutdownQ330Readers(ISI330_CONFIG *cfg)
             curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
         }
         lib_destroy_context(q330->ct);
-        LogMsg(LOG_INFO, "Disconnected from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
+        LogMsg("Disconnected from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
 
         crnt = listNextNode(crnt);
     }
