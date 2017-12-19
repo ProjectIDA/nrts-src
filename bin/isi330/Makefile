@@ -9,7 +9,7 @@ LIBDIR  = $(VPATH)../../../lib/$(PLATFORM)
 OPTMIZ  = -g
 INCS   += -I$(INCDIR)
 INCS   += -I$(SRC3RD)/lib330
-DEFS    = -D$(OSNAME) -D$(osname) -D$(OSTYPE) -D_REENTRANT
+DEFS    = -D$(OSNAME) -D$(OSTYPE) -D_REENTRANT
 DEFS   += -D_POSIX_PTHREAD_SEMANTICS
 CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS) ###-std=c99
 
