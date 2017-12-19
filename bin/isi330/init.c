@@ -10,11 +10,11 @@
 void help(char *myname)
 {
     fprintf(stderr, "\n");
-    fprintf(stderr, "usage: %s q330=HostnameOrIP:DataPort[:debug] sitename\n", myname);
+    fprintf(stderr, "usage: %s sitename q330=HostnameOrIP:DataPort[:debug] [q330=HostnameOrIP:DataPort[:debug]] \n", myname);
     fprintf(stderr, "\n");
     fprintf(stderr, "Required:\n");
-    fprintf(stderr, "    q330=name:port[:debug] => Quanterra Q330 input (may be repeated)\n");
     fprintf(stderr, "    sitename               => Station code\n");
+    fprintf(stderr, "    q330=name:port[:debug] => Quanterra Q330 input (may be repeated)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "       cfg=???? => ????????????????????????\n");

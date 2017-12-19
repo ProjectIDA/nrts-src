@@ -118,6 +118,7 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
     strcpy(newq330->tpc.host_software, "IDA:isi330");         // host application name
     strcpy(newq330->tpc.opt_contfile, "");       // disable for now
     newq330->tpc.opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_AUXMSG | VERB_PACKET;
+    newq330->tpc.opt_verbose = VERB_RETRY | VERB_REGMSG | VERB_AUXMSG;
     newq330->tpc.opt_zoneadjust = 1;        // no need, on UTC
     newq330->tpc.opt_secfilter = OSF_DATASERV;         // not using 1-sec callback
     newq330->tpc.opt_client_msgs = 10;      // set to min, NOT SURE HOW THIS IS USED
@@ -149,8 +150,8 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
     strcpy(newq330->tpr.host_interface, "");
     newq330->tpr.host_mincmdretry = 2;
     newq330->tpr.host_maxcmdretry = 30;
-    newq330->tpr.host_ctrlport = 9999;
-    newq330->tpr.host_dataport = 9998;
+    newq330->tpr.host_ctrlport = 0;
+    newq330->tpr.host_dataport = 0;
     // cfg->tpr.serial_flow = 0;
     // cfg->tpr.serial_baud = 9600;
     // cfg->tpr.serial_hostip = "";
@@ -259,14 +260,15 @@ static THREAD_FUNC Q330Thread(void *argptr)
 
     libstate = lib_get_state(*q330->ct, &liberr, &op_stat);
     while (1) {
-        fprintf(stderr, "[%s:%d] ", q330->host, q330->dp);
+        /* fprintf(stderr, "[%s:%d] ", q330->host, q330->dp); */
         if ((status = ExitStatus()) == 0) {
             sleep(1);
+            printf("CUR State for %s:%d [%d]: %s\n", q330->host, q330->dp, (int)libstate, lib_get_statestr(libstate, &state_str));
 
             new_state = lib_get_state(*q330->ct, &liberr, &op_stat);
             if (new_state != libstate) {
                 libstate = new_state;
-                printf("NEW State [%d]: %s\n", (int)libstate, lib_get_statestr(libstate, &state_str));
+                printf("NEW State for %s:%d [%d]: %s\n", q330->host, q330->dp, (int)libstate, lib_get_statestr(libstate, &state_str));
                 switch (libstate) {
                     case LIBSTATE_IDLE :
                     case LIBSTATE_TERM :
@@ -303,7 +305,6 @@ void StartQ330Readers(ISI330_CONFIG *cfg)
     LNKLST_NODE *crnt;
     static char *fid = "StartQ330Thread";
 
-//    SEM_INIT(&sem, 0, 1);
     head = &cfg->q330list;
 
     LogMsg(LOG_INFO, "Q330 config file = %s", cfg->cfgpath);
@@ -326,7 +327,7 @@ void StartQ330Readers(ISI330_CONFIG *cfg)
             SetExitStatus(MY_MOD_ID + 7);
             return;
         }
-//        SEM_WAIT(&sem);
+
         crnt = listNextNode(crnt);
     }
 }
@@ -335,13 +336,27 @@ void ShutdownQ330Readers(ISI330_CONFIG *cfg)
 {
     Q330 *q330;
     LNKLST_NODE *crnt;
+    enum tlibstate curstate;
+    enum tliberr liberr;
+    topstat op_stat;
 
     crnt = listFirstNode(head);
     while (crnt != NULL) {
         q330 = (Q330 *) crnt->payload;
 
+        LogMsg(LOG_INFO, "Deregistering from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
         lib_change_state(*q330->ct, LIBSTATE_IDLE, LIBERR_NOERR);
+        curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
+        while (curstate != LIBSTATE_IDLE) {
+            sleep(1);
+            curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
+        }
         lib_change_state(*q330->ct, LIBSTATE_TERM, LIBERR_NOERR);
+        curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
+        while (curstate != LIBSTATE_TERM) {
+            sleep(1);
+            curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
+        }
         lib_destroy_context(q330->ct);
         LogMsg(LOG_INFO, "Disconnected from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
 

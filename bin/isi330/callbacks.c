@@ -21,7 +21,7 @@ void isi330_state_callback(pointer p)
 	printf("STATE: state_type=%u info=%u : %s\n", state->state_type, state->info,
             lib_get_statestr(lib_get_state(state->context, &liberr, &opstat), &statestr));
     lib_get_statestr((enum tlibstate)state->info, &statestr);
-    printf(statestr);
+    printf("%s\n",statestr);
 
     /* PrintLib330Topstat(&opstat); */
 

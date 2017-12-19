@@ -8,7 +8,7 @@
 #define MY_MOD_ID ISI330_MOD_LOG
 
 static LOGIO lp;
-//static int level = LOG_INFO;
+static int level = LOG_INFO;
 
 void LogCommandLine(int argc, char **argv)
 {
@@ -37,11 +37,11 @@ VOID LogMsg(int level, char *format, ...)
     logioMsg(&lp, level, msgbuf);
 }
 
-//void LogMsgLevel(int newlevel)
-//{
-//    level = newlevel;
-//    logioMsg(&lp, level, "log level %d\n", level);
-//}
+void LogMsgLevel(int newlevel)
+{
+    level = newlevel;
+    logioMsg(&lp, level, "log level %d\n", level);
+}
 
 LOGIO *InitLogging(char *myname, char *spec, char *prefix, BOOL debug)
 {
