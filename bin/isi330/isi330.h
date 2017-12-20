@@ -13,6 +13,7 @@
 #undef TRUE
 #undef FALSE
 
+#include <time.h>
 #include "util.h"
 #include "logio.h"
 #include "q330.h"
@@ -30,8 +31,9 @@ static char *Copyright = "Copyright (C) 2017 - Regents of the University of Cali
 #define ISI330_MOD_Q330      ((INT32)  500)
 
 #define ISI330_DEFAULT_USER          "nrts"
-
 #define ISI330_STATION_CODE_SIZE 4
+#define ISI330_HOST_CTRLPORT_BASE 6330
+#define ISI330_HOST_DATAPORT_BASE 6530
 
 #define DEFAULT_USER           "nrts"
 #define DEFAULT_DAEMON         FALSE
