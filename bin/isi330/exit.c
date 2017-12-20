@@ -35,7 +35,7 @@ void SetExitStatus(INT32 status)
     MUTEX_LOCK(&mutex);
     ExitFlag = status;
     MUTEX_UNLOCK(&mutex);
-    LogMsg(LOG_DEBUG, "set exit status %ld", status);
+    LogMsg("set exit status %ld", status);
 }
 
 
