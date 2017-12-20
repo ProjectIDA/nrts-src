@@ -79,7 +79,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
      listInit(&cfg->q330list);
 
     for (int i = 1; i < argc; i++) {
-printf("argv[%d] = %s\n", i, argv[i]);
+
         if (strncmp(argv[i], "db=", strlen("db=")) == 0) {
             dbspec = argv[i] + strlen("db=");
         } else if (strncmp(argv[i], "q330=", strlen("q330=")) == 0) {
