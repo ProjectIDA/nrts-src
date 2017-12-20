@@ -150,8 +150,8 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
     strcpy(newq330->tpr.host_interface, "");
     newq330->tpr.host_mincmdretry = 2;
     newq330->tpr.host_maxcmdretry = 30;
-    newq330->tpr.host_ctrlport = 0;
-    newq330->tpr.host_dataport = 0;
+    newq330->tpr.host_ctrlport = ISI330_HOST_CTRLPORT_BASE + dp;
+    newq330->tpr.host_dataport = ISI330_HOST_DATAPORT_BASE + dp;
     // cfg->tpr.serial_flow = 0;
     // cfg->tpr.serial_baud = 9600;
     // cfg->tpr.serial_hostip = "";
@@ -339,25 +339,35 @@ void ShutdownQ330Readers(ISI330_CONFIG *cfg)
     enum tlibstate curstate;
     enum tliberr liberr;
     topstat op_stat;
+    struct timespec reqtp, remtp;
+    struct timeval tv1, tv2, tv3, tv4;
+    struct timezone tz;
+
+    reqtp.tv_sec = 0;
+    reqtp.tv_nsec = 500000000; // half a second
+    tz.tz_minuteswest = 0;
+    tz.tz_dsttime = 0;
 
     crnt = listFirstNode(head);
     while (crnt != NULL) {
         q330 = (Q330 *) crnt->payload;
 
         LogMsg("Deregistering from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
+
+        gettimeofday(&tv1, &tz);
+
         lib_change_state(*q330->ct, LIBSTATE_IDLE, LIBERR_NOERR);
-        curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
-        while (curstate != LIBSTATE_IDLE) {
-            sleep(1);
-            curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
-        }
+
+        // give library a change to change state. Empirically measured to take < .5 secs
+        // even if it takes longer and deregister isn't clean,
+        // reconnection using same ports will works
+        nanosleep(&reqtp, &remtp);
+
         lib_change_state(*q330->ct, LIBSTATE_TERM, LIBERR_NOERR);
-        curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
-        while (curstate != LIBSTATE_TERM) {
-            sleep(1);
-            curstate = lib_get_state(*q330->ct, &liberr, &op_stat);
-        }
+        nanosleep(&reqtp, &remtp);
+
         lib_destroy_context(q330->ct);
+
         LogMsg("Disconnected from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
 
         crnt = listNextNode(crnt);
