@@ -9,3 +9,5 @@ windows
 **/*.swp
 *.a
 *.o
+cmake-*
+.idea
