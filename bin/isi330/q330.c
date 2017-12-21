@@ -6,7 +6,7 @@
 #include "isi330.h"
 
 #define MY_MOD_ID ISI330_MOD_Q330
-//static SEMAPHORE sem;
+
 static LNKLST *head = NULL;
 
 #define DEFAULT_RETRY_SEC    30
@@ -150,22 +150,22 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
     strcpy(newq330->tpr.host_interface, "");
     newq330->tpr.host_mincmdretry = 2;
     newq330->tpr.host_maxcmdretry = 30;
-    newq330->tpr.host_ctrlport = ISI330_HOST_CTRLPORT_BASE + dp;
-    newq330->tpr.host_dataport = ISI330_HOST_DATAPORT_BASE + dp;
+    newq330->tpr.host_ctrlport = ISI330_HOST_CTRLPORT_BASE + (UINT16)dp;
+    newq330->tpr.host_dataport = ISI330_HOST_DATAPORT_BASE + (UINT16)dp;
     // cfg->tpr.serial_flow = 0;
     // cfg->tpr.serial_baud = 9600;
     // cfg->tpr.serial_hostip = "";
     newq330->tpr.opt_latencytarget = 0;
     newq330->tpr.opt_closedloop = 0;
     newq330->tpr.opt_dynamic_ip = 0;
-    newq330->tpr.opt_hibertime = 2;
-    newq330->tpr.opt_conntime = 10;
-    newq330->tpr.opt_connwait = 1;
-    newq330->tpr.opt_regattempts = 3;
+    newq330->tpr.opt_hibertime = 0;
+    newq330->tpr.opt_conntime = 0;
+    newq330->tpr.opt_connwait = 0;
+    newq330->tpr.opt_regattempts = 0;
     newq330->tpr.opt_ipexpire = 0;
-    newq330->tpr.opt_buflevel = 10;
-    newq330->tpr.opt_q330_cont = 10;
-    newq330->tpr.opt_dss_memory = 1024;
+    newq330->tpr.opt_buflevel = 0;
+    newq330->tpr.opt_q330_cont = 0;
+    newq330->tpr.opt_dss_memory = 0;
 
     return TRUE;
 }
@@ -205,15 +205,11 @@ int errcode;
 static THREAD_FUNC Q330Thread(void *argptr)
 {
     Q330 *q330;
-//    int errcode, suberr;
-//    BOOL first = TRUE;
 
-//    tcontext ct;
     enum tliberr liberr;
     enum tlibstate libstate, new_state;
     topstat op_stat;
     string63 state_str;
-//    string95 msg_buf;
     INT32 status = 0;
 
     static char *fid = "Q330Thread";
@@ -240,7 +236,7 @@ static THREAD_FUNC Q330Thread(void *argptr)
     if (liberr != LIBERR_NOERR) {
         PrintLib330Tliberr(liberr);
     } else {
-        printf("libstate: %s\n", lib_get_statestr(libstate, &state_str));
+        LogMsg("libstate: %s\n", lib_get_statestr(libstate, &state_str));
     }
     /* ping q330 to see if can register with q330 */
 
@@ -255,35 +251,39 @@ static THREAD_FUNC Q330Thread(void *argptr)
     if (liberr != LIBERR_NOERR) {
         PrintLib330Tliberr(liberr);
     } else {
-        printf("lib_register successful\n");
+        LogMsg("lib_register successful\n");
     }
 
     libstate = lib_get_state(*q330->ct, &liberr, &op_stat);
     while (1) {
-        /* fprintf(stderr, "[%s:%d] ", q330->host, q330->dp); */
+
         if ((status = ExitStatus()) == 0) {
             sleep(1);
-            printf("CUR State for %s:%d [%d]: %s\n", q330->host, q330->dp, (int)libstate, lib_get_statestr(libstate, &state_str));
+//            LogMsg("CUR State for %s:%d [%d]: %s\n", q330->host, q330->dp, (int)libstate, lib_get_statestr(libstate, &state_str));
 
             new_state = lib_get_state(*q330->ct, &liberr, &op_stat);
             if (new_state != libstate) {
                 libstate = new_state;
-                printf("NEW State for %s:%d [%d]: %s\n", q330->host, q330->dp, (int)libstate, lib_get_statestr(libstate, &state_str));
+                LogMsg("NEW State for %s:%d [%d]: %s\n", q330->host, q330->dp, (int)libstate, lib_get_statestr(libstate, &state_str));
                 switch (libstate) {
-                    case LIBSTATE_IDLE :
-                    case LIBSTATE_TERM :
-                    case LIBSTATE_PING :
-                    case LIBSTATE_CONN :
-                    case LIBSTATE_ANNC :
-                    case LIBSTATE_REG :
-                    case LIBSTATE_READCFG :
-                    case LIBSTATE_READTOK :
-                    case LIBSTATE_DECTOK :
+                    case LIBSTATE_IDLE : break;
+                    case LIBSTATE_TERM : break;
+                    case LIBSTATE_PING : break;
+                    case LIBSTATE_CONN : break;
+                    case LIBSTATE_ANNC : break;
+                    case LIBSTATE_REG : break;
+                    case LIBSTATE_READCFG : break;
+                    case LIBSTATE_READTOK : break;
+                    case LIBSTATE_DECTOK : break;
                     case LIBSTATE_RUNWAIT :
-                    case LIBSTATE_RUN :
-                    case LIBSTATE_DEALLOC :
-                    case LIBSTATE_DEREG :
-                    case LIBSTATE_WAIT :
+                        LogMsg("REQ State change for %s:%d TO state [%d]: %s\n",
+                               q330->host, q330->dp, (int)libstate, lib_get_statestr(LIBSTATE_RUN, &state_str));
+                        lib_change_state(*q330->ct, LIBSTATE_RUN, liberr);
+                        break;
+                    case LIBSTATE_RUN : break;
+                    case LIBSTATE_DEALLOC : break;
+                    case LIBSTATE_DEREG : break;
+                    case LIBSTATE_WAIT : break;
                     default:
                         break;
                 }
