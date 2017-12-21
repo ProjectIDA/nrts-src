@@ -3,11 +3,46 @@
  *  Callbacks provided to the Quanterra lib330 library
  *
  *=+===================================================================*/
+#include <libclient.h>
 #include "isi330.h"
 
 void isi330_miniseed_callback(pointer p)
 {
-    printf("miniseed calback with pointer %p\n", p);
+    tminiseed_call *msp;
+    char buf[256];
+
+    msp = (tminiseed_call *)p;
+
+    if (msp->chan_number == 0xFF) LogMsg("\nDP STATISTICS\n");
+
+    LogMsg("LIB330 CALLBACK (MINISEED): with pointer %p\n", p);
+    LogMsg("            station_name: %s", msp->station_name);
+    LogMsg("                location: %s", msp->location);
+    LogMsg("   chan_number (token #): %u", msp->chan_number);
+    LogMsg("                 channel: %s", msp->channel);
+    LogMsg("                    rate: %d", msp->rate);
+//  LogMsg("             cl_session: %lu", msp->cl_session);
+//  LogMsg("               cl_offset: %f", msp->cl_offset);
+    LogMsg("               timestamp: %f", msp->timestamp);
+    LogMsg("             filter_bits: %u", msp->filter_bits);
+    LogMsg("            packet_class: %s [%u]",
+           lib330PacketClassString(msp->packet_class),
+           msp->packet_class);
+    LogMsg("         miniseed_action: %u", msp->miniseed_action);
+    LogMsg("               data_size: %u", msp->data_size);
+    LogMsg("            data_address: %p", msp->data_address);
+
+    //    do something
+    switch (msp->packet_class) {
+        case PKC_DATA: break;
+        case PKC_EVENT: break;
+        case PKC_CALIBRATE: break;
+        case PKC_TIMING: break;
+        case PKC_MESSAGE: break;
+        case PKC_OPAQUE: break;
+        default: break;
+    }
+
 }
 
 void isi330_state_callback(pointer p)
@@ -18,10 +53,8 @@ void isi330_state_callback(pointer p)
     topstat opstat;
     enum tliberr liberr;
 
-	printf("STATE: state_type=%u info=%u : %s\n", state->state_type, state->info,
+	LogMsg("LIB330 CALLBACK (STATE): state_type=%u info=%u : %s\n", state->state_type, state->info,
             lib_get_statestr(lib_get_state(state->context, &liberr, &opstat), &statestr));
-    lib_get_statestr((enum tlibstate)state->info, &statestr);
-    printf("%s\n",statestr);
 
     /* PrintLib330Topstat(&opstat); */
 
@@ -59,5 +92,5 @@ void isi330_msg_callback(pointer p)
     msg = (tmsg_call *)p;
     string95 codestr;
 
-    printf("MSG: # %u [code=%d]: %s%s\n", msg->msgcount, msg->code, lib_get_msg(msg->code, &codestr),  msg->suffix);
+    LogMsg("LIB330 CALLBACK (MSG): # %u [code=%d]: %s%s\n", msg->msgcount, msg->code, lib_get_msg(msg->code, &codestr),  msg->suffix);
 }
