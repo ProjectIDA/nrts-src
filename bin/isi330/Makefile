@@ -46,10 +46,11 @@ OBJS += exit.o
 OBJS += init.o
 OBJS += log.o
 OBJS += signals.o
+OBJS += string.o
 
 OUTPUT  = isi330
 
-CC = cc ###clang
+CC = cc -std=c89 ###clang
  
 all: OBJS/$(PLATFORM) FORCE
 	cd OBJS/$(PLATFORM); \
