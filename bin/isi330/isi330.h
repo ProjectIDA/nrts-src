@@ -17,7 +17,6 @@
 #include "util.h"
 #include "logio.h"
 #include "q330.h"
-/* #include "isi/dl.h" */
 
 extern char *VersionIdentString;
 static char *Copyright = "Copyright (C) 2017 - Regents of the University of California.";
@@ -32,8 +31,8 @@ static char *Copyright = "Copyright (C) 2017 - Regents of the University of Cali
 
 #define ISI330_DEFAULT_USER          "nrts"
 #define ISI330_STATION_CODE_SIZE 4
-#define ISI330_HOST_CTRLPORT_BASE 6330
-#define ISI330_HOST_DATAPORT_BASE 6530
+#define ISI330_HOST_CTRLPORT_BASE ((UINT16) 6330)
+#define ISI330_HOST_DATAPORT_BASE ((UINT16) 6530)
 
 #define DEFAULT_USER           "nrts"
 #define DEFAULT_DAEMON         FALSE
@@ -43,6 +42,11 @@ static char *Copyright = "Copyright (C) 2017 - Regents of the University of Cali
 #define DEFAULT_BACKGROUND_LOG "syslogd:local0"
 #define DEFAULT_FOREGROUND_LOG "-"
 #define DEFAULT_DEBUG          FALSE
+
+typedef struct {
+    char *text;
+    int code;
+} LIB330_TEXT_MAP;
 
 typedef struct {
     MUTEX mutex;
@@ -63,8 +67,7 @@ typedef struct {
 
 
 typedef struct {
-	char *site;		// Disk Loop Name
-    /* ISI_DL *dl;     //ptr to disk loop struct */
+	char *site;        // Disk Loop Name
 	char *cfgpath;      /* Q330 configuration file */
 	LNKLST q330list;    /* zero or more Q330's */
 	LOGIO *lp;
@@ -118,7 +121,13 @@ void ShutdownQ330Readers(ISI330_CONFIG *cfg);
 
 /* signals.c */
 VOID StartSignalHandler(VOID);
-void SignalHandler(int sig);
+//void SignalHandler(int sig);
 
+/* string.c */
+char *lib330LibStateString(UINT8 code);
+char *lib330LibErrString(UINT8 code);
+char *lib330StateTypeString(UINT8 code);
+char *lib330MiniseedActionString(UINT8 code);
+char *lib330PacketClassString(UINT8 code);
 
 #endif

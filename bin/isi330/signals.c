@@ -13,7 +13,7 @@ sigset_t set;
 int sig;
 static char *fid = "SignalHandlerThread";
 
-    LogMsg("signal handler installed");
+    LogMsg("%s: Signal handler thread started", fid);
 
     sigfillset(&set); /* catch all signals defined by the system */
 
