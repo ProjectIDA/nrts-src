@@ -1,5 +1,5 @@
 #!/bin/csh
-# $Id: autocal,v 1.10 2016/08/18 23:04:20 dechavez Exp $
+# $Id: autocal,v 1.11 2017/11/02 16:12:52 dechavez Exp $
 #
 # Run the standard IDA random binary calibration suite
        
@@ -10,13 +10,16 @@ if (! -e $setup ) then
 endif
 source $setup
 
-foreach loc (00 10)
+foreach loc (10 00)
     foreach test (hf lf)
         idacal $test $loc
     end
 end
        
 # $Log: autocal,v $
+# Revision 1.11  2017/11/02 16:12:52  dechavez
+# swapped order of digitizers, doing secondary first to make CTBTO reporting easier
+#
 # Revision 1.10  2016/08/18 23:04:20  dechavez
 # Oops.  I had left 'idacal' as 'idacal2', left over from debugging.  Fixed now.
 #

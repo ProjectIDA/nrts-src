@@ -1,4 +1,4 @@
-#pragma ident "$Id: slink.c,v 1.17 2015/12/04 22:11:18 dechavez Exp $"
+#pragma ident "$Id: slink.c,v 1.18 2017/12/20 23:56:58 dechavez Exp $"
 /*======================================================================
  *
  * Tee incoming ISI data into an IRIS SeedLink server (ringserver).
@@ -54,7 +54,7 @@ static char *fid = "EnqueueMiniSeedRecord";
             }
             SEM_POST(&slink->queue.sem);
         }
-        slink->queue.empty = FALSE; 
+        slink->queue.empty = FALSE;
 
     MUTEX_UNLOCK(&slink->queue.mutex);
 }
@@ -71,12 +71,12 @@ static char *fid = "DequeueMiniSEED";
     MUTEX_LOCK(&slink->queue.mutex);
 
         handle = (MSEED_HANDLE *) slink->mseed;
-     
+
         if ((node = listFirstNode(slink->queue.list)) == NULL) {
             slink->queue.empty = TRUE;
             slink->queue.dropped = 0;
         }
-     
+
     MUTEX_UNLOCK(&slink->queue.mutex);
 
     return node;
@@ -355,6 +355,30 @@ static char *fid = "isidlSetSeedLinkOption";
     return TRUE;
 }
 
+static BOOL IDA1012BranchTaken(ISI_DL_SEEDLINK *slink, ISI_RAW_PACKET *raw)
+{
+MSEED_PACKED *packed;
+
+    if (raw->hdr.desc.type != ISI_TYPE_IDA10) return FALSE;
+    if (ida10SubFormatCode(raw->payload) != IDA10_SUBFORMAT_12) return FALSE;
+
+    if ((packed = (MSEED_PACKED *) malloc(sizeof(MSEED_PACKED))) == NULL) return FALSE; /* no way to flag the error, but it will certainly show up elsewhere */
+
+/* IDA10.12 means encapsulated 512-byte Miniseed, hence the use of explicit values */
+
+    packed->len = 512;
+    memcpy(packed->data, &raw->payload[64], packed->len);
+
+    if (!mseedUnpackHeader(&packed->hdr, packed->data)) {
+        free(packed);
+        return FALSE;
+    }
+
+    EnqueueMiniSeedRecord((void *) slink, packed);
+
+    return TRUE;
+}
+
 void isidlFeedSeedLink(ISI_DL_SEEDLINK *slink, ISI_RAW_PACKET *raw)
 {
 time_t QuitDelay;
@@ -366,6 +390,10 @@ static char *fid = "isidlFeedSeedLink";
 
     if (slink == NULL || !slink->enabled) return;
     handle = (MSEED_HANDLE *) slink->mseed;
+
+/* Special handling for IDA10.12 packets */
+
+    if (IDA1012BranchTaken(slink, raw)) return;
 
 /* NULL raw input means flush all incomplete MiniSEED packets */
 
@@ -420,6 +448,9 @@ static char *fid = "isidlFeedSeedLink";
 /* Revision History
  *
  * $Log: slink.c,v $
+ * Revision 1.18  2017/12/20 23:56:58  dechavez
+ * added IDA1012BranchTaken() (untested)
+ *
  * Revision 1.17  2015/12/04 22:11:18  dechavez
  * added missing return value to InitRecordQ()
  *

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2014/08/29 21:01:36 dechavez Exp $
+# $Id: Makefile,v 1.4 2017/10/30 22:35:32 dechavez Exp $
 # Makefile for idaspan
 
 VPATH   = 
@@ -17,8 +17,8 @@ LIBS += -lida
 LIBS += -lisidb
 LIBS += -ldbio
 LIBS += -lutil
-LIBS += -lmseed
 LIBS += -llogio
+LIBS += -lmseed -ldmc
 LIBS += -lz
 LIBS += -lm
 LIBS += $(SOCKLIBS)

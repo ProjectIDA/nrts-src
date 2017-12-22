@@ -1,5 +1,5 @@
 #!/bin/csh -f
-# "$Id: CheckTunnels,v 1.10 2017/07/06 21:04:20 dauerbach Exp $"
+# "$Id: CheckTunnels,v 1.11 2017/10/31 18:33:43 dechavez Exp $"
 #
 # Manage SSH tunnels
 
@@ -22,8 +22,8 @@ source $setup
 
 # These are not expected to need to be changed, so we hardcode them here
 
-set MyData       = 39136
-set MyShell      = 22
+set LocalData    = 39136
+set LocalShell   = 22
 set TunnelUser   = tunnel
 set TunnelName   = `hostname`
 set TunnelPorts  = $NRTS_HOME/etc/Tunnels
@@ -34,14 +34,14 @@ set default_peer = idahub
 # Single argument is assumed to be port number for the data service
 
 if ($#argv > 0) then
-    set MyData = $argv[1]
+    set LocalData = $argv[1]
     shift
 endif
 
 # Second argument (if it exists) is assumed to be the local ssh port
 
 if ($#argv > 0) then
-    set MyShell = $argv[1]
+    set LocalShell = $argv[1]
     shift
 endif
 
@@ -96,7 +96,7 @@ foreach RemoteHost ($RemoteHostList)
 
 
         logger -t $myname"[$$]" -p user.notice "Starting SSH tunnels into $RemoteHost"
-        set command = "ssh -f -N -R ${RemoteData}:localhost:${MyData} -R ${RemoteShell}:localhost:${MyShell} ${TunnelUser}@${RemoteHost}"
+        set command = "ssh ${TunnelUser}@${RemoteHost} -f -N -R ${RemoteData}:localhost:${LocalData} -R ${RemoteShell}:localhost:${LocalShell}"
         logger -t $myname"[$$]" -p user.notice "$command"
 
         # Create tunnel only if not already running
@@ -115,6 +115,10 @@ exit 0
 # Revision History
 #
 # $Log: CheckTunnels,v $
+# Revision 1.11  2017/10/31 18:33:43  dechavez
+# move the user@host part to the front of the command to support "pid tunnel" on small screens (yes, that's true)
+# changed MyData and MyShell to LocalData and LocalShell
+#
 # Revision 1.10  2017/07/06 21:04:20  dauerbach
 # Use entire ssh command when checking to see if tunnels already exist
 #

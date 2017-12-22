@@ -1,20 +1,18 @@
-# %W% %G%
+# $Id: Makefile,v 1.90 2017/10/30 23:47:07 dechavez Exp $
 # Make all executables 
 
 all: \
      aps \
      bswap \
-     cksqn \
      cssutil \
      fecho \
      fresp \
-     gpsutil \
      i10dmx \
-     i10push \
      iboot \
      ida10 \
      idagrep \
      idaspan \
+     idatomseed \
      imseed \
      isi \
      isid \
@@ -36,17 +34,15 @@ all: \
      qmon \
      qpp \
      qverify \
-     qxml \
      siomet \
      stripcat \
      substring \
      trim \
      ttylb \
      txtoida10 \
-     wcon \
      uniqpath \
      vhfilt \
-     xfer 
+     xfer
      #tristar \
      #tristar10
 
@@ -54,40 +50,16 @@ idadcc: \
      idaresponse \
      isiwww \
      jd \
-     soh_blk \
-
-addoss: \
-     sbd \
-     sbds \
-     sbd10 \
-     tstsbd
+     soh_blk
 
 aps: FORCE
 	cd aps; $(MAKE) install
 
-auz_isi: FORCE
-	cd auz_isi; $(MAKE) install
-
 bswap: FORCE
 	cd bswap; $(MAKE) install
 
-convertdb: FORCE
-	cd convertdb; $(MAKE) install
-
-cksqn: FORCE
-	cd cksqn; $(MAKE) install
-
 cssutil: FORCE
 	cd cssutil; $(MAKE) install
-
-dccdmx: FORCE
-	cd dccdmx; $(MAKE) install
-
-drm: FORCE
-	cd drm; $(MAKE) install
-
-drmreq: FORCE
-	cd drmreq; $(MAKE) install
 
 fecho: FORCE
 	cd fecho; $(MAKE) install
@@ -95,20 +67,8 @@ fecho: FORCE
 fresp: FORCE
 	cd fresp; $(MAKE) install
 
-gpsutil: FORCE
-	cd gpsutil; $(MAKE) install
-
-i10: FORCE
-	cd i10; $(MAKE) install
-
 i10dmx: FORCE
 	cd i10dmx; $(MAKE) install
-
-i10log: FORCE
-	cd i10log; $(MAKE) install
-
-i10push: FORCE
-	cd i10push; $(MAKE) install
 
 iboot: FORCE
 	cd iboot; $(MAKE) install
@@ -116,14 +76,8 @@ iboot: FORCE
 ida10: FORCE
 	cd ida10; $(MAKE) install
 
-idadmx: FORCE
-	cd idadmx; $(MAKE) install
-
 idagrep: FORCE
 	cd idagrep; $(MAKE) install
-
-idalst: FORCE
-	cd idalst; $(MAKE) install
 
 idaresponse: FORCE
 	cd idaresponse; $(MAKE) install
@@ -131,11 +85,11 @@ idaresponse: FORCE
 idaspan: FORCE
 	cd idaspan; $(MAKE) install
 
-imseed: FORCE
-	cd imseed; $(MAKE) install
-
 idatomseed: FORCE
 	cd idatomseed; $(MAKE) install
+
+imseed: FORCE
+	cd imseed; $(MAKE) install
 
 isi: FORCE
 	cd isi; $(MAKE) install
@@ -149,41 +103,20 @@ isidb: FORCE
 isidl: FORCE
 	cd isidl; $(MAKE) install
 
-isidmp: FORCE
-	cd isidmp; $(MAKE) install
-
-isihd: FORCE
-	cd isihd; $(MAKE) install
-
 isildl: FORCE
 	cd isildl; $(MAKE) install
 
 isilmd: FORCE
 	cd isilmd; $(MAKE) install
 
-isimerge: FORCE
-	cd isimerge; $(MAKE) install
-
 isimkdl: FORCE
 	cd isimkdl; $(MAKE) install
-
-isindx: FORCE
-	cd isindx; $(MAKE) install
 
 isiwww: FORCE
 	cd isiwww; $(MAKE) install
 
 jd: FORCE
 	cd jd; $(MAKE) install
-
-isi2liss: FORCE
-	cd isi2liss; $(MAKE) install
-
-isichkqdp: FORCE
-	cd isichkqdp; $(MAKE) install
-
-isp: FORCE
-	cd isp; $(MAKE) install
 
 misc: FORCE
 	cd misc; $(MAKE) install
@@ -197,20 +130,11 @@ msgrep: FORCE
 mslh: FORCE
 	cd mslh; $(MAKE) install
 
-mtutil: FORCE
-	cd mtutil; $(MAKE) install
-
 nrts: FORCE
 	cd nrts; $(MAKE) install
 
-oldmtutil: FORCE
-	cd oldmtutil; $(MAKE) install
-
 paro10: FORCE
 	cd paro10; $(MAKE) install
-
-parodl: FORCE
-	cd parodl; $(MAKE) install
 
 paroutil: FORCE
 	cd paroutil; $(MAKE) install
@@ -245,14 +169,8 @@ qpp: FORCE
 qverify: FORCE
 	cd qverify; $(MAKE) install
 
-qxml: FORCE
-	cd qxml; $(MAKE) install
-
 qsf: FORCE
 	cd qsf; $(MAKE) install
-
-rbdg: FORCE
-	cd rbdg; $(MAKE) install
 
 sbd: FORCE
 	cd sbd; $(MAKE) install
@@ -290,9 +208,6 @@ tstsbd: FORCE
 sacutil: FORCE
 	cd sacutil; $(MAKE) install
 
-sanlog: FORCE
-	cd sanlog; $(MAKE) install
-
 ttylb: FORCE
 	cd ttylb; $(MAKE) install
 
@@ -316,262 +231,136 @@ xfer: FORCE
 
 clean: FORCE
 	cd aps;        $(MAKE) $@
-	cd auz_isi;    $(MAKE) $@
 	cd bswap;      $(MAKE) $@
-	cd convertdb;  $(MAKE) $@
-	cd cksqn;      $(MAKE) $@
 	cd cssutil;    $(MAKE) $@
-	cd dccdmx;     $(MAKE) $@
-	cd drm;        $(MAKE) $@
-	cd drmreq;     $(MAKE) $@
 	cd fecho;      $(MAKE) $@
 	cd fresp;      $(MAKE) $@
-	cd gpsutil;    $(MAKE) $@
-	cd i10;        $(MAKE) $@
 	cd i10dmx;     $(MAKE) $@
-	cd i10log;     $(MAKE) $@
-	cd i10push;    $(MAKE) $@
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
-	cd idadmx;     $(MAKE) $@
 	cd idagrep;    $(MAKE) $@
-	cd idalst;     $(MAKE) $@
-	cd idaresponse;$(MAKE) $@
 	cd idaspan;    $(MAKE) $@
-	cd imseed;     $(MAKE) $@
 	cd idatomseed; $(MAKE) $@
+	cd imseed;     $(MAKE) $@
 	cd isi;        $(MAKE) $@
 	cd isid;       $(MAKE) $@
-	cd isidb;      $(MAKE) $@
 	cd isidl;      $(MAKE) $@
-	cd isidmp;     $(MAKE) $@
-	cd isihd;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
-	cd isilmd;     $(MAKE) $@
-	cd isimerge;   $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
-	cd isindx;     $(MAKE) $@
-	cd isiwww;     $(MAKE) $@
-	cd jd;         $(MAKE) $@
-	cd isi2liss;   $(MAKE) $@
-	cd isichkqdp;  $(MAKE) $@
-	cd isp;        $(MAKE) $@
 	cd misc;       $(MAKE) $@
 	cd msdmx;      $(MAKE) $@
-	cd mslh;       $(MAKE) $@
 	cd msgrep;     $(MAKE) $@
-	cd mtutil;     $(MAKE) $@
+	cd mslh;       $(MAKE) $@
 	cd nrts;       $(MAKE) $@
-	cd oldmtutil;  $(MAKE) $@
 	cd paro10;     $(MAKE) $@
-	cd parodl;     $(MAKE) $@
 	cd paroutil;   $(MAKE) $@
-	cd podir;      $(MAKE) $@
 	cd q330;       $(MAKE) $@
 	cd qcal;       $(MAKE) $@
 	cd qdpgrep;    $(MAKE) $@
 	cd qhlp;       $(MAKE) $@
-	cd qidchk;     $(MAKE) $@
 	cd qmd;        $(MAKE) $@
 	cd qmon;       $(MAKE) $@
 	cd qpp;        $(MAKE) $@
 	cd qverify;    $(MAKE) $@
-	cd qxml;       $(MAKE) $@
-	cd qsf;        $(MAKE) $@
-	cd sbd;        $(MAKE) $@
-	cd sbds;       $(MAKE) $@
-	cd sbd10;      $(MAKE) $@
-	cd soh_blk;    $(MAKE) $@
 	cd siomet;     $(MAKE) $@
 	cd stripcat;   $(MAKE) $@
 	cd substring;  $(MAKE) $@
 	cd trim;       $(MAKE) $@
-	cd tstsbd;     $(MAKE) $@
-	cd rbdg;       $(MAKE) $@
-	cd sacutil;    $(MAKE) $@
-	cd sanlog;     $(MAKE) $@
 	cd tristar;    $(MAKE) $@
 	cd tristar10;  $(MAKE) $@
 	cd ttylb;      $(MAKE) $@
-	cd ttyutil;    $(MAKE) $@
 	cd txtoida10;  $(MAKE) $@
-	cd wcon;       $(MAKE) $@
 	cd uniqpath;   $(MAKE) $@
 	cd vhfilt;     $(MAKE) $@
-	cd xfer;       $(MAKE) $@
 
 remove: FORCE
 	cd aps;        $(MAKE) $@
-	cd auz_isi;    $(MAKE) $@
 	cd bswap;      $(MAKE) $@
-	cd convertdb;  $(MAKE) $@
-	cd cksqn;      $(MAKE) $@
 	cd cssutil;    $(MAKE) $@
-	cd dccdmx;     $(MAKE) $@
-	cd drm;        $(MAKE) $@
-	cd drmreq;     $(MAKE) $@
 	cd fecho;      $(MAKE) $@
 	cd fresp;      $(MAKE) $@
-	cd gpsutil;    $(MAKE) $@
-	cd i10;        $(MAKE) $@
 	cd i10dmx;     $(MAKE) $@
-	cd i10log;     $(MAKE) $@
-	cd i10push;    $(MAKE) $@
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
-	cd idadmx;     $(MAKE) $@
 	cd idagrep;    $(MAKE) $@
-	cd idalst;     $(MAKE) $@
-	cd idaresponse;$(MAKE) $@
 	cd idaspan;    $(MAKE) $@
-	cd imseed;     $(MAKE) $@
 	cd idatomseed; $(MAKE) $@
+	cd imseed;     $(MAKE) $@
 	cd isi;        $(MAKE) $@
 	cd isid;       $(MAKE) $@
-	cd isidb;      $(MAKE) $@
 	cd isidl;      $(MAKE) $@
-	cd isidmp;     $(MAKE) $@
-	cd isihd;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
-	cd isilmd;     $(MAKE) $@
-	cd isimerge;   $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
-	cd isindx;     $(MAKE) $@
-	cd isiwww;     $(MAKE) $@
-	cd jd;         $(MAKE) $@
-	cd isi2liss;   $(MAKE) $@
-	cd isichkqdp;  $(MAKE) $@
-	cd isp;        $(MAKE) $@
 	cd misc;       $(MAKE) $@
 	cd msdmx;      $(MAKE) $@
-	cd mslh;       $(MAKE) $@
 	cd msgrep;     $(MAKE) $@
-	cd mtutil;     $(MAKE) $@
+	cd mslh;       $(MAKE) $@
 	cd nrts;       $(MAKE) $@
-	cd oldmtutil;  $(MAKE) $@
 	cd paro10;     $(MAKE) $@
-	cd parodl;     $(MAKE) $@
 	cd paroutil;   $(MAKE) $@
-	cd podir;      $(MAKE) $@
 	cd q330;       $(MAKE) $@
 	cd qcal;       $(MAKE) $@
 	cd qdpgrep;    $(MAKE) $@
 	cd qhlp;       $(MAKE) $@
-	cd qidchk;     $(MAKE) $@
 	cd qmd;        $(MAKE) $@
 	cd qmon;       $(MAKE) $@
 	cd qpp;        $(MAKE) $@
 	cd qverify;    $(MAKE) $@
-	cd qxml;       $(MAKE) $@
-	cd qsf;        $(MAKE) $@
-	cd sbd;        $(MAKE) $@
-	cd sbds;       $(MAKE) $@
-	cd sbd10;      $(MAKE) $@
-	cd soh_blk;    $(MAKE) $@
 	cd siomet;     $(MAKE) $@
 	cd stripcat;   $(MAKE) $@
 	cd substring;  $(MAKE) $@
 	cd trim;       $(MAKE) $@
-	cd tstsbd;     $(MAKE) $@
-	cd rbdg;       $(MAKE) $@
-	cd sacutil;    $(MAKE) $@
-	cd sanlog;     $(MAKE) $@
 	cd tristar;    $(MAKE) $@
 	cd tristar10;  $(MAKE) $@
 	cd ttylb;      $(MAKE) $@
-	cd ttyutil;    $(MAKE) $@
 	cd txtoida10;  $(MAKE) $@
-	cd wcon;       $(MAKE) $@
 	cd uniqpath;   $(MAKE) $@
 	cd vhfilt;     $(MAKE) $@
-	cd xfer;       $(MAKE) $@
 	rm -rf ../../bin/$(PLATFORM)
 
 REMOVE: FORCE
 	cd aps;        $(MAKE) $@
-	cd auz_isi;    $(MAKE) $@
 	cd bswap;      $(MAKE) $@
-	cd convertdb;  $(MAKE) $@
-	cd cksqn;      $(MAKE) $@
 	cd cssutil;    $(MAKE) $@
-	cd dccdmx;     $(MAKE) $@
-	cd drm;        $(MAKE) $@
-	cd drmreq;     $(MAKE) $@
 	cd fecho;      $(MAKE) $@
 	cd fresp;      $(MAKE) $@
-	cd gpsutil;    $(MAKE) $@
-	cd i10;        $(MAKE) $@
 	cd i10dmx;     $(MAKE) $@
-	cd i10log;     $(MAKE) $@
-	cd i10push;    $(MAKE) $@
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
-	cd idadmx;     $(MAKE) $@
 	cd idagrep;    $(MAKE) $@
-	cd idalst;     $(MAKE) $@
-	cd idaresponse;$(MAKE) $@
 	cd idaspan;    $(MAKE) $@
-	cd imseed;     $(MAKE) $@
 	cd idatomseed; $(MAKE) $@
+	cd imseed;     $(MAKE) $@
 	cd isi;        $(MAKE) $@
 	cd isid;       $(MAKE) $@
-	cd isidb;      $(MAKE) $@
 	cd isidl;      $(MAKE) $@
-	cd isidmp;     $(MAKE) $@
-	cd isihd;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
-	cd isilmd;     $(MAKE) $@
-	cd isimerge;   $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
-	cd isindx;     $(MAKE) $@
-	cd isiwww;     $(MAKE) $@
-	cd jd;         $(MAKE) $@
-	cd isi2liss;   $(MAKE) $@
-	cd isichkqdp;  $(MAKE) $@
-	cd isp;        $(MAKE) $@
 	cd misc;       $(MAKE) $@
 	cd msdmx;      $(MAKE) $@
-	cd mslh;       $(MAKE) $@
 	cd msgrep;     $(MAKE) $@
-	cd mtutil;     $(MAKE) $@
+	cd mslh;       $(MAKE) $@
 	cd nrts;       $(MAKE) $@
-	cd oldmtutil;  $(MAKE) $@
 	cd paro10;     $(MAKE) $@
-	cd parodl;     $(MAKE) $@
 	cd paroutil;   $(MAKE) $@
-	cd podir;      $(MAKE) $@
 	cd q330;       $(MAKE) $@
 	cd qcal;       $(MAKE) $@
 	cd qdpgrep;    $(MAKE) $@
 	cd qhlp;       $(MAKE) $@
-	cd qidchk;     $(MAKE) $@
 	cd qmd;        $(MAKE) $@
 	cd qmon;       $(MAKE) $@
 	cd qpp;        $(MAKE) $@
 	cd qverify;    $(MAKE) $@
-	cd qxml;       $(MAKE) $@
-	cd qsf;        $(MAKE) $@
-	cd sbd;        $(MAKE) $@
-	cd sbds;       $(MAKE) $@
-	cd sbd10;      $(MAKE) $@
-	cd soh_blk;    $(MAKE) $@
 	cd siomet;     $(MAKE) $@
 	cd stripcat;   $(MAKE) $@
 	cd substring;  $(MAKE) $@
 	cd trim;       $(MAKE) $@
-	cd tstsbd;     $(MAKE) $@
-	cd rbdg;       $(MAKE) $@
-	cd sacutil;    $(MAKE) $@
-	cd sanlog;     $(MAKE) $@
 	cd tristar;    $(MAKE) $@
 	cd tristar10;  $(MAKE) $@
 	cd ttylb;      $(MAKE) $@
-	cd ttyutil;    $(MAKE) $@
 	cd txtoida10;  $(MAKE) $@
-	cd wcon;       $(MAKE) $@
 	cd uniqpath;   $(MAKE) $@
 	cd vhfilt;     $(MAKE) $@
-	cd xfer;       $(MAKE) $@
 	rm -rf ../../bin/$(PLATFORM)
 
 FORCE:

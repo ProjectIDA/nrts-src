@@ -1,4 +1,4 @@
-#pragma ident "$Id: main.c,v 1.18 2016/02/01 18:47:00 dechavez Exp $"
+#pragma ident "$Id: main.c,v 1.19 2017/11/01 21:39:10 dechavez Exp $"
 /*======================================================================
  *
  *  IDA to MiniSEED filter - uses a modified version of the IRIS DMC
@@ -195,7 +195,11 @@ MSEED_THRESH threshold;
             nread = ida10ReadGz(gz, input, IDA10_MAXRECLEN, &unused, FALSE);
             if (nread > 0) {
                 IncrementInputCount();
-                if (mseedConvertIDA10(handle, &record, input)) ProcessRecord(handle, &record);
+                if (ida10SubFormatCode(input) == IDA10_SUBFORMAT_12) {
+                    ProcessIDA1012(handle, &input[64]);
+                } else {
+                    if (mseedConvertIDA10(handle, &record, input)) ProcessRecord(handle, &record);
+                }
             } else if (nread != IDA10_EOF) {
                 IncrementBadCount();
                 LogErr("ida10ReadGz: %s\n", ida10ErrorString(nread));
@@ -224,6 +228,9 @@ MSEED_THRESH threshold;
 /* Revision History
  *
  * $Log: main.c,v $
+ * Revision 1.19  2017/11/01 21:39:10  dechavez
+ * added a special branch for IDA10.12 (encapsulated Miniseed)
+ *
  * Revision 1.18  2016/02/01 18:47:00  dechavez
  * give up immediately on any ida10ReadGz() errors
  *

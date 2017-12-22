@@ -1,4 +1,4 @@
-#pragma ident "$Id: ep.c,v 1.4 2017/09/28 20:41:08 dauerbach Exp $"
+#pragma ident "$Id: ep.c,v 1.6 2017/10/11 23:16:34 dechavez Exp $"
 /*======================================================================
  *
  *  Q330 Environmental processor control
@@ -58,7 +58,7 @@ void EpDelay(Q330 *q330)
         qdpPrint_C2_EPD(stdout, &epd);
 
     } else {
-        printf("QEP Not Supported. Digitizer firmware update required. (minimum ver 1.146)\n");
+        qdpPrintUnsupportedQEP(stdout, q330->qdp);
     }
 }
 
@@ -82,7 +82,7 @@ QDP_TYPE_C2_EPCFG epcfg;
         }
 
     } else {
-        printf("QEP Not Supported. Digitizer firmware update required. (minimum ver 1.146)\n");
+        qdpPrintUnsupportedQEP(stdout, q330->qdp);
     }
 }
 
@@ -113,6 +113,12 @@ QDP_TYPE_C2_EPCFG epcfg;
 /* Revision History
  *
  * $Log: ep.c,v $
+ * Revision 1.6  2017/10/11 23:16:34  dechavez
+ * sigh.  Didn't test my previous commit ('cause it was "trivial").  Works now.
+ *
+ * Revision 1.5  2017/10/11 22:44:01  dechavez
+ * Print "library standard" message when reporting on EP firmware incompatibility
+ *
  * Revision 1.4  2017/09/28 20:41:08  dauerbach
  * added version checks for EP commands
  *

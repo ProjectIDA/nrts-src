@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.29 2014/08/29 21:03:04 dechavez Exp $
+# $Id: Makefile,v 1.30 2017/10/30 22:34:54 dechavez Exp $
 # Unix makefile for isid
 
 VPATH   = 
@@ -28,7 +28,7 @@ LIBS   += -ldbio
 LIBS   += -lutil
 LIBS   += -lmsgq
 LIBS   += -ldali
-LIBS   += -lmseed
+LIBS   += -lmseed -ldmc
 LIBS   += -lida10
 LIBS   += -ldmc
 LIBS   += -llogio

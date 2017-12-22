@@ -1,4 +1,4 @@
-#pragma ident "$Id: dl.c,v 1.47 2016/08/26 20:04:41 dechavez Exp $"
+#pragma ident "$Id: dl.c,v 1.48 2017/12/20 23:19:50 dechavez Exp $"
 /*======================================================================
  *
  * ISI disk loop support
@@ -384,7 +384,7 @@ static void IncrementIndicies(ISI_INDEX *index, UINT32 numpkt)
 
 /* The disk loop is "full" once we have reached the logical end.  Once that
  * happens, then all indices will march forward, incrementing by one each
- * time (and resetting to 0 when they get to the end of the file).  
+ * time (and resetting to 0 when they get to the end of the file).
  */
 
     if (index->yngest == index->lend) {
@@ -468,7 +468,7 @@ off_t offset;
 static BOOL NRTSCompatiblePacket(NRTS_DL *dl, ISI_RAW_PACKET *raw)
 {
 
-/* Only IDA packets are really compatible with NRTS */
+/* Only IDA10-11 packets are really compatible with NRTS */
 
     switch (raw->hdr.desc.type) {
       case ISI_TYPE_IDA5:
@@ -477,14 +477,19 @@ static BOOL NRTSCompatiblePacket(NRTS_DL *dl, ISI_RAW_PACKET *raw)
       case ISI_TYPE_IDA8:
       case ISI_TYPE_IDA9:
       case ISI_TYPE_IDA10:
-        return TRUE;
+        if (ida10SubFormatCode(raw->payload) != IDA10_SUBFORMAT_12) {
+            return TRUE;
+        } else {
+            nrtsMSEEDToIDA10DiskLoop(dl, &raw->payload[64]);
+            return FALSE; /* since we won't be writing here in any case */
+        }
     }
 
-/* But, MiniSEED can be shoehorned in */
+/* LISS MiniSeed can be also shoehorned in */
 
     if (raw->hdr.desc.type == ISI_TYPE_MSEED) {
         nrtsMSEEDToIDA10DiskLoop(dl, raw->payload);
-        return FALSE; /* since we won't be writing here in any case */
+        return FALSE; /* ditto */
     }
 
 /* Anything else is not NRTS compatible */
@@ -755,6 +760,9 @@ static char *fid = "isidlPacketSeqno";
 /* Revision History
  *
  * $Log: dl.c,v $
+ * Revision 1.48  2017/12/20 23:19:50  dechavez
+ * Added NRTS support for IDA10.12 (encapsulated miniSeed)
+ *
  * Revision 1.47  2016/08/26 20:04:41  dechavez
  * commented out the disk loop lock/unlock debug messages in LockDiskLoop()
  *

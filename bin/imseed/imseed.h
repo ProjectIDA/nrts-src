@@ -1,4 +1,4 @@
-#pragma ident "$Id: imseed.h,v 1.9 2015/05/21 21:55:16 dechavez Exp $"
+#pragma ident "$Id: imseed.h,v 1.10 2017/11/01 21:35:25 dechavez Exp $"
 #ifndef imseed_h_included
 #define imseed_h_included
 
@@ -41,6 +41,7 @@ void LogMsgLevel(int newlevel);
 LOGIO *InitLogging(char *myname, char *path, BOOL verbose);
 
 /* process.c */
+void ProcessIDA1012(MSEED_HANDLE *handle, UINT8 *src);
 void ProcessRecord(MSEED_HANDLE *handle, MSEED_RECORD *record);
 
 /* signals.c */
@@ -56,6 +57,9 @@ int InitWriter(char *use_root);
 /* Revision History
  *
  * $Log: imseed.h,v $
+ * Revision 1.10  2017/11/01 21:35:25  dechavez
+ * added ProcessIDA1012() prototype
+ *
  * Revision 1.9  2015/05/21 21:55:16  dechavez
  * added IncrementBadCount() prototype
  *

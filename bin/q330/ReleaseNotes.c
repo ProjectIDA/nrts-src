@@ -1,8 +1,11 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.95 2017/09/28 20:39:32 dauerbach Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.96 2017/10/11 22:44:15 dechavez Exp $"
 
-char *VersionIdentString = "Release 2.11.1";
+char *VersionIdentString = "Release 2.11.2";
 
 /* Release notes
+
+2.11.2  10/11/2017
+        Print "library standard" message when reporting on EP firmware incompatibility
 
 2.11.1  9/28/2017
         added version checks for EP commands
@@ -15,7 +18,7 @@ char *VersionIdentString = "Release 2.11.1";
         link with libqdp 3.15.0 to better handle GPS strings
 
 2.10.7  01/27/2017
-        link with libq330 3.7.6 to address re-introducing the double free bug in 3.7.5! 
+        link with libq330 3.7.6 to address re-introducing the double free bug in 3.7.5!
 
 2.10.6  01/24/2017
         link with libq330 3.7.5 to address bugs introduced in libq330 3.7.4
@@ -163,7 +166,7 @@ char *VersionIdentString = "Release 2.11.1";
        use qdpDataPortNumber() to assign data port parameter
 
 1.10.2 12/20/2010
-       Improved(?) header of q330.cfg output via "q330 cfg".  Removed unused 
+       Improved(?) header of q330.cfg output via "q330 cfg".  Removed unused
        resistors from Q330_INPUT.
 
 1.10.1 12/20/2010

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2014/08/29 21:13:36 dechavez Exp $
+# $Id: Makefile,v 1.12 2017/10/30 22:25:19 dechavez Exp $
 # Unix makefile for qpp
 
 VPATH   = 
@@ -28,7 +28,7 @@ LIBS   += -lqio
 LIBS   += -ludpio
 LIBS   += -lttyio
 LIBS   += -lutil
-LIBS   += -lmseed
+LIBS   += -lmseed -ldmc
 LIBS   += -llogio
 LIBS   += -lmd5
 LIBS   += -lz

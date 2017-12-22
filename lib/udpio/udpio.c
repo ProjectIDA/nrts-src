@@ -1,21 +1,21 @@
-#pragma ident "$Id: udpio.c,v 1.16 2016/08/26 20:09:25 dechavez Exp $"
+#pragma ident "$Id: udpio.c,v 1.17 2017/10/11 20:44:15 dechavez Exp $"
 /*======================================================================
  *
  *  BOOL udpioInit(UDPIO *up, int port, int to, LPIO *lp)
  *  Creates a socket used for subsequent I/O operations.  Port number is
  *  the port which the socket will listen on for incoming data, to is the
- *  read timeout interval in msec (use 0 for blocking I/O). 
- * 
+ *  read timeout interval in msec (use 0 for blocking I/O).
+ *
  *  int udpioSend(UDPIO *up, UINT32 ip, int port, char *buf, int len)
- *  Sends "len" bytes of data in the buffer pointed to by "buf" to 
+ *  Sends "len" bytes of data in the buffer pointed to by "buf" to
  *  port number "port" at IP address "ip" where "ip" is the 32 bit
  *  IP address in host byte order. "up" is the handle initialized
  *  with a prior call to udpioInit().  Returns the number of bytes sent
  *  (which will always be "len") or a negative number in case of error.
- * 
+ *
  *  int udpioRecv(UDPIO *up, char *buf, int buflen)
  *  Reads the next UDP packet at the port given by "up", which was
- *  initialized with a prior call to udpioInit().  The packet is stored 
+ *  initialized with a prior call to udpioInit().  The packet is stored
  *  in the buffer pointed to by "buf", which is "buflen" bytes long.  If
  *  the incoming message is too large (ie, is more than "buflen" bytes
  *  long, then the message will be truncated.  Returns the number of bytes
@@ -109,7 +109,7 @@ WSADATA lpWSAData;
     }
 
 #ifdef WIN32
-    if (WSAStartup(MAKEWORD(2,2), &lpWSAData) != 0){ 
+    if (WSAStartup(MAKEWORD(2,2), &lpWSAData) != 0){
         logioMsg(up->lp, LOG_ERR, "%s: WSAStartup", fid);
         return FALSE;
     }
@@ -167,13 +167,13 @@ static char *fid = "udpioRecv";
     if (buflen < 1) {
         logioMsg(up->lp, LOG_ERR, "%s: illegal buflen '%d'", fid, buflen);
         errno = EINVAL;
-        return -1;
+        return -2;
     }
 
     if (up->sd == INVALID_SOCKET) {
         logioMsg(up->lp, LOG_ERR, "%s: invalid socket", fid, buflen);
         errno = EINVAL;
-        return -1;
+        return -3;
     }
 
     FD_ZERO(&fds);
@@ -192,14 +192,14 @@ static char *fid = "udpioRecv";
                 return 0;
             } else {
                 logioMsg(up->lp, LOG_INFO, "%s: RECVFROM: %s (got=%d, errno=%d)", fid, strerror(errno), got, errno);
-                if (errno != EAGAIN && errno != EINTR) return -1;
+                if (errno != EAGAIN && errno != EINTR) return -4;
             }
         } else if (error == 0) {
             errno = ETIMEDOUT;
             return 0;
         } else if (errno != EAGAIN && errno != EINTR) {
             logioMsg(up->lp, LOG_INFO, "%s: select: %s", fid, strerror(errno));
-            return -1;
+            return -5;
         }
     }
     UpdateStats(&up->stats.recv, got, utilTimeStamp());
@@ -314,6 +314,9 @@ BOOL verbose = FALSE;
 /* Revision History
  *
  * $Log: udpio.c,v $
+ * Revision 1.17  2017/10/11 20:44:15  dechavez
+ * generate unique return values for each possible udpioRecv() error condition
+ *
  * Revision 1.16  2016/08/26 20:09:25  dechavez
  * added a (got == 0) branch to RECVFROM() return value check in udpioRecv(),
  * include got in logging errors (got < 0)

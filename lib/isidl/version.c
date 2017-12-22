@@ -1,14 +1,18 @@
-#pragma ident "$Id: version.c,v 1.73 2016/08/26 20:05:13 dechavez Exp $"
+#pragma ident "$Id: version.c,v 1.74 2017/12/21 00:02:32 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "isi/dl.h"
 
-static VERSION version = {1, 25, 3};
+static VERSION version = {1, 26, 0};
 
 /* isidl library release notes
+
+1.26.0 12/20/2017
+       dl.c: added NRTS support for IDA10.12 (in NRTSCompatiblePacket()) (untested)
+       slink.c: added IDA1012BranchTaken() (untested)
 
 1.25.3 08/26/2016
        dl.c: commented out the disk loop lock/unlock debug messages in LockDiskLoop()
@@ -20,7 +24,7 @@ static VERSION version = {1, 25, 3};
        dl.c:    fixed sloppy block comment delimiter
        meta.c:  fixed format strings to calm OS X compiles
        pack.c:  utilUnpackINT64() instead of utilUnpackUINT64() where needed (benign, calms OS X)
-       slink.c: added missing return value to InitRecordQ() 
+       slink.c: added missing return value to InitRecordQ()
        tee.c:   fixed format strings to calm OS X compiles
        print.c: fixed format strings to calm OS X compiles
 
@@ -87,7 +91,7 @@ static VERSION version = {1, 25, 3};
 1.20.0 01/14/2013
        isi/dl.h: initial structures and prototypes for SeedLink support
        dl.c: tee to SeedLink option enabled, BUD option now ignored (will prune later)
-       utils.c: added SeedLink support to isidlInitOptions() 
+       utils.c: added SeedLink support to isidlInitOptions()
        slink.c: created
 
 1.19.1 07/30/2012
@@ -128,7 +132,7 @@ static VERSION version = {1, 25, 3};
 1.15.0 11/04/2010
        isi/dl.h: add hdrlen to ISI_DL_SYS
        dl.c: ISI_DL_SYS hdrlen support
-       print.c: ISI_DL_SYS hdrlen support 
+       print.c: ISI_DL_SYS hdrlen support
 
 1.14.0 08/27/2010
        pack.c: initial release
@@ -179,7 +183,7 @@ static VERSION version = {1, 25, 3};
         glob.c: added support for NRTS_HOME environment variable
 
 1.10.0  09/14/2007
-        dl.c: removed ISI_DL_FLAGS_TIME_DL_OPS_ENABLED related code, 
+        dl.c: removed ISI_DL_FLAGS_TIME_DL_OPS_ENABLED related code,
               improved debug and log messages, added support for both
               partial and complete overlaps, fixed problem with plugged
               NRTS diskloops following first rejected packet
@@ -195,7 +199,7 @@ static VERSION version = {1, 25, 3};
 1.9.3   02/08/2007
         dl.c: disk loop writers keep files open, added conditional support
         for ISI_DL_FLAGS_TIME_DL_OPS (not compiled in this build)
-         
+
 1.9.2   01/31/2007
         wfdisc.c: allow for missing NRTS disk loop
 
@@ -270,7 +274,7 @@ static VERSION version = {1, 25, 3};
         glob.c: major rework to use libisidb lookups instead of flat file
         print.c: include tee file name in isiPrintDL() output
 
-        tee.c: support changed field names in updated ISI_GLOB 
+        tee.c: support changed field names in updated ISI_GLOB
 
 1.4.0   02/08/2006
         cnf.c: isiLookupSitechan() instead of isiLookupInst()

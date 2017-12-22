@@ -521,8 +521,8 @@ int util_dsteim2(INT32 *dest, INT32 destlen, UINT8 *src, INT32 srclen, UINT32 or
 /* string.c */
 void utilTrimNewline(char *string);
 BOOL utilIsBlankString(char *string);
+char *utilDotDecimalString(UINT32 addr, char *dest);
 char *utilPadString(char *input, int maxlen, int padchar);
-char *utilDotDecimalString(UINT32 iaddr, char *dest);
 char *utilTrimString(char *input);
 char *util_strpad(char *input, int maxlen, int padchar);
 char *util_strtrm(char *input);

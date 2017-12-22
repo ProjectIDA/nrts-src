@@ -1,15 +1,23 @@
-#pragma ident "$Id: version.c,v 1.118 2017/09/20 19:18:35 dauerbach Exp $"
+#pragma ident "$Id: version.c,v 1.119 2017/10/11 20:41:29 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "qdp.h"
 
-static VERSION version = {3, 16, 1};
-char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME__;
+static VERSION version = {3, 17, 0};
+char *libqdpBuildIdent = "libqdp release 3.17.0, compiled " __DATE__ " " __TIME__;
 
 /* qdp library release notes
+
+3.17.0 10/11/2017
+       qdp.h: added qdpPrintUnsupportedQEP() prototype
+       action.c: reworked ActionAPPCMD() to fail after repeated attempts instead of restarting machine,
+                 also, don't restart machine after automaton generated commands fail (ActionCERR)
+       config.c: print version info message when skipping C2_EPCFG updates for peers which don't support QEP
+       io.c: qdpRecvPkt() changed to log qioRecv() return value after failure
+       print.c: introduced qdpPrintUnsupportedQEP()
 
 3.16.1 09/20/2017
        config.c: added check for QEP support before updating C2_EPCFG
@@ -41,7 +49,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
                  causing QEP filter delays to get lost
 
 3.14.1 1/30/2017
-       qdp.h: Defined QDP_META_OLDTAG_EOF/TOKEN/COMBO to restore the old constants used in 
+       qdp.h: Defined QDP_META_OLDTAG_EOF/TOKEN/COMBO to restore the old constants used in
               libqdp 3.10.1 and before.  This to permit qpp to read meta-data files tagged
               with both the old and new constants.
        meta.c: support both QDP_META_TAG_x and QDP_META_OLDTAG_x tags in meta-data files
@@ -59,7 +67,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
                  (other wise non-data connections could not query the device), restart
                  automaton (instead of failing) when an automaton command fails (such as
                  the automaton "heartbeat" status requests
-            
+
 3.13.4 8/26/2016
        qdp/fsa.h: Removed QDP_ACTION_HBEAT as the first action for registered DTO events
 
@@ -99,7 +107,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
 
 3.13.0 07/20/2016 (checkpoint following reworking of state machine... not fully tested)
        qdp.h: replaced maxtry with watchdog interval in QDP_PAR, added QDP_DEFAULT_WATCHDOG_INTERVAL,
-           removed QDP_DEFAULT_TRASH_x constants, introduced QDP_FSA structure to hold stuff 
+           removed QDP_DEFAULT_TRASH_x constants, introduced QDP_FSA structure to hold stuff
            used by the automaton (not sure if I'm going to keep that, however), removed ntry from
            the QDP handle, renamed regerr to suberr and include a pointer to that to qdpConnect()
            the idea being that errcode explains the general reason and suberr has additional informatin
@@ -117,7 +125,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
         destroy.c: created, introducing qdpDestroyHandle()
         fsa.c: Reworked how all the various threads get started (introducing the "launch" feature from the new START
            action handler, which I'll probably back out now that I started thinking about how machine restarts should work).
-           Added smarts to figure out if the machine failed due to bad auth code (QDP_ERR_BADAUTH) or lack of a 
+           Added smarts to figure out if the machine failed due to bad auth code (QDP_ERR_BADAUTH) or lack of a
            responding peer (QDP_ERR_NORESPONSE).  That I'll keep.  Added retry logic to optionally deal with busy
            servers (which previously was being handled at the application level).
         init.c: support for new QDP_FSA field added to handle in qdp.h rev 1.89
@@ -141,7 +149,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
        action.c: introduced ActionGIVEUP()
        fsa.c: added QDP_ACTION_GIVEUP branch to EventHandler()
        init.c: QDP_PAR_OPTION_QIO_x based debug messages added
-       par.c: overloaded qdpSetDebug() to use new QDP_DEBUGx states to set QDP_PAR_OPTION_QIO_x options 
+       par.c: overloaded qdpSetDebug() to use new QDP_DEBUGx states to set QDP_PAR_OPTION_QIO_x options
        string.c: added QDP_ERR_REJECTED to ErrcodeMap[]
 
 3.11.4 02/12/2016
@@ -152,7 +160,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
 3.11.3 02/11/2016
        qdp.h:       changed QDP nsrq to ntry and QDP_PAR maxresp to maxtry as now we are
                     tracking challege responses as well as server request attempts
-       qdp/fsa.h:   introduced QDP_ACTION_DECODECH, reworked QDP_STATE_SRVRSP fsa entries to handle 
+       qdp/fsa.h:   introduced QDP_ACTION_DECODECH, reworked QDP_STATE_SRVRSP fsa entries to handle
                     no replies to challenge response (ie, bad auth code)
        qdp/errno.h: changed QDP_ERR_NOREPLY to QDP_ERR_NOREPLY_SRVRQ, introduced QDP_ERR_NOREPLY_CHRSP
        action.h: updated prototypes
@@ -161,7 +169,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
        fsa.c:    changed QDP nsrq to ntry and QDP_PAR maxresp to maxtry, added ActionDECODECH()
        par.c:    changed maxresp to maxtry, qdpSetMaxsrq() to qdpSetMaxtry()
        string.c: replaced QDP_ERR_NOREPLY with QDP_ERR_NOREPLY_SRVRQ and QDP_ERR_NOREPLY_CHRSP in ErrcodeMap[]
-      
+
 3.11.2 02/05/2016
        qdp/errno.h: introduced QDP_ERR_NOREPLY
        qdp.h: added maxsrq to QDP_PAR, defined QDP_DEFAULT_MAXSRQ (0), added nsrq to QDP
@@ -179,7 +187,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
               added constants to determine level of environmental processor support
               removed un-used "combo" field from QDP handle and added a new 'flags'
               field with session options (which is currently just QDP_FLAGS_EP_SUPPORTED)
-        qdp/fsa.h: Reworked automaton to include bringing in C1_FIX as part of the 
+        qdp/fsa.h: Reworked automaton to include bringing in C1_FIX as part of the
               handshake and then added QDP_ACTION_DECIDE to both eliminate the need for
               separate C&C and data link automatons (hurrah!).
         action.h: updated prototypes
@@ -207,7 +215,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
        pkts.c:
          Evidently adding QDP_SRB_EP (bit 20) to the status bitmap doesn't work when
          in the presence of other items requested (result too big?).  Anyway, worked
-         around this in qdpRequestMonitor() by making a single QDP_SRB_EP status 
+         around this in qdpRequestMonitor() by making a single QDP_SRB_EP status
          request and merging all the results into a single QDP_TYPE_C1_STAT.
        status.c:
          Changed all QDP_STAT_SDI_x contants to QDP_STAT_EP_SDI_x equivalents.
@@ -267,7 +275,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
        data.c: environmental processor support (1-Hz only)
        print.c: environmental processor support
        process.c: environmental processor support (1-Hz only)
-       status.c: environmental processor support 
+       status.c: environmental processor support
        string.c: qdpSdiPhaseString(), qdpSdiDriverString()
 
 3.8.5  01/14/2016
@@ -304,7 +312,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
        misc.c:   Added additional input checks and immediately return if no output defined
        status.c: made InitCounter() static
 
-3.8.1  08/24/2015 
+3.8.1  08/24/2015
        qdp.h:  added QDP_CAL_x constants, qdpCalState() protype
        misc.c: introduced qdpCalState()
 
@@ -542,7 +550,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
         print.c: print decoded configuration blockettes in qdpPrintBT_SPEC(),
            cleaned up detect formatting in qdpPrintTokenLcq
         process.c: instead of ignoring resid=2 for in ProcessMN38, assume 0.1 sec sint,
-           use flags instead of obsolete reqtoken rule in InitLC 
+           use flags instead of obsolete reqtoken rule in InitLC
         pt.c: initial release
         string.c: use QDP_TEXT_MAP from qdp/codes.h instead of local TEXT_MAP type, also QDP_WEB_PAGE_MAP from codes.h
         tokens.c: added QDP_TOKEN_TYPE_NONCOMP support, use QDP_DSS_PASSWD_LEN
@@ -630,7 +638,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
         io.c: explicitly set errno to zero on normal qdpRead() returns
 
 1.5.3   06/19/2009
-        steim.c: fixed nasty B01 little-endian byte order bug, 
+        steim.c: fixed nasty B01 little-endian byte order bug,
             deleted the dead code that had been #ifdef'd out in release 1.1.1
 
 1.5.2   03/17/2009
@@ -717,7 +725,7 @@ char *libqdpBuildIdent = "libqdp release 3.16.1, compiled " __DATE__ " " __TIME_
 
 1.0.0   05/18/2007
         Initial production release
-  
+
  */
 
 char *qdpVersionString()

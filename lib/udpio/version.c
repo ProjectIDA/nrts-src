@@ -1,14 +1,17 @@
-#pragma ident "$Id: version.c,v 1.8 2016/08/26 20:09:33 dechavez Exp $"
+#pragma ident "$Id: version.c,v 1.9 2017/10/11 20:44:29 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "udpio.h"
 
-static VERSION version = {1, 1, 2};
+static VERSION version = {1, 1, 3};
 
 /* udpio library release notes
+
+1.1.3  10/11/2017
+       udpio.c: generate unique return values for each possible udpioRecv() error condition
 
 1.1.2  08/26/2016
        udpio.c: added a (got == 0) branch to RECVFROM() return value check in udpioRecv(),

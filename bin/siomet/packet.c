@@ -1,4 +1,4 @@
-#pragma ident "$Id: packet.c,v 1.1 2017/09/28 18:20:44 dauerbach Exp $"
+#pragma ident "$Id: packet.c,v 1.2 2017/10/11 20:49:54 dechavez Exp $"
 /*======================================================================
  *
  *  proto-packet functions
@@ -14,19 +14,21 @@ static ISI_PUSH *ph = NULL;
 void FlushPacket(PROTO_PACKET *pkt)
 {
 UINT8 ida10[IDA10_FIXEDRECLEN];
-//IDA10_TS ts;
+static BOOL FirstPacket = TRUE;
 
     if (pkt->nsamp == 0) return;
 
     BuildIda10(pkt, ida10);
-//ida10UnpackTS(ida10, &ts);
-//LogMsg("%s", ida10TStoString(&ts, NULL));
     if (!isiPushRawPacket(ph, ida10, IDA10_FIXEDRECLEN, ISI_TYPE_IDA10)) {
         LogMsg("ERROR: FlushPacket: isiPushRawPacket: %s", strerror(errno));
         GracefulExit(MY_MOD_ID + 1);
     }
+    if (FirstPacket) {
+        LogMsg("initial packet delivered to ISI push server@%s:%d\n", ph->server, ph->port);
+        FirstPacket = FALSE;
+    }
 
-    pkt->nsamp = 0;
+        pkt->nsamp = 0;
 }
 
 void StartPacketPusher(char *server, int port, LOGIO *lp, int depth, char *sname, char *nname)
@@ -67,6 +69,9 @@ static char *fid = "StartPacketPusher";
 /* Revision History
  *
  * $Log: packet.c,v $
+ * Revision 1.2  2017/10/11 20:49:54  dechavez
+ * log message when first packet is delivered
+ *
  * Revision 1.1  2017/09/28 18:20:44  dauerbach
  * initial release
  *

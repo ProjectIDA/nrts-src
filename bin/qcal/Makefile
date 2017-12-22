@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2016/08/19 16:26:07 dechavez Exp $
+# $Id: Makefile,v 1.14 2017/10/30 22:27:17 dechavez Exp $
 # Unix makefile for qcal
 
 VPATH   = 
@@ -34,7 +34,7 @@ LIBS   += -ludpio
 LIBS   += -lttyio
 LIBS   += -llogio
 LIBS   += -lutil
-LIBS   += -ldmc
+LIBS   += -lmseed -ldmc
 LIBS   += -lmsgq
 LIBS   += -lmd5
 LIBS   += -lz

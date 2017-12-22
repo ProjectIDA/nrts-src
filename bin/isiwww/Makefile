@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2014/08/29 21:10:12 dechavez Exp $
+# $Id: Makefile,v 1.12 2017/10/30 22:32:34 dechavez Exp $
 # Unix makefile for isiwww
 
 VPATH   = 
@@ -13,7 +13,7 @@ DEFS   += -D_POSIX_PTHREAD_SEMANTICS
 DEFS   += -DDEFAULT_SERVER=\"idahub.ucsd.edu\"
 CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS)
 
-LIBS    = -L$(LIBDIR) -lisi -lida -lliss -lcssio -liacp -lisidb -ldbio -lida10 -lmseed -lutil -llogio
+LIBS    = -L$(LIBDIR) -lisi -lida -lliss -lcssio -liacp -lisidb -ldbio -lida10 -lmseed -ldmc -lutil -llogio
 LIBS   += $(SQLLIBS)
 LIBS   += -lz
 LIBS   += -lm

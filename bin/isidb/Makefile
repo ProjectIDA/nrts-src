@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2015/12/08 20:30:36 dechavez Exp $
+# $Id: Makefile,v 1.8 2017/10/30 22:33:43 dechavez Exp $
 # Unix makefile for isidb
 
 VPATH   = 
@@ -13,7 +13,7 @@ DEFS    = -D$(OSNAME) -D$(OSTYPE) -DOSVER=$(OSVER)
 DEFS   += $(SQLDEFS)
 CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS)
 
-LIBS    = -L$(LIBDIR) -lisidl -lisi -lida -lliss -lida10 -lisidb -ldbio -llogio -lutil -lmseed
+LIBS    = -L$(LIBDIR) -lisidl -lisi -lida -lliss -lida10 -lisidb -ldbio -llogio -lutil -lmseed -ldmc
 LIBS   += $(SQLLIBS)
 LIBS   += $(SOCKLIBS)
 LIBS   += $(MTLIBS)

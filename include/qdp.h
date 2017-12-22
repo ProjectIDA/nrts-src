@@ -1,4 +1,4 @@
-#pragma ident "$Id: qdp.h,v 1.97 2017/09/14 00:21:30 dauerbach Exp $"
+#pragma ident "$Id: qdp.h,v 1.98 2017/10/11 20:22:50 dechavez Exp $"
 /*======================================================================
  *
  *  Quanterra QDP communication
@@ -1349,6 +1349,7 @@ void qdpPrintLCQ(FILE *fp, QDP_LCQ *lcq, UINT16 print);
 void qdpPrint_SSCFG(FILE *fp, QDP_TYPE_SSCFG *sscfg);
 void qdpPrint_C2_EPD(FILE *fp, QDP_TYPE_C2_EPD *epd);
 void qdpPrint_C2_EPCFG(FILE *fp, QDP_TYPE_C2_EPCFG *epcfg, QDP_DP_TOKEN *token);
+void qdpPrintUnsupportedQEP(FILE *fp, QDP *qdp);
 
 /* process.c */
 BOOL qdpProcessPacket(QDP_LCQ *lcq, QDP_PKT *pkt);
@@ -1370,7 +1371,7 @@ void qdpIncrStatsDupData(QDP *qp);
 void qdpIncrStatsData(QDP *qp);
 void qdpIncrStatsFill(QDP *qp);
 void qdpIncrStatsRetry(QDP *qp);
-void qdpGetStats(QDP *qp, QDP_STATS *dest); 
+void qdpGetStats(QDP *qp, QDP_STATS *dest);
 UINT64 qdpSessionUptime(QDP *qp);
 void qdpLogStats(QDP *qp);
 void qdpPrintStats(FILE *fp, QDP *qp);
@@ -1500,6 +1501,9 @@ VERSION *qdpVersion(void);
 /* Revision History
  *
  * $Log: qdp.h,v $
+ * Revision 1.98  2017/10/11 20:22:50  dechavez
+ * added qdpPrintUnsupportedQEP() prototype
+ *
  * Revision 1.97  2017/09/14 00:21:30  dauerbach
  * updated prototypes
  *

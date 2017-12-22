@@ -1,6 +1,6 @@
-#pragma ident "$Id: config.c,v 1.13 2017/09/20 19:18:35 dauerbach Exp $"
+#pragma ident "$Id: config.c,v 1.14 2017/10/11 20:37:51 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * Full configuration stuff
  *
  *====================================================================*/
@@ -191,15 +191,15 @@ UINT16 memtype;
         errno = ENOENT;
         return FALSE;
     }
-     
+
     qdpUpdateDataPortChannelFreqs(dport, fix); /* ensure tokens and data port output freqs are consistent */
 
     qdpEncode_C1_LOG(&pkt, &dport->log, port);
     if (!qdpPostCmd(qdp, &pkt, TRUE)) return FALSE;
-     
+
     qdpPackTokenMemblk(&blk, &dport->token, memtype);
     if (!qdpPostMemBlk(qdp, &blk, delay, ntry, NULL)) return FALSE;
-     
+
     return TRUE;
 }
 
@@ -399,14 +399,18 @@ static int ntry = 10;
 
 /* C2_EPCFG */
 
-    if ((qdp->flags & QDP_FLAGS_EP_SUPPORTED) && (config->set & QDP_CONFIG_DEFINED_EPCFG)) {
-        qdpEncode_C2_EPCFG(&pkt, &config->epcfg);
-        if (verbose) {printf("Loading environmental processor configuration"); fflush(stdout);}
-        if (!qdpPostCmd(qdp, &pkt, TRUE)) {
-            if (verbose) printf(" *** FAILED ***\n");
-            return FALSE;
+    if (config->set & QDP_CONFIG_DEFINED_EPCFG) {
+        if (qdp->flags & QDP_FLAGS_EP_SUPPORTED) {
+            qdpEncode_C2_EPCFG(&pkt, &config->epcfg);
+            if (verbose) { printf("Loading environmental processor configuration"); fflush(stdout); }
+            if (!qdpPostCmd(qdp, &pkt, TRUE)) {
+                if (verbose) printf(" *** FAILED ***\n");
+                return FALSE;
+            }
+            if (verbose) printf("\n");
+        } else if (verbose) {
+            qdpPrintUnsupportedQEP(stdout, qdp);
         }
-        if (verbose) printf("\n");
     }
 
 /* Webpage */
@@ -452,6 +456,9 @@ static int ntry = 10;
 /* Revision History
  *
  * $Log: config.c,v $
+ * Revision 1.14  2017/10/11 20:37:51  dechavez
+ * print version info message when skipping C2_EPCFG updates for peers which don't support QEP
+ *
  * Revision 1.13  2017/09/20 19:18:35  dauerbach
  * added check for QEP support before updating C2_EPCFG
  *

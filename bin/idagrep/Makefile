@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2015/12/07 19:54:05 dechavez Exp $
+# $Id: Makefile,v 1.7 2017/10/30 22:48:31 dechavez Exp $
 # Unix makefile for idagrep
 
 VPATH   = 
@@ -12,7 +12,7 @@ DEFS    = -D$(OSNAME) -D$(OSTYPE) -DOSVER=$(OSVER) -D_REENTRANT
 DEFS   += -D_POSIX_PTHREAD_SEMANTICS
 CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS)
 
-LIBS    = -L$(LIBDIR) -lida -lida10 -ldbio -lmseed -lutil -llogio -lm
+LIBS    = -L$(LIBDIR) -lida -lida10 -ldbio -lmseed -ldmc -lutil -llogio -lm
 
 OBJS  = ReleaseNotes.o
 OBJS += main.o

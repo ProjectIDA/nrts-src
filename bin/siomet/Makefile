@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2017/09/28 18:20:44 dauerbach Exp $
+# $Id: Makefile,v 1.2 2017/10/30 22:24:45 dechavez Exp $
 # Makefile for siomet
 
 VPATH  =
@@ -20,7 +20,7 @@ LIBS   += -liacp
 LIBS   += -lttyio
 LIBS   += -lutil
 LIBS   += -lida10
-LIBS   += -lmseed
+LIBS   += -lmseed -ldmc
 LIBS   += -llogio
 LIBS   += -lmsgq
 LIBS   += -lz

@@ -1,6 +1,6 @@
-#pragma ident "$Id: io.c,v 1.18 2016/07/20 17:14:25 dechavez Exp $"
+#pragma ident "$Id: io.c,v 1.19 2017/10/11 20:40:27 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * Low level QDP I/O
  *
  *====================================================================*/
@@ -83,7 +83,7 @@ static char *fid = "qdpRecvPkt";
         msg = NULL;
     } else {
         *status = QDP_IOERROR;
-        qdpError(qp, "%s I/O error reading %s: %s", qp->peer.ident, up->ident, strerror(errno));
+        qdpError(qp, "%s I/O error (got=%d) reading %s: %s", qp->peer.ident, got, up->ident, strerror(errno));
         qdpReturnPktMsgToHeap(fid, qp, msg);
         msg = NULL;
     }
@@ -159,6 +159,9 @@ void qdpLogQdp(QDP *qdp)
 /* Revision History
  *
  * $Log: io.c,v $
+ * Revision 1.19  2017/10/11 20:40:27  dechavez
+ * qdpRecvPkt() changed to log qioRecv() return value after failure
+ *
  * Revision 1.18  2016/07/20 17:14:25  dechavez
  * qdpRecvPkt() now includes strerror() in I/O error message
  *

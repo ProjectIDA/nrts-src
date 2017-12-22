@@ -1,4 +1,4 @@
-#pragma ident "$Id: mseed.h,v 1.15 2017/10/20 01:33:22 dauerbach Exp $"
+#pragma ident "$Id: mseed.h,v 1.17 2017/11/21 21:05:14 dechavez Exp $"
 /*======================================================================
  *
  * Defines, templates, and prototypes for MiniSEED library
@@ -508,6 +508,9 @@ BOOL mseedWriteBlockette57(FILE *fp, MSEED_B57 *b57);
 /* b58.c */
 BOOL mseedWriteBlockette58(FILE *fp, MSEED_B58 *b58);
 
+/* chnloc.c */
+char *mseedChnLocToChnloc(char *chnid, char *locid, char *chnloc);
+
 /* copy.c */
 int mseedCopyINT16(INT16 *dest, INT16 *src, INT32 nsamp);
 int mseedCopyINT32(INT32 *dest, INT32 *src, INT32 nsamp);
@@ -532,7 +535,6 @@ BOOL mseedSetDebug(MSEED_HANDLE *handle, int value);
 BOOL mseedSetClockThreshold(MSEED_HANDLE *handle, int locked, int suspect);
 BOOL mseedSetStaid(MSEED_HANDLE *handle, char *staid);
 BOOL mseedSetNetid(MSEED_HANDLE *handle, char *netid);
-BOOL mseedSetFormat(MSEED_HANDLE *handle, int format);
 BOOL mseedSetIDA10Chanmap(MSEED_HANDLE *handle, LNKLST *chanmap);
 BOOL mseedSetDriftRate(MSEED_HANDLE *handle, REAL64 drift);
 INT32 mseedIncrementSeqno(MSEED_HANDLE *handle, char *ident);
@@ -549,6 +551,9 @@ BOOL mseedConvertIDA9(MSEED_HANDLE *handle, MSEED_RECORD *dest, UINT8 *src);
 
 /* ida10.c */
 BOOL mseedConvertIDA10(MSEED_HANDLE *handle, MSEED_RECORD *dest, UINT8 *src);
+
+/* ida1012.c */
+UINT8 *mseed512ToIDA1012(UINT8 *mseed512, UINT8 *dest);
 
 /* log.c */
 VOID mseedLog(MSEED_HANDLE *handle, int level, CHAR *format, ...);
@@ -640,6 +645,12 @@ VERSION *mseedVersion(VOID);
 /* Revision History
  *
  * $Log: mseed.h,v $
+ * Revision 1.17  2017/11/21 21:05:14  dechavez
+ * changed mseed512ToIDA1012() to return UINT8 * instead of BOOL
+ *
+ * Revision 1.16  2017/11/21 18:04:44  dechavez
+ * added mseedChnLocToChnloc() and mseed512ToIDA1012() prototypes
+ *
  * Revision 1.15  2017/10/20 01:33:22  dauerbach
  * added and edited some convenience #defines:
  *     #define MSEED_CHNLOCLEN (MSEED_CNAMLEN + MSEED_LNAMLEN)

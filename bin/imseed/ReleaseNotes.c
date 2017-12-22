@@ -1,8 +1,11 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.16 2016/02/01 18:47:22 dechavez Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.17 2017/11/01 21:37:51 dechavez Exp $"
 
-char *VersionIdentString = "Release 1.6.1";
+char *VersionIdentString = "Release 1.7.0";
 
 /* Release notes
+
+1.7.0  11/02/2017
+       Pass thru support for IDA10.12 (encapsulated Miniseed, payload emitted directly without unpacking)
 
 1.6.1  02/01/2016
        Give up immediately on any read errors
@@ -23,7 +26,7 @@ char *VersionIdentString = "Release 1.6.1";
        link with imseed 2.1.2 to flush MiniSEED records if time tear exeeds 1/2 sample interval
 
 1.5.2  08/26/2014
-       link with libmseed 2.1.1 to address 
+       link with libmseed 2.1.1 to address
          a) sample rate bug when using drift option
          b) incorrect packing of non-Steim data
          c) problems detecting time tears
@@ -51,7 +54,7 @@ char *VersionIdentString = "Release 1.6.1";
 1.3.0  04/14/2014
        added "rechan" option for renaming channels
        Added "drift" option to set blockette 100 actual sample rate (MK8 and Femtometer packets only)
-       Fixed spurious bit 5 in data quality flag bug for Q330 input 
+       Fixed spurious bit 5 in data quality flag bug for Q330 input
 
 1.2.0  never committed
 

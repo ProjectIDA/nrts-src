@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2011/10/24 19:40:41 dechavez Exp $
+# $Id: Makefile,v 1.2 2017/10/30 23:26:05 dechavez Exp $
 # Makefile for txtoida10
 
 VPATH   = 
@@ -19,6 +19,7 @@ LIBS += -liacp
 LIBS += -lmsgq
 LIBS += -lisidb
 LIBS += -ldbio
+LIBS += -lmseed -ldmc
 LIBS += -lliss
 LIBS += -llogio
 LIBS += -lutil

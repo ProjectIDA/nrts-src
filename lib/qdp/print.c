@@ -1,6 +1,6 @@
-#pragma ident "$Id: print.c,v 1.37 2017/09/14 00:25:17 dauerbach Exp $"
+#pragma ident "$Id: print.c,v 1.38 2017/10/11 20:41:01 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * Print stuff for debugging
  *
  *====================================================================*/
@@ -63,7 +63,7 @@ static int baud[MAXBAUD+2] = {-1, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 1
 int qdpBaud(int code)
 {
     if (code < 0 || code > MAXBAUD) code = MAXBAUD;
-     
+
     return baud[code];
 }
 
@@ -807,7 +807,7 @@ int i;
     fprintf(fp, "           base port = %hu\n", phy->baseport);
     fprintf(fp, "            ethernet = %s %02x:%02x:%02x:%02x:%02x:%02x 0x%04x (",
         utilDotDecimalString(phy->ethernet.ip, NULL),
-        phy->ethernet.mac[0], phy->ethernet.mac[1], phy->ethernet.mac[2], 
+        phy->ethernet.mac[0], phy->ethernet.mac[1], phy->ethernet.mac[2],
         phy->ethernet.mac[3], phy->ethernet.mac[4], phy->ethernet.mac[5],
         phy->ethernet.flags
     );
@@ -1185,6 +1185,14 @@ char chn[QDP_CNAME_LEN+1], loc[QDP_LNAME_LEN+1];
     }
 }
 
+void qdpPrintUnsupportedQEP(FILE *fp, QDP *qdp)
+{
+    fprintf(fp, "QEP not supported by Q330 firmware (version %d.%02d installed, %d.%02d required)\n",
+        qdp->c1_fix.sys_ver.major, qdp->c1_fix.sys_ver.minor,
+        QDP_MIN_EP_VERSION_MAJOR, QDP_MIN_EP_VERSION_MINOR
+    );
+}
+
 /*-----------------------------------------------------------------------+
  |                                                                       |
  | Copyright (C) 2006 Regents of the University of California            |
@@ -1212,6 +1220,9 @@ char chn[QDP_CNAME_LEN+1], loc[QDP_LNAME_LEN+1];
 /* Revision History
  *
  * $Log: print.c,v $
+ * Revision 1.38  2017/10/11 20:41:01  dechavez
+ * introduced qdpPrintUnsupportedQEP()
+ *
  * Revision 1.37  2017/09/14 00:25:17  dauerbach
  * introduced qdpPrintPreampBitmap()
  *
@@ -1226,7 +1237,7 @@ char chn[QDP_CNAME_LEN+1], loc[QDP_LNAME_LEN+1];
  *
  * Revision 1.33  2016/01/23 00:18:06  dechavez
  * added qdpPrint_C2_EPD(), include tokens in qdpPrint_C2_EPCFG()
- *
+
  * Revision 1.32  2016/01/21 20:48:16  dechavez
  * fixed format string to calm OS X compile
  *

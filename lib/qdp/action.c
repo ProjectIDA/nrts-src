@@ -1,6 +1,6 @@
-#pragma ident "$Id: action.c,v 1.38 2017/04/13 15:21:13 dechavez Exp $"
+#pragma ident "$Id: action.c,v 1.39 2017/10/11 20:35:34 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * FSA event handlers for all events except for handling of DT_DATA.
  * That is taken care of in reorder.c, and is where you will find
  * ActionINITDACK() and ActionDATA().
@@ -175,9 +175,9 @@ static char *fid = "ActionLD_C1_FIX";
 
     if (qp->c1_fix.sys_ver.major >= QDP_MIN_EP_VERSION_MAJOR && qp->c1_fix.sys_ver.minor >= QDP_MIN_EP_VERSION_MINOR) {
         qp->flags |= QDP_FLAGS_EP_SUPPORTED;
-        qdpInfo(qp, "%s peer supports QEP", qp->peer.ident);
+        qdpInfo(qp, "%s supports QEP (sys ver %d.%03d)", qp->peer.ident, qp->c1_fix.sys_ver.major, qp->c1_fix.sys_ver.minor);
     } else {
-        qdpInfo(qp, "%s peer does NOT support QEP", qp->peer.ident);
+        qdpInfo(qp, "%s does NOT support QEP (sys ver %d.%03d)", qp->peer.ident, qp->c1_fix.sys_ver.major, qp->c1_fix.sys_ver.minor);
     }
 }
 
@@ -264,7 +264,7 @@ static char *fid = "ActionRQ_C1_FLGS";
 
 /* Load combo packet and initialize reorder buffer */
 
-#define MS100_TO_NANOSEC 
+#define MS100_TO_NANOSEC(x) ((x * 100) * NANOSEC_PER_MSEC)
 void ActionLD_C1_FLGS(QDP *qp, QDP_EVENT *event)
 {
 QDP_PKT *pkt;
@@ -276,7 +276,7 @@ static char *fid = "ActionLD_C1_FLGS";
     qdpDecode_C1_COMBO(qp->meta.raw.combo, &qp->meta.combo);
 
     qp->recv.last_packet = qp->meta.combo.log.dataseq;
-    qp->recv.ack_to = ((UINT64) qp->meta.combo.log.ack_to * 100) * NANOSEC_PER_MSEC;
+    qp->recv.ack_to = MS100_TO_NANOSEC(qp->meta.combo.log.ack_to);
     ActionINITDACK(qp);
     qdpDebug(qp, "%s ack_to set to %llu msec", qp->peer.ident, qp->recv.ack_to / NANOSEC_PER_MSEC);
     qdpDebug(qp, "%s last_packet set to %hu", qp->peer.ident, qp->recv.last_packet);
@@ -348,7 +348,7 @@ static char *fid = "ActionTLD";
 
     /* send a dummy command to tell AppcmdThread running over in fsa.c to suicide */
 
-    if ((msg = msgqGet(&qp->Q.cmd.heap, MSGQ_NOWAIT)) != NULL) { 
+    if ((msg = msgqGet(&qp->Q.cmd.heap, MSGQ_NOWAIT)) != NULL) {
         qdpDebug(qp, "%s: send QDP_CX_XXXX 'poison pill' to AppcmdThread", fid);
         pkt = (QDP_PKT *) msg->data;
         qdpInitPkt(pkt, QDP_CX_XXXX, 0, 0);
@@ -405,9 +405,6 @@ static char *fid = "ActionCERR";
     switch (sender(qp, pkt)) {
       case FROM_AUTOMATON:
         qdpError(qp, "%s: %s automaton command error %d (%s)", fid, qp->peer.ident, qp->cmd.err, qdpErrString(qp->cmd.err));
-        qdpError(qp, "restarting handshake\n");
-        ActionSTART(qp, event);
-        ActionSRVRQ(qp, event);
         break;
       case FROM_USER:
         usr = (QDP_PKT *) qp->cmd.msg->data;
@@ -533,17 +530,16 @@ static char *fid = "ActionAPPCMD";
 
     pkt = (QDP_PKT *) qp->cmd.msg->data;
 
-/* Restart the machine if we fail to get a response after "repeated" attempts */
+/* give up on this command if we fail to get a response after "repeated" attempts */
 
     if (qp->cmd.attempts > QDP_MAX_CMD_ATTEMPTS) {
         qdpInfo(qp, "WARNING: no response to user issued '%s' command\n", qdpCmdString(pkt->hdr.cmd));
         qp->cmd.ok = FALSE;
+        qp->cmd.err = QDP_CERR_TIMEOUT;
+        errno = ETIMEDOUT;
         msgqPut(&qp->Q.cmd.heap, qp->cmd.msg);
         qp->cmd.msg = NULL;
         SEM_POST(&qp->cmd.sem);
-        qdpInfo(qp, "restarting handshake\n");
-        ActionSTART(qp, event);
-        ActionSRVRQ(qp, event);
         return;
     }
 
@@ -602,7 +598,7 @@ static char *fid = "ActionDACK";
     ActionINITDACK(qp);
     qp->recv.count = 0;
     utilResetTimer(&qp->recv.timer);
-    
+
 }
 
 /* DT_FILL packets get tossed */
@@ -716,6 +712,10 @@ static char *fid = "ActionWATCHDOG";
 /* Revision History
  *
  * $Log: action.c,v $
+ * Revision 1.39  2017/10/11 20:35:34  dechavez
+ * reworked ActionAPPCMD() to fail after repeated attempts instead of restarting machine
+ * also, don't restart machine after automaton generated commands fail (ActionCERR)
+ *
  * Revision 1.38  2017/04/13 15:21:13  dechavez
  * added deregister when aborting handshake with a disabled data port
  *

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2017/10/20 01:51:37 dauerbach Exp $
+# $Id: Makefile,v 1.7 2017/10/30 22:37:05 dechavez Exp $
 # Unix makefile for i10push
 
 VPATH   = 
@@ -27,7 +27,7 @@ LIBS   += -ludpio
 LIBS   += -lttyio
 LIBS   += -llogio
 LIBS   += -lutil
-LIBS   += -lmseed
+LIBS   += -lmseed -ldmc
 LIBS   += -ldmc
 LIBS   += -lmsgq
 LIBS   += -lmd5

@@ -1,7 +1,7 @@
-$Id: ida10.txt,v 1.2 2017/10/19 23:49:58 dauerbach Exp $
+$Id: ida10.txt,v 1.3 2017/11/02 21:00:43 dechavez Exp $
 
                       IDA REV 10 DATA PACKET FORMAT
-                      Last modified: September 19, 2013
+                      Last modified: October 19, 2017
 
 The description below refers to the following data types:
 
@@ -616,6 +616,10 @@ Offset  Length   Type       Description
  60       2      INT16      nominal sample rate factor
  62       2      INT16      nominal sample rate multiplier
  64   variable   UINT8      the data
+
+ The data format/status descriptor at offset 56 Does Not Apply for IDA10.12
+ data.  The equivalent information is encoded in the FSDH header inside
+ the Miniseed payload.  The IDA libida10 library takes care of hiding this.
 
 stream name
 ------------

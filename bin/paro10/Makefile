@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.5 2014/08/29 21:12:41 dechavez Exp $
+# $Id: Makefile,v 1.6 2017/10/30 22:22:42 dechavez Exp $
 # Unix makefile for paro10
 
 VPATH   = 
@@ -28,7 +28,7 @@ LIBS   += -liacp
 LIBS   += -lttyio
 LIBS   += -lutil
 LIBS   += -lida10
-LIBS   += -lmseed
+LIBS   += -lmseed -ldmc
 LIBS   += -llogio
 LIBS   += -lmsgq
 LIBS   += -lz

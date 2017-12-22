@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.15 2014/08/29 21:15:44 dechavez Exp $
+# $Id: Makefile,v 1.16 2017/10/30 22:01:37 dechavez Exp $
 # Makefile for utilities that use the edep service
 
 VPATH  =
@@ -16,7 +16,7 @@ LIBRARIES  += $(LIBDIR)/libsacio.a
 LIBRARIES  += $(LIBDIR)/libutil.a
 LIBRARIES  += $(LIBDIR)/libseed.a
 #OUTPUT = xfer_tap xfer_prt xfer_tocss xfer_togse xfer_tosac xfer_toseed eztap
-OUTPUT = eztap xfer_tap
+OUTPUT = eztap
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE
 	cd OBJS/$(PLATFORM); \
@@ -70,4 +70,4 @@ xfer_toseed: $(VPATH)toseed.c $(LIBRARIES)
 	$(CC) $(CFLAGS) -o $@ $(VPATH)toseed.c -lxfer -lseed -lutil -llogio -lm $(MTLIBS)
 
 eztap: $(VPATH)eztap.c $(LIBRARIES)
-	$(CC) $(CFLAGS) -o $@ $(VPATH)eztap.c -lxfer -lnrts -lida -lisidb -ldbio -lida10 -lisidb -lutil -lseed -llogio -lmseed $(SOCKLIBS) -lm $(SQLLIBS) $(MTLIBS)
+	$(CC) $(CFLAGS) -o $@ $(VPATH)eztap.c -lxfer -lnrts -lida -lisidb -ldbio -lida10 -lisidb -lutil -lseed -llogio -lmseed -ldmc $(SOCKLIBS) -lm $(SQLLIBS) $(MTLIBS)

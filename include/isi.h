@@ -1,4 +1,4 @@
-#pragma ident "$Id: isi.h,v 1.70 2015/12/08 18:11:00 dechavez Exp $"
+#pragma ident "$Id: isi.h,v 1.71 2017/11/20 23:32:54 dechavez Exp $"
 /*======================================================================
  *
  *  Ida System Interface library
@@ -303,13 +303,13 @@ typedef struct {
 #define ISI_MSEED_HDR_LEN 56 // THIS MUST BE KEPT IN SYNC WITH liss.h:LISS_MSEED_HDR_LEN
 
 typedef struct {
-    char site[ISI_SITELEN+1];   /* source site name */
-    ISI_SEQNO seqno;            /* source sequence number */
-    ISI_SEQNO oldseqno;         /* original source sequence number (for isimerge'd data) */
-    ISI_DATA_DESC desc;         /* payload descriptor */
-    ISI_CONTENTS contents;      /* content descriptor */
-    UINT8 mseed[ISI_MSEED_HDR_LEN]; /* equivalent MiniSEED header */
-    UINT32 status;              /* unpack status, etc */
+    char site[ISI_SITELEN+1];       /* source site name */
+    ISI_SEQNO seqno;                /* source sequence number */
+    ISI_SEQNO oldseqno;             /* UNUSED: a bad idea, abandoned */
+    ISI_DATA_DESC desc;             /* payload descriptor */
+    ISI_CONTENTS contents;          /* UNUSED: a good idea, never fleshed out */
+    UINT8 mseed[ISI_MSEED_HDR_LEN]; /* UNUSED: a failed attempt fake MiniSEED from IDA10 */
+    UINT32 status;                  /* unpack status, etc */
     struct {
         UINT32 payload;       /* number of bytes _allocated_ to payload */
         UINT32 used;          /* number of bytes _used_ in payload */
@@ -780,6 +780,9 @@ LNKLST *isiRequestWfdisc(ISI *isi, int maxdur);
 /* Revision History
  *
  * $Log: isi.h,v $
+ * Revision 1.71  2017/11/20 23:32:54  dechavez
+ * identified unused ISI_RAW_HEADER fields in comments
+ *
  * Revision 1.70  2015/12/08 18:11:00  dechavez
  * updated prototypes
  *

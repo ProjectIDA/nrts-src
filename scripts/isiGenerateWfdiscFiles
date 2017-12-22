@@ -1,5 +1,5 @@
 #!/bin/csh -f
-# $Id: isiGenerateWfdiscFiles,v 1.14 2015/12/10 00:00:15 dechavez Exp $
+# $Id: isiGenerateWfdiscFiles,v 1.15 2017/10/30 19:08:46 dechavez Exp $
 #
 # Collect all available NRTS wfdiscs into station and network day files
 
@@ -127,9 +127,6 @@ foreach wfdisc (*.wfdisc)
     if (-z $wfdisc) rm $wfdisc
 end
 
-# Update calib/calper
-
-setcalib >& /dev/null
 # Remove outdated wfdiscs and install new ones
 
 touch $outdir/dummy.wfdisc
@@ -154,6 +151,9 @@ exit 1
 # Revision History
 #
 # $Log: isiGenerateWfdiscFiles,v $
+# Revision 1.15  2017/10/30 19:08:46  dechavez
+# don't bother calling setcalib (it doesn't do anything)
+#
 # Revision 1.14  2015/12/10 00:00:15  dechavez
 # undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
 # (didn't work in cron, duh)

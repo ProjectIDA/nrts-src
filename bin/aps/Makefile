@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2011/12/15 18:51:54 dechavez Exp $
+# $Id: Makefile,v 1.5 2017/12/21 21:41:09 dauerbach Exp $
 # Unix makefile for aps
 
 VPATH   = 
@@ -39,6 +39,7 @@ REMOVE: FORCE
  
 doinstall: $(OUTPUT) $(BINDIR)
 	rm -f $(BINDIR)/$(OUTPUT)
+	mkdir -p $(BINDIR)
 	cp $(OUTPUT) $(BINDIR)/$(OUTPUT)
 	chmod 4755 $(BINDIR)/$(OUTPUT)
  

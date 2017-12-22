@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2014/08/11 20:45:06 dechavez Exp $
+# $Id: Makefile,v 1.5 2017/10/30 22:34:28 dechavez Exp $
 # Makefile for imseed
 
 VPATH   = 
@@ -13,14 +13,13 @@ DEFS   += -D_POSIX_PTHREAD_SEMANTICS
 CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS)
 
 LIBS  = -L$(LIBDIR)
-LIBS += -lmseed
 LIBS += -lida10
 LIBS += -lisi
 LIBS += -lida
 LIBS += -lisidb
 LIBS += -ldbio
 LIBS += -llogio
-LIBS += -ldmc
+LIBS += -lmseed -ldmc
 LIBS += -lliss
 LIBS += -lutil
 LIBS += -lm

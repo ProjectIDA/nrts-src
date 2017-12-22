@@ -76,7 +76,7 @@ LISS_MSEED_HDR mseed;
       default:
         fprintf(stderr, "illegal data quality code '%c'\n", qcode);
         help(argv[0]);
-    }
+    } 
 
     if ((gz = gzdopen(fileno(stdin), "rb")) == NULL) {
         perror("gzdopen");

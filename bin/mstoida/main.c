@@ -1,4 +1,4 @@
-#pragma ident "$Id: main.c,v 1.1 2017/10/20 01:24:12 dauerbach Exp $"
+#pragma ident "$Id: main.c,v 1.3 2017/11/21 21:07:06 dechavez Exp $"
 /*======================================================================
  *
  * MiniSEED to IDA10 Conversion Application
@@ -16,66 +16,19 @@ static void help(char *myname)
 
 int main(int argc, char **argv)
 {
-int i;
-MSEED_RECORD record;
 MSEED_PACKED packed_record;
-/* char chnloc[MSEED_CHNLOCLEN + 1]; */
-char *chnloc;
-char buf[IDA10_FIXEDHDRLEN];
-char *ptr;
-int srfact, srmult;
-UINT8 clock_stat;
+char ida10[IDA10_FIXEDRECLEN];
 
     if (argc != 1) help(argv[0]);
 
-    chnloc = (char *)malloc(MSEED_CHNLOCLEN);
-
     while (mseedReadPackedRecord(stdin, &packed_record)) {
-        if (!mseedUnpackRecord(&record, packed_record.data)) {
-            fprintf(stderr, "ERROR unpacking MSEED packed record\n");
+
+        if (mseed512ToIDA1012(packed_record.data, ida10) == NULL) {
+            fprintf(stderr, "%s: mseed512ToIDA1012: %s\n", argv[0], strerror(errno));
             exit(1);
         }
 
-        chnloc[0] = 0;
-        memset(buf, 0, IDA10_FIXEDHDRLEN);
-
-        chnloc = strncat(chnloc, record.hdr.chnid, MSEED_CNAMLEN);
-        chnloc = strncat(chnloc, record.hdr.locid, MSEED_LNAMLEN);
-
-        clock_stat = (record.hdr.flags.ioc & (1 << 5)) ? 1 : 0;
-
-        if (record.hdr.reclen != MSEED_DEFAULT_RECLEN) {
-            fprintf(stderr, "ERROR: record.reclen (%d) != MSEED_DEFAULT_RECLEN (%d)\n",
-                    record.hdr.reclen,
-                    MSEED_DEFAULT_RECLEN);
-            exit(1);
-        }
-
-        ptr = buf;
-        ptr += utilPackBytes(ptr, (UINT8 *) "TS", 2);
-        *ptr++ = 10;
-        *ptr++ = 12;
-        ptr += utilPackBytes(ptr, (UINT8 *) record.hdr.staid, IDA1012_SNAME_LEN);
-        ptr += utilPackBytes(ptr, (UINT8 *) record.hdr.netid, IDA1012_NNAME_LEN);
-        ptr += utilPackUINT64(ptr, record.hdr.tstamp);
-        ptr++; /* skipping device clock specific status */
-        *ptr++ = clock_stat;
-        ptr += utilPackUINT32(ptr, record.hdr.seqno);
-        ptr += 4;   /* utilPackUINT32(ptr, 0); host timestamp */
-        ptr += 20;  /* skipping reserved portion of header */
-        ptr += utilPackUINT16(ptr, IDA10_FIXEDRECLEN - (ptr - buf + sizeof(UINT16)));
-
-        ptr += utilPackBytes(ptr, chnloc, MSEED_CHNLOCLEN + 1);
-        *ptr++ = IDA10_COMP_NONE; /* data format not used for IDA10.12 MSEED payloads */
-        *ptr++ = 1; /* gain */
-        ptr += utilPackUINT16(ptr, record.hdr.nsamp);
-        mseedNsintToFactMult(record.hdr.nsint, &srfact, &srmult);
-        ptr += utilPackINT16(ptr, srfact);
-        ptr += utilPackINT16(ptr, srmult);
-
-        memcpy(ptr, packed_record.data, MSEED_DEFAULT_RECLEN);
-
-        if (fwrite(buf, IDA10_FIXEDRECLEN, 1, stdout) != 1) {
+        if (fwrite(ida10, IDA10_FIXEDRECLEN, 1, stdout) != 1) {
             perror("fwrite");
             exit(1);
         }
@@ -117,6 +70,12 @@ UINT8 clock_stat;
 /* Revision History
  *
  * $Log: main.c,v $
+ * Revision 1.3  2017/11/21 21:07:06  dechavez
+ * changed mseed512ToIDA1012() success test to reflect new return type (UINT8 *) in libmseed 2.7.1
+ *
+ * Revision 1.2  2017/11/21 18:09:07  dechavez
+ * moved conversion code over to libmseed as mseed512ToIDA1012(), reworked main to use same
+ *
  * Revision 1.1  2017/10/20 01:24:12  dauerbach
  * Initial 1.0.0 commit
  *

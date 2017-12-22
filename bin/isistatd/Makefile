@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2015/09/17 05:03:20 dauerbach Exp $
+# $Id: Makefile,v 1.4 2017/10/30 22:32:57 dechavez Exp $
 # Unix makefile for isistatd
 
 VPATH   = 
@@ -26,7 +26,7 @@ LIBS   += -liacp
 LIBS   += -llogio
 LIBS   += -lida10
 LIBS   += -lutil
-LIBS   += -lmseed
+LIBS   += -lmseed -ldmc
 LIBS   += -lttyio
 LIBS   += -lz
 LIBS   += -lm

@@ -1,8 +1,11 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.156 2017/02/03 20:48:07 dechavez Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.157 2017/12/21 00:04:21 dechavez Exp $"
 
-char *VersionIdentString = "Release 4.11.6";
+char *VersionIdentString = "Release 4.12.0";
 
 /* Release Notes
+
+4.12.0  12/20/2017
+        link with libisidl 1.26.0 for IDA10.12 NRTS and Seedlink support (untested)
 
 4.11.6  02/03/2017
         link with libqdp 3.14.3 to get useful error messages about invalid action codes
@@ -11,7 +14,7 @@ char *VersionIdentString = "Release 4.11.6";
         link with libqdp 3.14.2 to fix problem with QEP time stamps
 
 4.11.4  01/26/2017
-        link with libq330 3.7.6 to address re-introducing the double free bug in 3.7.5! 
+        link with libq330 3.7.6 to address re-introducing the double free bug in 3.7.5!
 
 4.11.3  12/22/2016
         link with libq330 3.7.4 to address double free bug with bad config files
@@ -61,7 +64,7 @@ char *VersionIdentString = "Release 4.11.6";
 4.6.1  10/29/2014
        Link with libmseed 2.2.0 to address core dumps coming from uncompressible solar channels
        The uncompressible solar channels are a side effect of the version skew in the firmware
-       beteween the TS-45 and TS-60 charge controllers.  
+       beteween the TS-45 and TS-60 charge controllers.
 
 4.6.0  08/28/2014
        Rework to support moving of ISI_DL_OPTIONS into ISI_DL handle, and use
@@ -78,7 +81,7 @@ char *VersionIdentString = "Release 4.11.6";
 
 4.5.0  08/11/2014
        Link with libmseed 2.0.0 to address Seedlink issues that arose in 4.4.0,
-       and with libisidl 1.24.0 to take care of core dumps when bad packets are 
+       and with libisidl 1.24.0 to take care of core dumps when bad packets are
        encountered when exporting to SeedLink.
 
 4.4.0  04/29/2014
@@ -182,7 +185,7 @@ char *VersionIdentString = "Release 4.11.6";
        Modified QDP barometer support to conform with libqdplus 1.4.0.  Works
        OK except for some occasional "stutters" in time stamp and small spikes.
        Further work still needed before deploying.
-       
+
 2.2.1  02/03/2011
        link with libqdp 3.1.0 to fix auto-restart of Q330 connections
 
@@ -222,7 +225,7 @@ char *VersionIdentString = "Release 4.11.6";
         smaller than what were already in the disk loop
 
 1.20.6  09/30/2010
-        link with libq330 1.5.0 to recognize q330.cfg files that include the 
+        link with libq330 1.5.0 to recognize q330.cfg files that include the
         e300 calibration parameter
 
 1.20.5  07/23/2010
@@ -288,7 +291,7 @@ char *VersionIdentString = "Release 4.11.6";
 1.18.3  02/08/2008
         Link with libnrts 4.8.6 to correct IDA10.5 sample data byte order
         problem on little endian systems.  Add SIGPIPE handler for Slate builds.
-       
+
 1.18.2  02/03/2008
         Link with libliss 1.2.2 to correct bug where non-data packets were
         not making it into the disk loop
@@ -381,7 +384,7 @@ char *VersionIdentString = "Release 4.11.6";
 1.11.1  12/06/2006
         Preliminary 10.4 support (underlying library not fully tested).
         Use the streamlined QDPLUS_PKT
-        
+
 1.11.0  11/13/2006
         Updated 10.3 support, NRTS_MAXCHN increased to 64, added various
         -dbgxxx command line options

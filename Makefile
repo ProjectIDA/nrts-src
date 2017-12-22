@@ -1,13 +1,8 @@
 # $Id: Makefile,v 1.6 2008/01/07 22:19:58 dechavez Exp $
 # Make everything
 
-all: 3rdparty lib bin
+all: lib bin
 install: all
-
-3rdparty: FORCE
-	date
-	cd 3rdparty; $(MAKE)
-	date
 
 lib: FORCE
 	date

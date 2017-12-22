@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.34 2015/08/24 19:15:53 dechavez Exp $
+# $Id: Makefile,v 1.35 2017/10/30 22:31:17 dechavez Exp $
 # Makefile for misc programs
 
 VPATH   =
@@ -10,30 +10,31 @@ INCS    = -I$(INCDIR)
 DEFS    = -D$(OSNAME) -D$(OSTYPE) -D_REENTRANT
 CFLAGS  = $(OPTMIZ) $(INCS) -L$(LIBDIR) $(DEFS) $(SITEFLAGS)
 OUTPUT += attol
-#OUTPUT += basefs
-#OUTPUT += cd2
+OUTPUT += basefs
 OUTPUT += dos2unix
 OUTPUT += etoh
 OUTPUT += filelock
 OUTPUT += filetimes
 OUTPUT += gmt
-OUTPUT += i4echo
+OUTPUT += lcase
+OUTPUT += lttoa
+OUTPUT += ucase
+OUTPUT += unix2dos
+#OUTPUT += cd2
+#OUTPUT += cd2
+#OUTPUT += i4echo
 #OUTPUT += idadd
 #OUTPUT += idadtc
 #OUTPUT += idasync
-OUTPUT += lcase
-OUTPUT += lttoa
 #OUTPUT += modtime
 #OUTPUT += netread
 #OUTPUT += pingwait
 #OUTPUT += revcode
-OUTPUT += s4echo
+#OUTPUT += s4echo
 #OUTPUT += selrec
 #OUTPUT += stability
 #OUTPUT += ts
-OUTPUT += ucase
-OUTPUT += unix2dos
-OUTPUT += validate
+#OUTPUT += validate
 #OUTPUT += ydtodmdy
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE

@@ -238,6 +238,7 @@ BOOL BuildStreamControlList(ISIDL_PAR *par);
 /* signals.c */
 VOID StartSignalHandler(VOID);
 void SignalHandler(int sig);
+VOID StartSignalHandler(VOID);
 
 /* write.c */
 BOOL WritePacketToDisk(ISI_DL *dl, ISI_RAW_PACKET *raw);

@@ -35,7 +35,7 @@ static struct {
 #define DEFAULT_HTDOCPATH "/ida/web"
 #endif
 
-#ifndef SAMP_PER_PACKET
+#ifndef SAMP_PER_PACKET 
 #define  SAMP_PER_PACKET 240
 #endif /*  SAMP_PER_PACKET */
 
@@ -66,11 +66,11 @@ typedef struct {
 
 static COLOR_MAP ColorMap[] = {
     { 432000, 0,  DKGRAY, WHITE },   //  5 days
-    { 345600, 10, MDGRAY, WHITE },   //  4 days
-    { 259200, 25, LTGRAY, BLACK },   //  3 days
-    { 172800, 37, PINK,   BLACK },   //  2 day
-    {  86499, 50, RED,    BLACK },   //  1 day
-    {  21600, 66, TAN,    BLACK },   //  6 hrs
+    { 345600, 10, MDGRAY, WHITE },   //  4 days 
+    { 259200, 25, LTGRAY, BLACK },   //  3 days 
+    { 172800, 37, PINK,   BLACK },   //  2 day 
+    {  86499, 50, RED,    BLACK },   //  1 day 
+    {  21600, 66, TAN,    BLACK },   //  6 hrs 
     {   7200, 75, YELLOW, BLACK },   //  2 hr
     {   3600, 87, GREEN,  BLACK },   //  1 hr
     {   1800, 100, BLUE,   BLACK },   // 30 min
@@ -150,7 +150,7 @@ static int GetNsegbg(UINT32 test)
 int i, indexval, unreached;
 
     for (i = 0; (i < NumColorsNseg);  i++) {
-        if (test < ColorMapNseg[i].percent) return ColorMapNseg[i].bg;
+        if (test < ColorMapNseg[i].percent) return ColorMapNseg[i].bg; 
     }
     return ColorMapNseg[2].bg;
     return unreached; /* just to calm some compilers */
@@ -303,23 +303,23 @@ int  j=0;
     fprintf(fp, "<tr>");
     for (i = 0; ColorMap[i].value >= 0; i++) {
       if (GetBg(i) > 0) {
-        if (ColorMap[i].value / 432000) {
+        if (ColorMap[i].value / 432000) { 
             phrase[i] = "gt 5 days";
-        } else if (ColorMap[i].value / 345600) {
+        } else if (ColorMap[i].value / 345600) { 
             phrase[i] = "gt 4 days";
-        } else if (ColorMap[i].value / 259200) {
+        } else if (ColorMap[i].value / 259200) { 
             phrase[i] = "gt 3 days";
-        } else if (ColorMap[i].value / 172800) {
+        } else if (ColorMap[i].value / 172800) { 
             phrase[i] = "gt 2 days";
-        } else if (ColorMap[i].value / 86400)  {
+        } else if (ColorMap[i].value / 86400)  { 
             phrase[i] = "gt 1 day";
-        } else if (ColorMap[i].value / 21600)  {
+        } else if (ColorMap[i].value / 21600)  { 
             phrase[i] = "gt 6 hours";
-        } else if (ColorMap[i].value / 7200)   {
+        } else if (ColorMap[i].value / 7200)   { 
             phrase[i] = "gt 2 hours";
-        } else if (ColorMap[i].value / 3600)   {
+        } else if (ColorMap[i].value / 3600)   { 
             phrase[i] = "gt 1 hour";
-        } else if (ColorMap[i].value / 1800)   {
+        } else if (ColorMap[i].value / 1800)   { 
             phrase[i] = "gt 30 minutes";
         } else {
             phrase[i] = "lt 30 minutes";
@@ -385,7 +385,7 @@ parchvar[0]=0;
     fprintf(fp, "<CENTER><h2>IDA/NRTS Status at %s</h2></CENTER>\n", isiserver);
     PrintStatusLegend(fp);
     PrintTimeStamp(fp);
-
+    
 //    Accommodate multiple color links
     MakeLinkColorSS(fp);
 
@@ -432,11 +432,11 @@ chanlink[0]=0;
             else {
                 fprintf(fp,"\n%s",sta);
             }
-                fprintf(fp, "<font color=\"%06x\">%s</A>\n<font size=\"+3\" color=\"%06x\"><B>*</B></td>\n",
+                fprintf(fp, "<font color=\"%06x\">%s</A>\n<font size=\"+3\" color=\"%06x\"><B>*</B></td>\n", 
                     GetFg(tslw),util_ucase(sta),GetBg(tslw));
         } else {
             if (stationdir != NULL) {
-                fprintf(fp, "\n<A HREF=\"%s\" class=\"visited\">",stahomelink);
+                fprintf(fp, "\n<A HREF=\"%s\" class=\"visited\">",stahomelink);            
             }
             else {
                 fprintf(fp,"\n%s",sta);
@@ -448,7 +448,7 @@ chanlink[0]=0;
         fprintf(fp, "<A HREF=\"%s\">",chanlink);
         fprintf(fp, "<font color=\"%06x\">%i</A></td>\n",GetPercentfg(livechn),livechn);
         fprintf(fp, "<td style=\"width:5px\" align=\"center\" bgcolor=\"%06x\">\n",GetNsegbg(nseg));
-        fprintf(fp, "<font color=\"%06x\">%i</td>\n",Getnsegfg(nseg),nseg);
+        fprintf(fp, "<font color=\"%06x\">%i</td>\n",Getnsegfg(nseg),nseg);       
         fprintf(fp, "<td align=\"center\" width=150>%s</td>\n",utilLttostr((INT32)tols,0,tbuf));
         fprintf(fp, "<td align=\"center\">%s</td>\n",utilLttostr((INT32)latency,8,tbuf));
         fprintf(fp, "<td align=\"center\">%s</td>\n",utilLttostr((INT32)tslw,8,tbuf));
@@ -527,12 +527,7 @@ webstuff[0]=0;
             }
         }
         First = FALSE;
-        printf("%s: %s (%d/%d) nrec: %u \n", soh->entry[i].name.sta, soh->entry[i].name.chnloc, (UINT32) soh->entry[i].tslw, (UINT32) tslw, soh->entry[i].nrec);
-        if ((soh->entry[i].nrec != 0) && (UINT32) tslw <= LIVE_LATENCY_THRESHOLD) {
-           livechn++; // if channel is reporting, count it
-        } else {
-           printf("%s: %s\n", "skipping dead channel", soh->entry[i].name.chnloc);
-        }
+        if ((soh->entry[i].nrec != 0) && (UINT32) tslw <= LIVE_LATENCY_THRESHOLD) livechn++; // if channel is reporting, count it
         totchn++;    // count total channels
         if (nseg > 0) totnseg++;    // count total nseg if value > 0
     }
@@ -560,7 +555,7 @@ int i;
 char *name;
 
     for (i = 0; i < slist->count; i++) {
-        name = (char *) slist->array[i];
+        name = (char *) slist->array[i]; 
         if (!strcmp(name,sta)) return i;
     }
     return -1;
@@ -578,14 +573,14 @@ stachanfn[0]=0;
          perror("MakeNextButtons");
          exit(0);
     }
-    if (idx == 0) {
+    if (idx == 0) { 
         prevsta = (char *) slist->array[slist->count-1];
     } else {
         prevsta = (char *) slist->array[idx-1];
     }
     sprintf(stachanfn,"http://%s/%s/%s%s",webstuff,isiserver,prevsta,str2);
     fprintf(fp,"<B><A HREF=\"%s\" class=\"working\"><CENTER>PREVIOUS</A>\n",stachanfn);
-    if (idx == ((slist->count)-1)) {
+    if (idx == ((slist->count)-1)) { 
         nextsta = (char *) slist->array[0];
     } else {
         nextsta = (char *) slist->array[idx+1];
@@ -619,13 +614,13 @@ ackpage[0]=0;
     fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
     fprintf(fp, "<CENTER><h2>IDA/NRTS Status for Station %s at %s</h2></CENTER>\n", sta,isiserver);
     PrintChnPgLegend(fp);
-    fprintf(fp,"<BR><A HREF=\"http://%s/index.html \" class=\"working\"><CENTER><BIG>MAIN PAGE</A></CENTER>\n", weblink);
+    fprintf(fp,"<BR><A HREF=\"http://%s/index.html \" class=\"working\"><CENTER><BIG>MAIN PAGE</A></CENTER>\n", weblink);    
     MakeNextButtons(fp, slist, sta, isiserver, webstuff);
 
 //    Print links to the other stations' pages here
     fprintf(fp, "<CENTER><TABLE CELLPADDING=\"5\" border=\"1\">");
     for (i=0;  i < slist->count; i++) {
-        name = (char *) slist->array[i];
+        name = (char *) slist->array[i]; 
         if (!(i % 10)) fprintf(fp,"<TR>");
         sprintf(stachanfn,"http://%s/%s%s",weblink,name,str2);
         fprintf(fp, "<TD><A HREF=\"%s\">%s</A></TD>\n",stachanfn,name);
@@ -835,8 +830,8 @@ LNKLST *slist;
                 PrintTimeStamp(ofp);
                 fclose(ofp);
                 if (i == soh->nentry) continue;
-            }
-            ofp = OpenChanPageOutput(isiserver, soh->entry[i].name.sta, htdocpath, webpath);
+            } 
+            ofp = OpenChanPageOutput(isiserver, soh->entry[i].name.sta, htdocpath, webpath); 
             MakeChanPageHeader(ofp, slist, isiserver, htdocpath, webpath, webstuff, soh->entry[i].name.sta);
             PrevSta = util_ucase(soh->entry[i].name.sta);
         }
@@ -860,7 +855,7 @@ LNKLST *slist;
 }
 static void help(char *myname)
 {
-static char *VerboseHelp =
+static char *VerboseHelp = 
 "The arguments in [ square brackets ] are optional:\n"
 "\n"
 "isiserver=string  default: idahub.ucsd.edu \n"
