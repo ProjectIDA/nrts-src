@@ -1,1 +1,0 @@
-void StartGettingData(isiTapResults *p);
