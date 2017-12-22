@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2015/09/15 23:24:46 dechavez Exp $
+# $Id: Makefile,v 1.8 2017/11/21 18:06:27 dechavez Exp $
 # Makefile for mseed library
 
 VPATH   = 
@@ -21,6 +21,7 @@ OBJS   += $(OUTPUT)(b54.o)
 OBJS   += $(OUTPUT)(b52.o)
 OBJS   += $(OUTPUT)(b57.o)
 OBJS   += $(OUTPUT)(b58.o)
+OBJS   += $(OUTPUT)(chnloc.o)
 OBJS   += $(OUTPUT)(convert.o)
 OBJS   += $(OUTPUT)(copy.o)
 OBJS   += $(OUTPUT)(data.o)
@@ -30,6 +31,7 @@ OBJS   += $(OUTPUT)(handle.o)
 OBJS   += $(OUTPUT)(history.o)
 OBJS   += $(OUTPUT)(ida9.o)
 OBJS   += $(OUTPUT)(ida10.o)
+OBJS   += $(OUTPUT)(ida1012.o)
 OBJS   += $(OUTPUT)(log.o)
 OBJS   += $(OUTPUT)(pack.o)
 OBJS   += $(OUTPUT)(print.o)

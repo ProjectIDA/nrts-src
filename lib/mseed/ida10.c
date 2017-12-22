@@ -1,4 +1,4 @@
-#pragma ident "$Id: ida10.c,v 1.3 2014/08/26 17:29:08 dechavez Exp $"
+#pragma ident "$Id: ida10.c,v 1.4 2017/10/30 21:55:06 dechavez Exp $"
 /*======================================================================
  *
  *  Conversion from IDA10 to MSEED_RECORD
@@ -8,6 +8,13 @@
 #include "ida10.h"
 #include "isi.h"
 #include "dmc.h"
+
+static void ChnlocToChnLoc(ISI_STREAM_NAME *name)
+{
+    if (name == NULL) return;
+    memcpy(name->chn, name->chnloc, ISI_CHNLEN); name->chn[ISI_CHNLEN] = 0;
+    memcpy(name->loc, name->chnloc+ISI_CHNLEN, ISI_LOCLEN); name->loc[ISI_LOCLEN] = 0;
+}
 
 BOOL mseedConvertIDA10(MSEED_HANDLE *handle, MSEED_RECORD *dest, UINT8 *src)
 {
@@ -43,7 +50,7 @@ static char *fid = "mseedConvertIDA10";
 /* and the IDA10 channel name is split from chnlc into chn, loc pairs */
 
     strncpy(name.chnloc, ts.hdr.cname, ISI_CHNLOCLEN);
-    isiChnlocToChnLoc(&name);
+    ChnlocToChnLoc(&name);
     strncpy(chnid, name.chn, 4);
     strncpy(locid, name.loc, 3);
 
@@ -124,6 +131,9 @@ static char *fid = "mseedConvertIDA10";
 /* Revision History
  *
  * $Log: ida10.c,v $
+ * Revision 1.4  2017/10/30 21:55:06  dechavez
+ * remove libisi dependency by using a local version of ChnlocToChnLoc()
+ *
  * Revision 1.3  2014/08/26 17:29:08  dechavez
  * use new IDA10_TTAG nepoch field to set hdr.tstamp
  *

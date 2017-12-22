@@ -1,18 +1,30 @@
-#pragma ident "$Id: version.c,v 1.23 2017/06/20 21:55:49 dechavez Exp $"
+#pragma ident "$Id: version.c,v 1.26 2017/11/21 21:09:24 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "mseed.h"
 
-static VERSION version = {2, 6, 3};
+static VERSION version = {2, 7, 1};
 
 /* mseed library release notes
 
+2.7.1  11/21/2017
+       mseed.h: changed mseed512ToIDA1012() to return UINT8 * instead of BOOL
+       ida1012.c: changed mseed512ToIDA1012() to return pointer to IDA10.12 packet instead of BOOL
+
+2.7.0  11/21/2017
+       mseed.h: added mseedChnLocToChnloc() and mseed512ToIDA1012() prototypes
+       chnloc.c: initial release
+       ida1012.c: initial release
+
+2.6.4  10/30/2017
+       ida10.c: remove libisi dependency by using a local version of ChnlocToChnLoc()
+
 2.6.3  06/20/2017
        unpack.c: fixed sample interval vs sample rate bug in mseedUnpackB100()
-       
+
 2.6.2  11/10/2016
        util.c:   change mseedSetIdent() packet identifier string to be of the form NN_SSS_LL_CCC/MSEED
                  (drop the _Q field so that the Nanometrics Apollo client won't get confused)
@@ -26,7 +38,7 @@ static VERSION version = {2, 6, 3};
        mseed.h: added options field to MSEED_HANDLE
        handle.c: added mseedSetOptions(), initialze (new) options field in InitHandle()
        record.c: modified ContinuousRecord() to check for breaks on tqual or flag transitions depending on options
-        
+
 2.5.5  11/13/2015
        header.c: fixed up some sprintf format vs type inconsitencies, added some casts to calm Darwin compile
        history.c: replaced some incorrect return FALSE statements with return NULL
@@ -48,11 +60,11 @@ static VERSION version = {2, 6, 3};
                  mseedCSSDatatypeString(), added code to mseedSetIdent() to also set the new sig field
 
 2.5.2  09/30/2015
-       mseed.h: changed MSEED_B52_CLOCK_TOLERANCE() macro to avoid division by zero 
+       mseed.h: changed MSEED_B52_CLOCK_TOLERANCE() macro to avoid division by zero
                 added mseedChnloc() protoype
        b33.c:   removed dead code (AddBlockette33() no longer being used)
        chan.c:  introducing mseedChnloc()
-       
+
 2.5.1  09/15/2015
        mseed.h: changed MSEED_HDR nsamp from INT16 to INT32 and updated mseedCopyX() protoypes accordingly
        copy.c: changed nsamp arg to INT32
@@ -67,7 +79,7 @@ static VERSION version = {2, 6, 3};
        unpack.c: split FSDH decoding out of mseedUnpackHeader() into mseedUnpackFSDH(), made
           the previously static "internal" decoders public so that they could be used in read.c
 
-                 
+
 2.4.1  09/03/2015
        util.c: fixed bug assinging type in mseedStageType with FILTER_TYPE_IIR_PZ
 
@@ -86,14 +98,14 @@ static VERSION version = {2, 6, 3};
        b30.c: remove leading zeros on integers to improve readability
        b33.c: remove leading zeros on integers to improve readability
        b34.c: fixed len bug, remove leading zeros on integers to improve readability
-       b50.c: fixed len bug, added missing tildes 
+       b50.c: fixed len bug, added missing tildes
        b52.c: fixed len bug
        b53.c: fixed len bug
        b57.c: removed spurious "history" field left over from sloppy copy and paste
        b58.c: moved semicolon placement in len calculation to match other files
-       
+
 2.3.0  07/10/2015
-       mseed.h: 
+       mseed.h:
        b50.c: remove leading zeros on integers to improve readability
        b52.c: remove leading zeros on integers to improve readability
        b53.c: created

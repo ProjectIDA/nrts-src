@@ -1,4 +1,4 @@
-#pragma ident "$Id: util.c,v 1.11 2016/11/10 17:03:41 dechavez Exp $"
+#pragma ident "$Id: util.c,v 1.12 2017/11/21 18:06:12 dechavez Exp $"
 /*======================================================================
  *
  *  miscellaneous utilities
@@ -27,10 +27,10 @@ struct {
 
 char *mseedCSSDatatypeString(MSEED_HDR *hdr)
 {
-static char *s2 = "s2"; static char *i2 = "i2"; 
-static char *s4 = "s4"; static char *i4 = "i4"; 
-static char *t4 = "t4"; static char *f4 = "f4"; 
-static char *t8 = "t8"; static char *f8 = "f8"; 
+static char *s2 = "s2"; static char *i2 = "i2";
+static char *s4 = "s4"; static char *i4 = "i4";
+static char *t4 = "t4"; static char *f4 = "f4";
+static char *t8 = "t8"; static char *f8 = "f8";
 
     if (hdr->order == BIG_ENDIAN_BYTE_ORDER) {
         switch (hdr->format) {
@@ -208,7 +208,7 @@ static char *fid = "mseedMaxSamp";
     }
 
 /* First, figure out how much of the output record is needed for headers */
-        
+
     hlen = mseedPackedHeaderLength(hdr);
     dlen = handle->reclen - hlen;
 
@@ -270,6 +270,9 @@ void mseedInitHeader(MSEED_HDR *hdr)
 /* Revision History
  *
  * $Log: util.c,v $
+ * Revision 1.12  2017/11/21 18:06:12  dechavez
+ * removed trailing spaces
+ *
  * Revision 1.11  2016/11/10 17:03:41  dechavez
  * change mseedSetIdent() packet identifier string to be of the form NN_SSS_LL_CCC/MSEED
  * (drop the _Q field so that the Nanometrics Apollo client won't get confused)
