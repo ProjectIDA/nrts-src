@@ -15,6 +15,7 @@ all: \
      idatomseed \
      imseed \
      isi \
+     isi330 \
      isid \
      isidl \
      isildl \
@@ -93,6 +94,9 @@ imseed: FORCE
 
 isi: FORCE
 	cd isi; $(MAKE) install
+
+isi330: FORCE
+	cd isi330; $(MAKE) install
 
 isid: FORCE
 	cd isid; $(MAKE) install
