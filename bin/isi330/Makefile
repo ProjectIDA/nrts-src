@@ -15,14 +15,18 @@ CFLAGS  = $(OPTMIZ) $(INCS) $(DEFS) $(SITEFLAGS) ###-std=c99
 
 
 LIBS    = -L$(LIBDIR)
-#LIBS   += -lida
-#LIBS   += -lisidb
 LIBS   += -lisi
-#LIBS   += -lida10
+LIBS   += -lida
+LIBS   += -lisidb
+LIBS   += -ldbio
+LIBS   += -lida10
+LIBS   += -lliss
 LIBS   += -liacp
 LIBS   += -lq330
 LIBS   += -lqdp
 LIBS   += -lqio
+LIBS   += -lmseed
+LIBS   += -ldmc
 LIBS   += -ludpio
 LIBS   += -lttyio
 LIBS   += -llogio
@@ -45,6 +49,7 @@ OBJS += q330.o
 OBJS += exit.o
 OBJS += init.o
 OBJS += log.o
+OBJS += packet.o
 OBJS += signals.o
 OBJS += string.o
 
