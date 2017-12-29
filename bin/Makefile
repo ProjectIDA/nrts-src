@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.90 2017/10/30 23:47:07 dechavez Exp $
+# $Id: Makefile,v 1.92 2017/12/27 21:43:32 dauerbach Exp $
 # Make all executables 
 
 all: \
@@ -247,6 +247,7 @@ clean: FORCE
 	cd idatomseed; $(MAKE) $@
 	cd imseed;     $(MAKE) $@
 	cd isi;        $(MAKE) $@
+	cd isi330;     $(MAKE) $@
 	cd isid;       $(MAKE) $@
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
@@ -291,6 +292,7 @@ remove: FORCE
 	cd idatomseed; $(MAKE) $@
 	cd imseed;     $(MAKE) $@
 	cd isi;        $(MAKE) $@
+	cd isi330;     $(MAKE) $@
 	cd isid;       $(MAKE) $@
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
@@ -320,6 +322,7 @@ remove: FORCE
 	cd txtoida10;  $(MAKE) $@
 	cd uniqpath;   $(MAKE) $@
 	cd vhfilt;     $(MAKE) $@
+	cd xfer;       $(MAKE) $@
 	rm -rf ../../bin/$(PLATFORM)
 
 REMOVE: FORCE
@@ -336,6 +339,7 @@ REMOVE: FORCE
 	cd idatomseed; $(MAKE) $@
 	cd imseed;     $(MAKE) $@
 	cd isi;        $(MAKE) $@
+	cd isi330;     $(MAKE) $@
 	cd isid;       $(MAKE) $@
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
@@ -365,6 +369,7 @@ REMOVE: FORCE
 	cd txtoida10;  $(MAKE) $@
 	cd uniqpath;   $(MAKE) $@
 	cd vhfilt;     $(MAKE) $@
+	cd xfer;       $(MAKE) $@
 	rm -rf ../../bin/$(PLATFORM)
 
 FORCE:
