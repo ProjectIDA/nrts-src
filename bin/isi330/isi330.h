@@ -14,6 +14,14 @@
 #undef FALSE
 
 #include <time.h>
+#include "mseed.h"
+#include "dmc.h"
+#include "ida.h"
+#include "ida10.h"
+#include "dbio.h"
+#include "isi.h"
+#include "isi/db.h"
+#include "liss.h"
 #include "util.h"
 #include "logio.h"
 #include "q330.h"
@@ -28,6 +36,7 @@ static char *Copyright = "Copyright (C) 2017 - Regents of the University of Cali
 #define ISI330_MOD_LOG       ((INT32)  300)
 #define ISI330_MOD_SIGNALS   ((INT32)  400)
 #define ISI330_MOD_Q330      ((INT32)  500)
+#define ISI330_MOD_PACKET    ((INT32)  600)
 
 #define ISI330_DEFAULT_USER          "nrts"
 #define ISI330_STATION_CODE_SIZE 4
@@ -42,6 +51,10 @@ static char *Copyright = "Copyright (C) 2017 - Regents of the University of Cali
 #define DEFAULT_BACKGROUND_LOG "syslogd:local0"
 #define DEFAULT_FOREGROUND_LOG "-"
 #define DEFAULT_DEBUG          FALSE
+#define DEFAULT_NETID              "II"
+#define DEFAULT_PACKET_QUEUE_DEPTH 50
+
+
 
 typedef struct {
     char *text;
@@ -71,6 +84,9 @@ typedef struct {
 	char *cfgpath;      /* Q330 configuration file */
 	LNKLST q330list;    /* zero or more Q330's */
 	LOGIO *lp;
+    char netname[ISI_NETLEN + 1];
+    char server[MAXPATHLEN+1];
+    int port;
 } ISI330_CONFIG;
 
 /* For passing command line to MainThread */
@@ -118,6 +134,10 @@ void SaveQ330Meta(void *args, QDP_META *meta);
 char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root);
 void StartQ330Readers(ISI330_CONFIG *cfg);
 void ShutdownQ330Readers(ISI330_CONFIG *cfg);
+
+/* packet.c */
+void StartRecordPusher(char *server, int port, LOGIO *lp, int depth, char *sname, char *nname);
+void FlushRecord(UINT8 *rawmseed);
 
 /* signals.c */
 VOID StartSignalHandler(VOID);

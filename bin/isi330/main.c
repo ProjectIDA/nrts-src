@@ -15,7 +15,7 @@ void MainThread(MainThreadParams *cmdline)
     static INT32 status;
 
     cfg = init(cmdline->myname, cmdline->argc, cmdline->argv);
-printf("done init-ing...\n");
+
     while (1) {
         sleep(1);
         // TODO
@@ -31,14 +31,12 @@ printf("done init-ing...\n");
 
 int main(int argc, char **argv) {
 
-printf("Top of Main...\n");
     MainThreadParams cmdline;
 
     cmdline.argc   = argc;
     cmdline.argv   = argv;
     cmdline.myname = argv[0];
 
-printf("Go to mMainThread...\n");
     MainThread(&cmdline);
 
 }
