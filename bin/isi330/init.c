@@ -10,23 +10,18 @@
 void help(char *myname)
 {
     fprintf(stderr, "\n");
-    fprintf(stderr, "usage: %s sitename q330=HostnameOrIP:DataPort[:debug] [q330=HostnameOrIP:DataPort[:debug]] \n", myname);
+    fprintf(stderr, "usage: %s sitename q330=HostnameOrIP:DataPort[:debug] [q330=HostnameOrIP:DataPort[:debug]] dl=server:port \n", myname);
     fprintf(stderr, "\n");
     fprintf(stderr, "Required:\n");
     fprintf(stderr, "    sitename               => Station code\n");
     fprintf(stderr, "    q330=name:port[:debug] => Quanterra Q330 input (may be repeated)\n");
+    fprintf(stderr, "    dl=server:port         => ISI Disk Loop server and port\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Options:\n");
-    fprintf(stderr, "       cfg=???? => ????????????????????????\n");
-    fprintf(stderr, "        db=spec => set database to `spec'\n");
-//    fprintf(stderr, "       trec=int => override records/tee file parameter\n");
-//    fprintf(stderr, "        to=secs => set I/O timeout interval\n");
-    fprintf(stderr, "       log=name => set log file name\n");
-//    fprintf(stderr, "    maxdur=secs => force exit after 'secs' seconds\n");
-//    fprintf(stderr, "seedlink=cfgstr => set SeedLink configuration (where cfgstr is srv:port:len:depth:net)\n");
-//    fprintf(stderr, "    -noseedlink => disable SeedLink support\n");
-//    fprintf(stderr, " slinkdebug=int => set SeedLink debug level\n");
-    fprintf(stderr, "            -bd => run in the background\n");
+    fprintf(stderr, "    cfg=<path>  => Location of q330.cfg configuration file\n");
+    fprintf(stderr,"     net=netid   => set network code (default: 'II' \n");
+    fprintf(stderr, "    log=name    => set log file name\n");
+    fprintf(stderr, "    -bd         => run in the background\n");
     fprintf(stderr, "\n");
     exit(1);
 }
@@ -51,21 +46,14 @@ static char *prefix(ISI330_CONFIG *cfg)
 
 ISI330_CONFIG *init(char *myname, int argc, char **argv)
 {
+    static char *fid = "init";
     static BOOL debug = FALSE;
     static char *log = NULL;
     static BOOL daemon = DEFAULT_DAEMON;
     ISI330_CONFIG *cfg;
     char *user = ISI330_DEFAULT_USER;
     char *cfgpath = NULL;
-//    char *station = NULL;
-//    char *q330host = NULL;
-    struct {
-        BOOL pkt;
-        BOOL ttag;
-        BOOL bwd;
-        BOOL dl;
-        BOOL lock;
-    } dbg = { FALSE, FALSE, FALSE, FALSE, FALSE };
+    int depth = DEFAULT_PACKET_QUEUE_DEPTH;
 
 
     if ((cfg = (ISI330_CONFIG *) malloc(sizeof(ISI330_CONFIG))) == NULL) {
@@ -73,6 +61,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
         exit(MY_MOD_ID + 1);
     }
     cfg->site = NULL;
+    cfg->port = -1;
 
 /*  Get command line arguments  */
 
@@ -92,17 +81,24 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
                  exit(MY_MOD_ID);
              }
              cfgpath = argv[i] + strlen("cfg=");
-        } else if (cfg->site == NULL) {
-            if ((cfg->site = strdup(argv[i])) == NULL) {
-                fprintf(stderr, "%s: strdup: %s\n", myname, strerror(errno));
-                exit(MY_MOD_ID);
+        } else if (strncasecmp(argv[i], "dl=", strlen("dl=")) == 0) {
+            if (!utilParseServer(argv[i]+strlen("dl="), cfg->server, &cfg->port)) {
+                fprintf(stderr, "error parsing dl argument: %s\n", strerror(errno));
+                exit(1);
             }
+        } else if (strncmp(argv[i], "net=", strlen("net=")) == 0) {
+            strcpy(cfg->netname, argv[i] + strlen("net="));
         } else if (strncmp(argv[i], "log=", strlen("log=")) == 0) {
             log = argv[i] + strlen("log=");
         } else if (strcmp(argv[i], "-bd") == 0) {
             daemon = TRUE;
         } else if (strcmp(argv[i], "-debug") == 0) {
             debug = TRUE;
+        } else if (cfg->site == NULL) {  // this must be last
+            if ((cfg->site = strdup(argv[i])) == NULL) {
+                fprintf(stderr, "%s: strdup: %s\n", myname, strerror(errno));
+                exit(MY_MOD_ID);
+            }
         } else {
             fprintf(stderr, "%s: unrecognized argument '%s'\n", myname, argv[i]);
             help(myname);
@@ -150,13 +146,24 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     InitExit(cfg);
 
     // dump config for review
-    PrintISI330Config(cfg);
+    /* PrintISI330Config(cfg); */
+
+    /* Missing network ID is OK, but user must specify station name and remote disk loop */
+
+    if (cfg->netname == NULL) strncpy(cfg->netname, DEFAULT_NETID, ISI_NETLEN + 1);
+
+    if (cfg->port < 0) {
+        fprintf(stderr, "ERROR: missing or incomplete dl=server:port argument\n");
+        help(argv[0]);
+    }
+
+    // start record pusher
+    StartRecordPusher(cfg->server, cfg->port, cfg->lp, depth, cfg->site, cfg->netname);
 
     // start Q330 readers
     StartQ330Readers(cfg);
 
-
-    LogMsg("Initialization complete");
+    LogMsg("%s: initialization complete", fid);
 
     return cfg;
 }
