@@ -1,4 +1,4 @@
-#pragma ident "$Id: slink.c,v 1.18 2017/12/20 23:56:58 dechavez Exp $"
+#pragma ident "$Id: slink.c,v 1.19 2018/01/08 23:36:28 dauerbach Exp $"
 /*======================================================================
  *
  * Tee incoming ISI data into an IRIS SeedLink server (ringserver).
@@ -391,10 +391,6 @@ static char *fid = "isidlFeedSeedLink";
     if (slink == NULL || !slink->enabled) return;
     handle = (MSEED_HANDLE *) slink->mseed;
 
-/* Special handling for IDA10.12 packets */
-
-    if (IDA1012BranchTaken(slink, raw)) return;
-
 /* NULL raw input means flush all incomplete MiniSEED packets */
 
     if (raw == NULL) {
@@ -405,6 +401,10 @@ static char *fid = "isidlFeedSeedLink";
         while (!QueueIsEmpty(slink) && time(NULL) < QuitDelay) sleep(1);
         return;
     }
+
+/* Special handling for IDA10.12 packets */
+
+    if (IDA1012BranchTaken(slink, raw)) return;
 
 /* First time through, launch the packet forwarding thread */
 
@@ -448,6 +448,9 @@ static char *fid = "isidlFeedSeedLink";
 /* Revision History
  *
  * $Log: slink.c,v $
+ * Revision 1.19  2018/01/08 23:36:28  dauerbach
+ * move IDA1012 format check to after check for NULL raw packet
+ *
  * Revision 1.18  2017/12/20 23:56:58  dechavez
  * added IDA1012BranchTaken() (untested)
  *
