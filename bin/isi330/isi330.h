@@ -128,10 +128,12 @@ void PrintLib330Tliberr(enum tliberr);
 void PrintLib330Topstat(topstat *popstat);
 
 /* q330.c */
-void ToggleQ330DebugState(void);
-void SaveQ330Packet(void *args, QDP_PKT *pkt);
-void SaveQ330Meta(void *args, QDP_META *meta);
-char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root);
+BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330db, char *argstr);
+void LoadQ330Hosts(ISI330_CONFIG *cfg, LNKLST *q330Hosts, Q330_CFG *q330cfg);
+//void ToggleQ330DebugState(void);
+//void SaveQ330Packet(void *args, QDP_PKT *pkt);
+//void SaveQ330Meta(void *args, QDP_META *meta);
+//char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root);
 void StartQ330Readers(ISI330_CONFIG *cfg);
 void ShutdownQ330Readers(ISI330_CONFIG *cfg);
 
@@ -141,7 +143,6 @@ void FlushRecord(UINT8 *rawmseed);
 
 /* signals.c */
 VOID StartSignalHandler(VOID);
-//void SignalHandler(int sig);
 
 /* string.c */
 char *lib330LibStateString(UINT8 code);

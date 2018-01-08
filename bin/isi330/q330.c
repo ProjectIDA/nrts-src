@@ -12,53 +12,15 @@ static LNKLST *head = NULL;
 #define DEFAULT_RETRY_SEC    30
 #define DEFAULT_WATCHDOG_SEC 60
 
-//
-//static UINT32 MsecSinceLastData(Q330 *q330)
-//{
-//UINT32 msec;
-//UINT64 last, interval;
-//
-//    MUTEX_LOCK(&q330->mutex);
-//        last = q330->tstamp.dt_data;
-//    MUTEX_UNLOCK(&q330->mutex);
-//
-//    interval = utilTimeStamp() - last;
-//    msec = interval / NANOSEC_PER_MSEC;
-//
-//    return msec;
-//}
-
-/* Toggle debug mode on all Q330 readers */
-
-//void ToggleQ330DebugState(void)
-//{
-//Q330 *q330;
-//UINT64 serialno;
-//LNKLST_NODE *crnt;
-//static char *fid = "ToggleQ330DebugState";
-//
-//    crnt = listFirstNode(head);
-//    while (crnt != NULL) {
-//        q330 = (Q330 *) crnt->payload;
-//        MUTEX_LOCK(&q330->mutex);
-//            q330->par.debug = (q330->par.debug == QDP_TERSE) ? QDP_DEBUG : QDP_TERSE;
-//            if (q330->qp != NULL) q330->qp->par.debug = q330->par.debug;
-//            serialno = q330->par.serialno;
-//        MUTEX_UNLOCK(&q330->mutex);
-//        LogMsg(LOG_INFO, "%s: %016llx QDP log level %d", fid, serialno, q330->par.debug);
-//        crnt = listNextNode(crnt);
-//    }
-//}
-
 
 /* Initialize a new Q330 (except for metadata) */
 
-static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char *argstr)
+BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330db, char *argstr)
 {
     char *name;
     int dp;
     Q330_ADDR qcfg;
-    int debug = 0;
+//    int debug = 0;
     LNKLST *TokenList;
     static char *fid = "InitQ330";
 
@@ -73,12 +35,10 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
         return FALSE;
     }
 
-    if (TokenList->count != 2 && TokenList->count != 3) {
+    if (TokenList->count != 2) {
         fprintf(stderr, "incorrect q330 string \"%s\"\n", argstr);
         return FALSE;
     }
-
-    if (TokenList->count == 3) debug = atoi((char *) TokenList->array[2]);
 
     name = (char *) TokenList->array[0];
     dp = atoi((char *) TokenList->array[1]);
@@ -89,8 +49,8 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
 
 /* Get serial number, and auth code from the name */
 
-    if (!q330GetAddr(name, q330cfg, &qcfg)) {
-        fprintf(stderr, "Unable to locate '%s' in Q330 config file '%s'\n", name, q330cfg->path.addr);
+    if (!q330GetAddr(name, q330db, &qcfg)) {
+        fprintf(stderr, "Unable to locate '%s' in Q330 config file '%s'\n", name, q330db->path.addr);
         return FALSE;
     }
 
@@ -101,7 +61,7 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
     newq330->dp = (UINT16)dp;
     newq330->sn = qcfg.serialno;
     newq330->authcode = qcfg.authcode;
-    newq330->debug = debug;
+    newq330->debug = 0; //debug;
 
     newq330->retry    = DEFAULT_RETRY_SEC * MSEC_PER_SEC;
     newq330->watchdog = DEFAULT_WATCHDOG_SEC * MSEC_PER_SEC;
@@ -172,29 +132,57 @@ static BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330cfg, char 
 
 /* Add a new Q330 to the list */
 
-char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root)
+//char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root)
+//{
+//    Q330 newq330;
+//    static Q330_CFG *q330cfg = NULL;
+//    static char *fid = "AddQ330";
+//    int errcode;
+//
+//    /* Read the config file once, the first time here */
+//
+//    if (q330cfg == NULL) {
+//        if ((q330cfg = q330ReadCfg(root, &errcode)) == NULL) {
+//            q330PrintErrcode(stderr, "q330ReadCfg: ", root, errcode);
+//            return NULL;
+//        }
+//    }
+//
+//    if (!InitQ330(cfg, &newq330, q330cfg, argstr)) return NULL;
+//    if (!listAppend(&cfg->q330list, &newq330, sizeof(Q330))) {
+//        fprintf(stderr, "%s: listAppend: %s\n", fid, strerror(errno));
+//        return NULL;
+//    }
+//
+//    return q330cfg->path.addr;
+//}
+
+void LoadQ330Hosts(ISI330_CONFIG *cfg, LNKLST *q330Hosts, Q330_CFG *q330cfg)
 {
-Q330 newq330;
-static Q330_CFG *q330cfg = NULL;
-static char *fid = "AddQ330";
-int errcode;
+    static char *fid = "LoadQ330Hosts";
+    Q330 newq330;
+    LNKLST *head;
+    LNKLST_NODE *crnt;
+    listInit(&cfg->q330list);
 
-/* Read the config file once, the first time here */
+    head = q330Hosts;
+    crnt = listFirstNode(head);
+    while (crnt != NULL) {
 
-    if (q330cfg == NULL) {
-        if ((q330cfg = q330ReadCfg(root, &errcode)) == NULL) {
-            q330PrintErrcode(stderr, "q330ReadCfg: ", root, errcode);
-            return NULL;
+        if (crnt->payload == NULL) {
+            LogMsg("%s: crnt->payload == NULL", fid);
+            exit(MY_MOD_ID + 7);
         }
+
+        if (!InitQ330(cfg, &newq330, q330cfg, crnt->payload)) exit(MY_MOD_ID + 8);
+
+        if (!listAppend(&cfg->q330list, &newq330, sizeof(Q330))) {
+            fprintf(stderr, "%s: listAppend: %s\n", fid, strerror(errno));
+            exit(MY_MOD_ID + 9);
+        }
+        crnt = listNextNode(crnt);
     }
 
-    if (!InitQ330(cfg, &newq330, q330cfg, argstr)) return NULL;
-    if (!listAppend(&cfg->q330list, &newq330, sizeof(Q330))) {
-        fprintf(stderr, "%s: listAppend: %s\n", fid, strerror(errno));
-        return NULL;
-    }
-
-    return q330cfg->path.addr;
 }
 
 /* Read packets from the Q330.  Since we are using the user supplied
