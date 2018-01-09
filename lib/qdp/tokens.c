@@ -1,4 +1,4 @@
-#pragma ident "$Id: tokens.c,v 1.12 2015/12/04 23:15:12 dechavez Exp $"
+#pragma ident "$Id: tokens.c,v 1.13 2018/01/09 01:08:11 dechavez Exp $"
 /*======================================================================
  *
  * Decode DP tokens
@@ -933,9 +933,9 @@ QDP_TOKEN_LCQ *lcq;
     for (i = 0; i < token->lcq.count; i++) {
         lcq = (QDP_TOKEN_LCQ *) token->lcq.array[i];
         if (lcq->cntrl.code == QDP_UNDEFINED_ID) {
-            lcq->cntrl.code = qdpEventDetectorCode(token, lcq->cntrl.name);
+            lcq->cntrl.code = qdpControlDetectorCode(token, lcq->cntrl.name);
         } else if (lcq->cntrl.name[0] == 0) {
-            strlcpy(lcq->cntrl.name, qdpEventDetectorName(token, lcq->cntrl.code), QDP_PASCALSTRING_LEN);
+            strlcpy(lcq->cntrl.name, qdpControlDetectorName(token, lcq->cntrl.code), QDP_PASCALSTRING_LEN);
         }
         for (j = 0; j < QDP_LCQ_NUM_DETECT; j++) CompleteDetect(token, lcq, j);
         CompleteIirIdent(token, &lcq->ave.filt);
@@ -995,7 +995,7 @@ char *opstr, buf[QDP_PASCALSTRING_LEN+1];
 static void CompleteControlDetector(QDP_DP_TOKEN *token)
 {
 int i;
-QDP_TOKEN_CDS *cds; 
+QDP_TOKEN_CDS *cds;
 
     if (token == NULL) return;
     for (i = 0; i < token->cds.count; i++) {
@@ -1052,6 +1052,9 @@ BOOL qdpFinalizeToken(QDP_DP_TOKEN *token)
 /* Revision History
  *
  * $Log: tokens.c,v $
+ * Revision 1.13  2018/01/09 01:08:11  dechavez
+ * fixed bug setting lcq control detector
+ *
  * Revision 1.12  2015/12/04 23:15:12  dechavez
  * casts, format fixes and the like, all to calm OS X compiles
  *

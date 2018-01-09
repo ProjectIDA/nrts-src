@@ -1,4 +1,4 @@
-#pragma ident "$Id: version.c,v 1.119 2017/10/11 20:41:29 dechavez Exp $"
+#pragma ident "$Id: version.c,v 1.120 2018/01/09 01:07:40 dechavez Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,10 +6,13 @@
  *====================================================================*/
 #include "qdp.h"
 
-static VERSION version = {3, 17, 0};
+static VERSION version = {3, 17, 1};
 char *libqdpBuildIdent = "libqdp release 3.17.0, compiled " __DATE__ " " __TIME__;
 
 /* qdp library release notes
+
+3.17.1 01/08/2018
+       tokens.c: fixed bug setting lcq control detector
 
 3.17.0 10/11/2017
        qdp.h: added qdpPrintUnsupportedQEP() prototype

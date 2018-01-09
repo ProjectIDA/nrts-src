@@ -1,8 +1,11 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.85 2016/08/04 22:36:19 dechavez Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.86 2018/01/03 17:37:58 dechavez Exp $"
 
-char *VersionIdentString = "Release 4.5.1";
+char *VersionIdentString = "Release 4.6.0";
 
 /* Release notes
+
+4.6.0  01/03/2018
+       link with libisidl 1.26.0 for IDA10.12 support
 
 4.5.1  08/04/2016
        include dbspec in error message when unable to load database
@@ -140,7 +143,7 @@ char *VersionIdentString = "Release 4.5.1";
        Fixed hanging ServiceThreads on abnormal disconnect (ie, timeout)
 
 3.0.2  02/05/2007
-       don't core dump on wd requests for a non-NRTS site, 
+       don't core dump on wd requests for a non-NRTS site,
        fixed bug causing first channel in a request to be ignored, and bug
        causing duplicate packets instead of new channel packets when dl indices
        matched between streams
