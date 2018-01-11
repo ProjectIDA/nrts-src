@@ -63,27 +63,28 @@ typedef struct {
 
 typedef struct {
     MUTEX mutex;
-	char *host;
+    char *host;
     LOGIO *lp;
-	Q330_CFG *q330cfg;
-	UINT16 dp;
-	tpar_create tpc;
-	tpar_register tpr;
-	tcontext *ct;
+    Q330_CFG *q330cfg;
+    UINT16 dp;
+    tpar_create tpc;
+    tpar_register tpr;
+    tcontext *ct;
     BOOL first;
     UINT64 sn;
     UINT64 authcode;
     UINT32 retry;     /* registration retry interval */
     UINT32 watchdog;  /* maximum msecs of no data before restarting connection */
     int debug;
-} Q330;
+} ISI330_Q330;
 
 
 typedef struct {
-	char *site;        // Disk Loop Name
-	char *cfgpath;      /* Q330 configuration file */
-	LNKLST q330list;    /* zero or more Q330's */
-	LOGIO *lp;
+    char *site;           /* Disk Loop Name */
+    char *cfgpath;        /* Q330 configuration file */
+    char q330HostArgstr[255]; /* cmd line q330 host:dp parameter as passed */
+    ISI330_Q330 *q330;
+    LOGIO *lp;
     char netname[ISI_NETLEN + 1];
     char server[MAXPATHLEN+1];
     int port;
@@ -128,14 +129,14 @@ void PrintLib330Tliberr(enum tliberr);
 void PrintLib330Topstat(topstat *popstat);
 
 /* q330.c */
-BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330db, char *argstr);
-void LoadQ330Hosts(ISI330_CONFIG *cfg, LNKLST *q330Hosts, Q330_CFG *q330cfg);
-//void ToggleQ330DebugState(void);
-//void SaveQ330Packet(void *args, QDP_PKT *pkt);
-//void SaveQ330Meta(void *args, QDP_META *meta);
-//char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root);
-void StartQ330Readers(ISI330_CONFIG *cfg);
-void ShutdownQ330Readers(ISI330_CONFIG *cfg);
+BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db);
+void LoadQ330Host(ISI330_CONFIG *cfg, Q330_CFG *q330cfg);
+/* //void ToggleQ330DebugState(void); */
+/* //void SaveQ330Packet(void *args, QDP_PKT *pkt); */
+/* //void SaveQ330Meta(void *args, QDP_META *meta); */
+/* //char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root); */
+void StartQ330Reader(ISI330_CONFIG *cfg);
+void ShutdownQ330Reader(ISI330_CONFIG *cfg);
 
 /* packet.c */
 void StartRecordPusher(char *server, int port, LOGIO *lp, int depth, char *sname, char *nname);

@@ -29,7 +29,7 @@ static BOOL FirstRecord = TRUE;
         GracefulExit(MY_MOD_ID + 1);
     }
     if (FirstRecord) {
-        LogMsg("initial packet delivered to ISI push server@%s:%d\n", ph->server, ph->port);
+        LogMsg("initial packet enqueued to ISI push server@%s:%d\n", ph->server, ph->port);
         FirstRecord = FALSE;
     }
 

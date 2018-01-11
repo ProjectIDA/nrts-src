@@ -64,15 +64,13 @@ LOGIO *InitLogging(char *myname, char *spec, char *prefix, BOOL debug)
 
 void PrintISI330Config(ISI330_CONFIG *cfg) {
 
-    LNKLST_NODE *cur;
-    Q330 *q330;
+    ISI330_Q330 *q330;
 
     LogMsg("site: %s\n", cfg->site);
     LogMsg("cfgpath: %s\n\n", cfg->cfgpath);
 
-    cur = listFirstNode(&cfg->q330list);
-    while (cur != NULL) {
-        q330 = (Q330 *) cur->payload;
+    q330 = cfg->q330;
+    if (q330 != NULL) {
         LogMsg("%s:%d tpar_create:\n", q330->host, q330->dp);
         LogMsg("%s:%d tpar_create.q330id_serial[0]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[0]);
         LogMsg("%s:%d tpar_create.q330id_serial[1]:  %x\n", q330->host, q330->dp, q330->tpc.q330id_serial[1]);
@@ -118,8 +116,6 @@ void PrintISI330Config(ISI330_CONFIG *cfg) {
         /* printf("cfg->tpar_register.serial_flow:         %d\n", cfg->tpr.serial_flow); /1* 1 = hardware flow control *1/ */
         /* printf("cfg->tpar_register.serial_baud:         %ld\n", cfg->tpr.serial_baud); /1* in bps *1/ */
         /* printf("cfg->tpar_register.serial_hostip:       %ld\n", cfg->tpr.serial_hostip); /1* IP address to identify host *1/ */
-
-        cur = listNextNode(cur);
     }
 }
 

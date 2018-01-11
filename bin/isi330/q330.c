@@ -7,26 +7,25 @@
 
 #define MY_MOD_ID ISI330_MOD_Q330
 
-static LNKLST *head = NULL;
-
 #define DEFAULT_RETRY_SEC    30
 #define DEFAULT_WATCHDOG_SEC 60
 
 
 /* Initialize a new Q330 (except for metadata) */
 
-BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330db, char *argstr)
+BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db)
 {
     char *name;
     int dp;
-    Q330_ADDR qcfg;
+    Q330_ADDR qcfg; // from q330 cfg database
 //    int debug = 0;
     LNKLST *TokenList;
     static char *fid = "InitQ330";
 
-/* Parse the argument list */
+    /* Parse the argument list */
+    /* should have hostname/ip plus q330 DP to talk to ':' separated */
 
-    if ((TokenList = utilStringTokenList(argstr, ":,", 0)) == NULL) {
+    if ((TokenList = utilStringTokenList(cfg->q330HostArgstr, ":,", 0)) == NULL) {
         fprintf(stderr, "%s: utilStringTokenList: %s\n", fid, strerror(errno));
         return FALSE;
     }
@@ -36,153 +35,119 @@ BOOL InitQ330(ISI330_CONFIG *cfg, Q330 *newq330, Q330_CFG *q330db, char *argstr)
     }
 
     if (TokenList->count != 2) {
-        fprintf(stderr, "incorrect q330 string \"%s\"\n", argstr);
+        fprintf(stderr, "%s: incorrect q330 string \"%s\"\n", fid, cfg->q330HostArgstr);
         return FALSE;
     }
 
     name = (char *) TokenList->array[0];
     dp = atoi((char *) TokenList->array[1]);
-    if ((dp < LP_TEL1) || (dp > LP_TEL4)) {
-        fprintf(stderr, "%s is an incorrect q330 data port number\n", (char *) TokenList->array[1]);
+    if ((dp < LP_TEL1 + 1) || (dp > LP_TEL4 + 1)) {
+        fprintf(stderr, "%s: %s is an incorrect q330 data port number\n", fid, (char *) TokenList->array[1]);
         return FALSE;
     }
 
-/* Get serial number, and auth code from the name */
+    /* create isi330 Q330 struct */
+
+    if ((cfg->q330 = (ISI330_Q330 *) malloc(sizeof(ISI330_Q330))) == NULL) {
+        fprintf(stderr, "%s malloc ISI330_Q330", fid);
+        return FALSE;
+    }
+
+    /* Get serial number, and auth code from the name */
 
     if (!q330GetAddr(name, q330db, &qcfg)) {
         fprintf(stderr, "Unable to locate '%s' in Q330 config file '%s'\n", name, q330db->path.addr);
         return FALSE;
     }
 
-    MUTEX_INIT(&newq330->mutex);
-    newq330->host = name;
-    newq330->lp = cfg->lp;
-    newq330->first = TRUE;
-    newq330->dp = (UINT16)dp;
-    newq330->sn = qcfg.serialno;
-    newq330->authcode = qcfg.authcode;
-    newq330->debug = 0; //debug;
+    MUTEX_INIT(&cfg->q330->mutex);
+    cfg->q330->host = name;
+    cfg->q330->lp = cfg->lp;
+    cfg->q330->first = TRUE;
+    cfg->q330->dp = (UINT16)dp;
+    cfg->q330->sn = qcfg.serialno;
+    cfg->q330->authcode = qcfg.authcode;
+    cfg->q330->debug = 0; //debug;
 
-    newq330->retry    = DEFAULT_RETRY_SEC * MSEC_PER_SEC;
-    newq330->watchdog = DEFAULT_WATCHDOG_SEC * MSEC_PER_SEC;
+    cfg->q330->retry    = DEFAULT_RETRY_SEC * MSEC_PER_SEC;
+    cfg->q330->watchdog = DEFAULT_WATCHDOG_SEC * MSEC_PER_SEC;
 
     /* initialize tpar_create struct */
 
     UINT32 snhi = (UINT32) (qcfg.serialno >> 32);
     UINT32 snlo = (UINT32) (qcfg.serialno & 0x00000000FFFFFFFF);
-    newq330->tpc.q330id_serial[0] = snlo;
-    newq330->tpc.q330id_serial[1] = snhi;
-    newq330->tpc.q330id_dataport = (UINT16)dp;
-    strncpy(newq330->tpc.q330id_station, cfg->site, 6);
-    newq330->tpc.host_timezone = 0;         // using UTC on host systems
-    strcpy(newq330->tpc.host_software, "IDA:isi330");         // host application name
-    strcpy(newq330->tpc.opt_contfile, "");       // disable for now
-    newq330->tpc.opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_AUXMSG | VERB_PACKET;
-    newq330->tpc.opt_verbose = VERB_RETRY | VERB_REGMSG | VERB_AUXMSG;
-    newq330->tpc.opt_zoneadjust = 1;        // no need, on UTC
-    newq330->tpc.opt_secfilter = OSF_DATASERV;         // not using 1-sec callback
-    newq330->tpc.opt_client_msgs = 10;      // set to min, NOT SURE HOW THIS IS USED
-    newq330->tpc.opt_minifilter = OMF_ALL;  // send all messages
-    newq330->tpc.opt_aminifilter = 0;       // disabling, I think...
-    newq330->tpc.opt_compat = 0;            // using flag bits in tokens
-    newq330->tpc.amini_exponent = 12;        // not using 'archival' ms, but set to 512 byte records
-    newq330->tpc.amini_512highest = 20;     // 40hz, but not relevant
-    newq330->tpc.mini_embed = 1;            // embed calibration and event blockettes in miniseed
-    newq330->tpc.mini_separate = 0;         // generate sSEPARATE mniniseed records for cal and event blockettes
-    newq330->tpc.mini_firchain = NULL;      // just using built-in FIR filters
-    newq330->tpc.call_minidata = isi330_miniseed_callback;      // NEED TO HAVE CALLBACK FOR DATA COLLECTION
-    newq330->tpc.call_aminidata = NULL;     // not collecting archival miniseed
-    newq330->tpc.resp_err = LIBERR_NOERR;
-    newq330->tpc.call_state = isi330_state_callback;         // state change callback??? Will probably want this
-    newq330->tpc.call_messages = isi330_msg_callback;      // message callback, will want this later
-    newq330->tpc.call_secdata = NULL;       // not collecting 1-sec data;
-    newq330->tpc.call_lowlatency = NULL;    // NYI
-    newq330->tpc.call_baler = NULL;         // not using
-    newq330->tpc.file_owner = NULL;         // until better understood. Used in libsupport
+    cfg->q330->tpc.q330id_serial[0] = snlo;
+    cfg->q330->tpc.q330id_serial[1] = snhi;
+    cfg->q330->tpc.q330id_dataport = (UINT16)dp - 1; // lib330 uses 0-based dataport enumeration
+    strncpy(cfg->q330->tpc.q330id_station, cfg->site, 6);
+    cfg->q330->tpc.host_timezone = 0;         // using UTC on host systems
+    strcpy(cfg->q330->tpc.host_software, "IDA:isi330");         // host application name
+    strcpy(cfg->q330->tpc.opt_contfile, "");       // disable for now
+    cfg->q330->tpc.opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_AUXMSG | VERB_PACKET;
+    cfg->q330->tpc.opt_verbose = VERB_RETRY | VERB_REGMSG | VERB_AUXMSG;
+    cfg->q330->tpc.opt_zoneadjust = 1;        // no need, on UTC
+    cfg->q330->tpc.opt_secfilter = OSF_DATASERV;         // not using 1-sec callback
+    cfg->q330->tpc.opt_client_msgs = 10;      // set to min, NOT SURE HOW THIS IS USED
+    cfg->q330->tpc.opt_minifilter = OMF_ALL;  // send all messages
+    cfg->q330->tpc.opt_aminifilter = 0;       // disabling, I think...
+    cfg->q330->tpc.opt_compat = 0;            // using flag bits in tokens
+    cfg->q330->tpc.amini_exponent = 12;        // not using 'archival' ms, but set to 512 byte records
+    cfg->q330->tpc.amini_512highest = 20;     // 40hz, but not relevant
+    cfg->q330->tpc.mini_embed = 1;            // embed calibration and event blockettes in miniseed
+    cfg->q330->tpc.mini_separate = 0;         // generate sSEPARATE mniniseed records for cal and event blockettes
+    cfg->q330->tpc.mini_firchain = NULL;      // just using built-in FIR filters
+    cfg->q330->tpc.call_minidata = isi330_miniseed_callback;      // NEED TO HAVE CALLBACK FOR DATA COLLECTION
+    cfg->q330->tpc.call_aminidata = NULL;     // not collecting archival miniseed
+    cfg->q330->tpc.resp_err = LIBERR_NOERR;
+    cfg->q330->tpc.call_state = isi330_state_callback;         // state change callback??? Will probably want this
+    cfg->q330->tpc.call_messages = isi330_msg_callback;      // message callback, will want this later
+    cfg->q330->tpc.call_secdata = NULL;       // not collecting 1-sec data;
+    cfg->q330->tpc.call_lowlatency = NULL;    // NYI
+    cfg->q330->tpc.call_baler = NULL;         // not using
+    cfg->q330->tpc.file_owner = NULL;         // until better understood. Used in libsupport
 
     /* initialize registration struct */
 
-    newq330->tpr.q330id_auth[0] = 0;
-    newq330->tpr.q330id_auth[1] = 0;
-    strcpy(newq330->tpr.q330id_address, newq330->host);
-    newq330->tpr.q330id_baseport = 5330;
-    newq330->tpr.host_mode = HOST_ETH;
-    strcpy(newq330->tpr.host_interface, "");
-    newq330->tpr.host_mincmdretry = 2;
-    newq330->tpr.host_maxcmdretry = 30;
-    newq330->tpr.host_ctrlport = ISI330_HOST_CTRLPORT_BASE + (UINT16)dp;
-    newq330->tpr.host_dataport = ISI330_HOST_DATAPORT_BASE + (UINT16)dp;
+    cfg->q330->tpr.q330id_auth[0] = 0;
+    cfg->q330->tpr.q330id_auth[1] = 0;
+    strcpy(cfg->q330->tpr.q330id_address,cfg->q330->host);
+    cfg->q330->tpr.q330id_baseport = 5330;
+    cfg->q330->tpr.host_mode = HOST_ETH;
+    strcpy(cfg->q330->tpr.host_interface, "");
+    cfg->q330->tpr.host_mincmdretry = 2;
+    cfg->q330->tpr.host_maxcmdretry = 30;
+    cfg->q330->tpr.host_ctrlport = ISI330_HOST_CTRLPORT_BASE + qcfg.instance;
+    cfg->q330->tpr.host_dataport = ISI330_HOST_DATAPORT_BASE + qcfg.instance;
+    LogMsg("CTRL PORT: %d\n", cfg->q330->tpr.host_ctrlport);
+    LogMsg("DATA PORT: %d\n", cfg->q330->tpr.host_dataport);
     // cfg->tpr.serial_flow = 0;
     // cfg->tpr.serial_baud = 9600;
     // cfg->tpr.serial_hostip = "";
-    newq330->tpr.opt_latencytarget = 0;
-    newq330->tpr.opt_closedloop = 0;
-    newq330->tpr.opt_dynamic_ip = 0;
-    newq330->tpr.opt_hibertime = 0;
-    newq330->tpr.opt_conntime = 0;
-    newq330->tpr.opt_connwait = 0;
-    newq330->tpr.opt_regattempts = 0;
-    newq330->tpr.opt_ipexpire = 0;
-    newq330->tpr.opt_buflevel = 0;
-    newq330->tpr.opt_q330_cont = 0;
-    newq330->tpr.opt_dss_memory = 0;
+    cfg->q330->tpr.opt_latencytarget = 0;
+    cfg->q330->tpr.opt_closedloop = 0;
+    cfg->q330->tpr.opt_dynamic_ip = 0;
+    cfg->q330->tpr.opt_hibertime = 0;
+    cfg->q330->tpr.opt_conntime = 0;
+    cfg->q330->tpr.opt_connwait = 0;
+    cfg->q330->tpr.opt_regattempts = 0;
+    cfg->q330->tpr.opt_ipexpire = 0;
+    cfg->q330->tpr.opt_buflevel = 0;
+    cfg->q330->tpr.opt_q330_cont = 0;
+    cfg->q330->tpr.opt_dss_memory = 0;
 
     return TRUE;
 }
 
-/* Add a new Q330 to the list */
-
-//char *AddQ330(ISI330_CONFIG *cfg, char *argstr, char *root)
-//{
-//    Q330 newq330;
-//    static Q330_CFG *q330cfg = NULL;
-//    static char *fid = "AddQ330";
-//    int errcode;
-//
-//    /* Read the config file once, the first time here */
-//
-//    if (q330cfg == NULL) {
-//        if ((q330cfg = q330ReadCfg(root, &errcode)) == NULL) {
-//            q330PrintErrcode(stderr, "q330ReadCfg: ", root, errcode);
-//            return NULL;
-//        }
-//    }
-//
-//    if (!InitQ330(cfg, &newq330, q330cfg, argstr)) return NULL;
-//    if (!listAppend(&cfg->q330list, &newq330, sizeof(Q330))) {
-//        fprintf(stderr, "%s: listAppend: %s\n", fid, strerror(errno));
-//        return NULL;
-//    }
-//
-//    return q330cfg->path.addr;
-//}
-
-void LoadQ330Hosts(ISI330_CONFIG *cfg, LNKLST *q330Hosts, Q330_CFG *q330cfg)
+void LoadQ330Host(ISI330_CONFIG *cfg, Q330_CFG *q330cfg)
 {
     static char *fid = "LoadQ330Hosts";
-    Q330 newq330;
-    LNKLST *head;
-    LNKLST_NODE *crnt;
-    listInit(&cfg->q330list);
 
-    head = q330Hosts;
-    crnt = listFirstNode(head);
-    while (crnt != NULL) {
-
-        if (crnt->payload == NULL) {
-            LogMsg("%s: crnt->payload == NULL", fid);
-            exit(MY_MOD_ID + 7);
-        }
-
-        if (!InitQ330(cfg, &newq330, q330cfg, crnt->payload)) exit(MY_MOD_ID + 8);
-
-        if (!listAppend(&cfg->q330list, &newq330, sizeof(Q330))) {
-            fprintf(stderr, "%s: listAppend: %s\n", fid, strerror(errno));
-            exit(MY_MOD_ID + 9);
-        }
-        crnt = listNextNode(crnt);
+    if (cfg->q330HostArgstr == NULL) {
+        LogMsg("%s: cfg->q330HostArgstr == NULL", fid);
+        exit(MY_MOD_ID + 7);
     }
 
+    if (!InitQ330(cfg, q330cfg)) exit(MY_MOD_ID + 8);
 }
 
 /* Read packets from the Q330.  Since we are using the user supplied
@@ -192,7 +157,7 @@ void LoadQ330Hosts(ISI330_CONFIG *cfg, LNKLST *q330Hosts, Q330_CFG *q330cfg)
 
 static THREAD_FUNC Q330Thread(void *argptr)
 {
-    Q330 *q330;
+    ISI330_Q330 *q330;
 
     enum tliberr liberr;
     enum tlibstate libstate, new_state;
@@ -286,44 +251,34 @@ static THREAD_FUNC Q330Thread(void *argptr)
 
 /* Launch all Q330 readers */
 
-void StartQ330Readers(ISI330_CONFIG *cfg)
+void StartQ330Reader(ISI330_CONFIG *cfg)
 {
     THREAD tid;
-    Q330 *q330;
-    LNKLST_NODE *crnt;
-    static char *fid = "StartQ330Thread";
+    ISI330_Q330 *q330;
+    static char *fid = "StartQ330Reader";
 
-    head = &cfg->q330list;
 
+    LogMsg("Q330 Argstr = %s", cfg->q330HostArgstr);
     LogMsg("Q330 config file = %s", cfg->cfgpath);
     LogMsg("Q330 site = %s", cfg->site);
     LogMsg("Q330 registration retry interval = %d sec", DEFAULT_RETRY_SEC);
     LogMsg("Q330 watchdog interval = %d sec", DEFAULT_WATCHDOG_SEC);
 
-    crnt = listFirstNode(head);
-    while (crnt != NULL) {
-        if (crnt->payload == NULL) {
-            LogMsg("%s: crnt->payload == NULL", fid);
-            SetExitStatus(MY_MOD_ID + 7);
-            return;
-        }
-        q330 = (Q330 *) crnt->payload;
-        q330->lp = cfg->lp;
-        strncpy(q330->tpc.q330id_station, cfg->site, 6);
-        if (!THREAD_CREATE(&tid, Q330Thread, (void *) q330)) {
+    if (cfg->q330 != NULL) {
+        if (!THREAD_CREATE(&tid, Q330Thread, (void *) cfg->q330)) {
             LogMsg("%s: THREAD_CREATE: Q330Thread: %s", fid, strerror(errno));
             SetExitStatus(MY_MOD_ID + 7);
             return;
         }
-
-        crnt = listNextNode(crnt);
+    } else {
+        LogMsg("%s: crnt->payload == NULL", fid);
+        SetExitStatus(MY_MOD_ID + 7);
+        return;
     }
 }
 
-void ShutdownQ330Readers(ISI330_CONFIG *cfg)
+void ShutdownQ330Reader(ISI330_CONFIG *cfg)
 {
-    Q330 *q330;
-    LNKLST_NODE *crnt;
     enum tlibstate curstate;
     enum tliberr liberr;
     topstat op_stat;
@@ -336,29 +291,24 @@ void ShutdownQ330Readers(ISI330_CONFIG *cfg)
     tz.tz_minuteswest = 0;
     tz.tz_dsttime = 0;
 
-    crnt = listFirstNode(head);
-    while (crnt != NULL) {
-        q330 = (Q330 *) crnt->payload;
-
-        LogMsg("Deregistering from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
+    if (cfg->q330 != NULL) {
+        LogMsg("Deregistering from site %s Q330: %s:%d\n", cfg->site, cfg->q330->host, cfg->q330->dp);
 
         gettimeofday(&tv1, &tz);
 
-        lib_change_state(*q330->ct, LIBSTATE_IDLE, LIBERR_NOERR);
+        lib_change_state(*cfg->q330->ct, LIBSTATE_IDLE, LIBERR_NOERR);
 
         // give library a change to change state. Empirically measured to take < .5 secs
         // even if it takes longer and deregister isn't clean,
         // reconnection using same ports will works
         nanosleep(&reqtp, &remtp);
 
-        lib_change_state(*q330->ct, LIBSTATE_TERM, LIBERR_NOERR);
+        lib_change_state(*cfg->q330->ct, LIBSTATE_TERM, LIBERR_NOERR);
         nanosleep(&reqtp, &remtp);
 
-        lib_destroy_context(q330->ct);
+        lib_destroy_context(cfg->q330->ct);
 
-        LogMsg("Disconnected from site %s Q330: %s:%d\n", cfg->site, q330->host, q330->dp);
-
-        crnt = listNextNode(crnt);
+        LogMsg("Disconnected from site %s Q330: %s:%d\n", cfg->site, cfg->q330->host, cfg->q330->dp);
     }
 
 }

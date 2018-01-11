@@ -50,7 +50,7 @@ static char *fid = "Exit";
         LogMsg("shutting down on signal %ld", status - ISI330_MOD_SIGNALS);
     }
 
-    ShutdownQ330Readers(cfg);
+    ShutdownQ330Reader(cfg);
 
 // TODO   isidlCloseDiskLoop(cfg->dl);
 
