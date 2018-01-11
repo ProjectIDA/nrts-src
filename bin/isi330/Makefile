@@ -55,7 +55,7 @@ OBJS += string.o
 
 OUTPUT  = isi330
 
-CC = cc -std=c89 ###clang
+CC = cc ### -std=c89 ###clang
  
 all: OBJS/$(PLATFORM) FORCE
 	cd OBJS/$(PLATFORM); \
