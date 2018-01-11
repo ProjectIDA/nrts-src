@@ -1,4 +1,4 @@
-#pragma ident "$Id$"
+#pragma ident "$Id: siomet.h,v 1.1 2018/01/11 00:32:42 dauerbach Exp $"
 /*
  * SIO met sensor support 
  */
@@ -78,5 +78,8 @@ VERSION *siometVersion(void);
 
 /* Revision History
  *
- * $Log$
+ * $Log: siomet.h,v $
+ * Revision 1.1  2018/01/11 00:32:42  dauerbach
+ * add header file; somehow missing from repo
+ *
  */
