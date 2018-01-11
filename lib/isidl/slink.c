@@ -1,4 +1,4 @@
-#pragma ident "$Id: slink.c,v 1.19 2018/01/08 23:36:28 dauerbach Exp $"
+#pragma ident "$Id: slink.c,v 1.20 2018/01/11 18:52:09 dechavez Exp $"
 /*======================================================================
  *
  * Tee incoming ISI data into an IRIS SeedLink server (ringserver).
@@ -352,12 +352,25 @@ static char *fid = "isidlSetSeedLinkOption";
 
     dl->slink.mseed = handle;
 
+/* Launch the packet forwarding thread */
+
+    SEM_INIT(&dl->slink.sem, 0, 1);
+    if (!THREAD_CREATE(&dl->slink.tid, RingServerWriteThread, (void *) &dl->slink)) {
+        logioMsg(dl->slink.lp, LOG_ERR, "*** ERROR *** %s: can't start RingServerWriteThread!", fid);
+        logioMsg(dl->slink.lp, LOG_WARN, "** NOTICE ** SeedLink feed terminated");
+        dl->slink.enabled = FALSE;
+        return;
+    }
+    THREAD_DETACH(dl->slink.tid);
+    SEM_WAIT(&dl->slink.sem);
+
     return TRUE;
 }
 
-static BOOL IDA1012BranchTaken(ISI_DL_SEEDLINK *slink, ISI_RAW_PACKET *raw)
+static BOOL IDA1012Branch(ISI_DL_SEEDLINK *slink, ISI_RAW_PACKET *raw)
 {
 MSEED_PACKED *packed;
+static char *fid = "IDA1012Branch";
 
     if (raw->hdr.desc.type != ISI_TYPE_IDA10) return FALSE;
     if (ida10SubFormatCode(raw->payload) != IDA10_SUBFORMAT_12) return FALSE;
@@ -404,21 +417,7 @@ static char *fid = "isidlFeedSeedLink";
 
 /* Special handling for IDA10.12 packets */
 
-    if (IDA1012BranchTaken(slink, raw)) return;
-
-/* First time through, launch the packet forwarding thread */
-
-    if (slink->first.acquired) {
-        SEM_INIT(&slink->sem, 0, 1);
-        if (!THREAD_CREATE(&slink->tid, RingServerWriteThread, (void *) slink)) {
-            logioMsg(slink->lp, LOG_ERR, "*** ERROR *** %s: can't start RingServerWriteThread!", fid);
-            logioMsg(slink->lp, LOG_WARN, "** NOTICE ** SeedLink feed terminated");
-            slink->enabled = FALSE;
-            return;
-        }
-        SEM_WAIT(&slink->sem);
-        slink->first.acquired = FALSE;
-    }
+    if (IDA1012Branch(slink, raw)) return;
 
 /* At this point we have waveform data in an ISI_RAW_PACKET, convert to a MSEED_RECORD */
 
@@ -448,6 +447,9 @@ static char *fid = "isidlFeedSeedLink";
 /* Revision History
  *
  * $Log: slink.c,v $
+ * Revision 1.20  2018/01/11 18:52:09  dechavez
+ * debugged IDA1012Branch() (renamed from IDA1012BranchTaken)
+ *
  * Revision 1.19  2018/01/08 23:36:28  dauerbach
  * move IDA1012 format check to after check for NULL raw packet
  *

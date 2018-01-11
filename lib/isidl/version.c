@@ -1,4 +1,4 @@
-#pragma ident "$Id: version.c,v 1.75 2018/01/08 23:44:46 dauerbach Exp $"
+#pragma ident "$Id: version.c,v 1.76 2018/01/11 18:57:38 dechavez Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,9 +6,13 @@
  *====================================================================*/
 #include "isi/dl.h"
 
-static VERSION version = {1, 26, 1};
+static VERSION version = {1, 26, 2};
 
 /* isidl library release notes
+
+1.26.2 01/08/2018
+       push.c: changed format of incoming connection message
+       slink.c: debugged IDA1012Branch() (renamed from IDA1012BranchTaken)
 
 1.26.1 01/08/2018 dauerbach
        slink.c:isiFeedSeedLink:  moved call to IDA1012BranchTaken() to after check for raw == NULL

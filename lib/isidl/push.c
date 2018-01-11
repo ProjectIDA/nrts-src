@@ -1,4 +1,4 @@
-#pragma ident "$Id: push.c,v 1.4 2014/08/28 21:25:11 dechavez Exp $"
+#pragma ident "$Id: push.c,v 1.5 2018/01/11 18:49:29 dechavez Exp $"
 /*======================================================================
  *
  *  server to ISI_PUSH clients
@@ -53,7 +53,7 @@ static char *fid = "ClientThread";
 
     par = (LOCAL_PAR *) argptr;
     ident = iacpPeerIdent(par->client);
-    logioMsg(par->lp, LOG_INFO, "%s: connection established", ident);
+    logioMsg(par->lp, LOG_INFO, "connection from %s", ident);
 
     finished = FALSE;
     while (!finished) {
@@ -62,7 +62,7 @@ static char *fid = "ClientThread";
         if (iacpRecvFrame(par->client, &frame, buf, IDA10_MAXRECLEN)) {
 
            /* Make sure signature is OK */
-     
+
             if (!frame.auth.verified) {
                 iacpSendAlert(par->client, IACP_ALERT_FAILED_AUTH);
                 logioMsg(par->lp, LOG_INFO, "%s: %s", ident, iacpAlertString(IACP_ALERT_FAILED_AUTH));
@@ -154,6 +154,9 @@ LOCAL_PAR *par;
 /* Revision History
  *
  * $Log: push.c,v $
+ * Revision 1.5  2018/01/11 18:49:29  dechavez
+ * changed format of incoming connection message
+ *
  * Revision 1.4  2014/08/28 21:25:11  dechavez
  * rework to use user supplied function for writing data, and move of options into ISI_DL handle
  *
