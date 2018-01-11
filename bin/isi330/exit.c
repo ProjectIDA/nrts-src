@@ -52,8 +52,6 @@ static char *fid = "Exit";
 
     ShutdownQ330Reader(cfg);
 
-// TODO   isidlCloseDiskLoop(cfg->dl);
-
     exit(status);
 
 }
