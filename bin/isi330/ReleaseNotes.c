@@ -1,8 +1,11 @@
-char *VersionIdentString = "Release 0.9.0";
+char *VersionIdentString = "Release 0.9.1";
 
 /* Release Notes */
 /*
- *
+
+0.9.1   2018-01-11 dauerbach
+        change logging init to use lowercase site/station id
+
 0.9.0   2018-01-11 dauerbach
         Only allow single q330 host
         Change DP to use 1-based indexing
