@@ -1,11 +1,10 @@
-# $Id: Makefile,v 1.18 2017/10/20 00:46:38 dauerbach Exp $
+# $Id: Makefile,v 1.19 2018/01/11 23:30:11 dauerbach Exp $
 # Makefile for nrts_edes
 
 VPATH  = 
 INCDIR = $(VPATH)../../../include
 BINDIR = $(VPATH)../../../../bin/$(PLATFORM)
 LIBDIR = $(VPATH)../../../../lib/$(PLATFORM)
-NOTESDIR= $(VPATH)../../../ReleaseNotes
 
 OPTMIZ = -g
 INCS   = -I$(INCDIR)
@@ -74,7 +73,7 @@ release: FORCE
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
 	cd OBJS/$(PLATFORM); \
-	$(MAKE) -f ../../Makefile VPATH=../../ doinstall notes
+	$(MAKE) -f ../../Makefile VPATH=../../ doinstall 
 
 clean: OBJS/$(PLATFORM) FORCE
 	rm -f OBJS/$(PLATFORM)/*.o
@@ -86,9 +85,6 @@ doinstall: $(OUTPUT)
 	rm -f $(BINDIR)/$(OUTPUT)
 	cp $(OUTPUT) $(BINDIR)/$(OUTPUT)
 	chmod 755 $(BINDIR)/$(OUTPUT)
-
-notes: $(VPATH)ReleaseNotes.c
-	$(INSTALL) -c -m 664 $(VPATH)ReleaseNotes.c $(NOTESDIR)/$(OUTPUT)
 
 REMOVE: $(BINDIR)
 	rm -rf OBJS

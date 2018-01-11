@@ -1,11 +1,11 @@
-# $Id: Makefile,v 1.20 2017/10/20 00:17:36 dauerbach Exp $
+# $Id: Makefile,v 1.21 2018/01/11 23:30:11 dauerbach Exp $
 # Makefile for i10dmx
 
 VPATH  = 
 INCDIR = $(VPATH)../../include
 BINDIR = $(VPATH)../../../bin/$(PLATFORM)
 LIBDIR = $(VPATH)../../../lib/$(PLATFORM)
-NOTESDIR= $(VPATH)../../ReleaseNotes
+# NOTESDIR= $(VPATH)../../ReleaseNotes
 OPTMIZ = -g
 INCS   = -I$(INCDIR)
 INCS  += $(SQLINCS)
@@ -63,7 +63,7 @@ release: FORCE
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
 	cd OBJS/$(PLATFORM); \
-	$(MAKE) -f ../../Makefile VPATH=../../ doinstall notes
+	$(MAKE) -f ../../Makefile VPATH=../../ doinstall
 
 clean: OBJS/$(PLATFORM) FORCE
 	rm -f OBJS/$(PLATFORM)/*.o
@@ -73,9 +73,6 @@ remove: OBJS/$(PLATFORM) $(BINDIR) FORCE
 
 doinstall: $(OUTPUT)
 	$(INSTALL) -c -m 755 $(OUTPUT) $(BINDIR)
-
-notes: $(VPATH)ReleaseNotes.c
-	$(INSTALL) -c -m 664 $(VPATH)ReleaseNotes.c $(NOTESDIR)/$(OUTPUT)
 
 REMOVE: $(BINDIR)
 	rm -rf OBJS

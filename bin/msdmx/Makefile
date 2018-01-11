@@ -1,11 +1,10 @@
-# $Id: Makefile,v 1.1 2015/10/02 15:46:39 dechavez Exp $
+# $Id: Makefile,v 1.2 2018/01/11 23:30:11 dauerbach Exp $
 # Makefile for msdmx
 
 VPATH  = 
 INCDIR = $(VPATH)../../include
 BINDIR = $(VPATH)../../../bin/$(PLATFORM)
 LIBDIR = $(VPATH)../../../lib/$(PLATFORM)
-NOTESDIR= $(VPATH)../../ReleaseNotes
 OPTMIZ = -g
 INCS   = -I$(INCDIR)
 DEFS   = -D$(OSNAME) -D$(OSTYPE)
@@ -44,7 +43,7 @@ release: FORCE
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
 	cd OBJS/$(PLATFORM); \
-	$(MAKE) -f ../../Makefile VPATH=../../ doinstall notes
+	$(MAKE) -f ../../Makefile VPATH=../../ doinstall 
 
 clean: OBJS/$(PLATFORM) FORCE
 	rm -f OBJS/$(PLATFORM)/*.o
@@ -54,9 +53,6 @@ remove: OBJS/$(PLATFORM) $(BINDIR) FORCE
 
 doinstall: $(OUTPUT)
 	$(INSTALL) -c -m 755 $(OUTPUT) $(BINDIR)
-
-notes: $(VPATH)ReleaseNotes.c
-	$(INSTALL) -c -m 664 $(VPATH)ReleaseNotes.c $(NOTESDIR)/$(OUTPUT)
 
 REMOVE: $(BINDIR)
 	rm -rf OBJS
