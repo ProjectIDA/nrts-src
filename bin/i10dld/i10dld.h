@@ -1,4 +1,4 @@
-#pragma ident "$Id: i10dld.h,v 1.2 2018/01/10 23:52:41 dechavez Exp $"
+#pragma ident "$Id: i10dld.h,v 1.3 2018/01/11 19:05:19 dechavez Exp $"
 #ifndef i10dld_h_included
 #define i10dld_h_included
 #include "util.h"
@@ -21,6 +21,7 @@ static char *Copyright = "Copyright (C) 2018 - Regents of the University of Cali
 #define DEFAULT_DB             "/usr/nrts"
 #define DEFAULT_USER           "nrts"
 #define DEFAULT_DAEMON         FALSE
+#define DEFAULT_VERBOSE        FALSE
 #define DEFAULT_SEEDLINK       TRUE
 
 #define UNDEFINED_PORT       -1
@@ -35,7 +36,7 @@ void LogIDA10PacketHeader(UINT8 *raw, UINT64 count);
 
 /* dl.c */
 void ToggleDLWriteVerbosity(void);
-ISI_DL *OpenDiskLoop(char *dbspec, char *myname, char *site, LOGIO *lp, int flags, char *seedlink);
+ISI_DL *OpenDiskLoop(char *dbspec, char *myname, char *site, LOGIO *lp, int flags, char *seedlink, BOOL verbose);
 void CloseDiskLoop(void);
 BOOL USER_SUPPLIED_WRITE_FUNCTION(ISI_DL *dl, ISI_RAW_PACKET *raw);
 
@@ -87,6 +88,9 @@ void StartSignalHandler(void);
 /* Revision History
  *
  * $Log: i10dld.h,v $
+ * Revision 1.3  2018/01/11 19:05:19  dechavez
+ * updated prototypes and defines
+ *
  * Revision 1.2  2018/01/10 23:52:41  dechavez
  * first production release
  *

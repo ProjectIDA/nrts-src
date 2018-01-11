@@ -1,4 +1,4 @@
-#pragma ident "$Id: dl.c,v 1.3 2018/01/11 00:05:41 dechavez Exp $"
+#pragma ident "$Id: dl.c,v 1.4 2018/01/11 19:06:26 dechavez Exp $"
 /*======================================================================
  *
  * Disk loop I/O
@@ -11,7 +11,7 @@
 
 static ISI_DL *dl = NULL;
 static UINT64 count = 0;
-static BOOL Debug = FALSE;
+static BOOL Debug = DEFAULT_VERBOSE;
 
 void ToggleDLWriteVerbosity(void)
 {
@@ -19,7 +19,7 @@ void ToggleDLWriteVerbosity(void)
     LogMsg("incoming packet logging %s", Debug ? "enabled" : "disabled");
 }
 
-ISI_DL *OpenDiskLoop(char *dbspec, char *myname, char *site, LOGIO *lp, int flags, char *seedlink)
+ISI_DL *OpenDiskLoop(char *dbspec, char *myname, char *site, LOGIO *lp, int flags, char *seedlink, BOOL verbose)
 {
 static ISI_GLOB glob;
 static UINT32 options = ISI_OPTION_GENERATE_SEQNO | ISI_OPTION_INSERT_32BIT_SEQNO | ISI_OPTION_INSERT_32BIT_TSTAMP;
@@ -47,6 +47,8 @@ static char *fid = "OpenDiskLoop";
         Exit(MY_MOD_ID + 3);
     }
     isidlLogSeedLinkOption(lp, LOG_INFO, dl);
+
+    if (verbose) Debug = TRUE;
 
     return dl;
 }
@@ -114,6 +116,9 @@ static char *fid = "WritePacketToDisk";
 /* Revision History
  *
  * $Log: dl.c,v $
+ * Revision 1.4  2018/01/11 19:06:26  dechavez
+ * added support for verbose option
+ *
  * Revision 1.3  2018/01/11 00:05:41  dechavez
  * removed log message about first packet (library does that already)
  *

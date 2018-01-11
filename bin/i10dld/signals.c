@@ -1,4 +1,4 @@
-#pragma ident "$Id: signals.c,v 1.1 2018/01/10 21:20:18 dechavez Exp $"
+#pragma ident "$Id: signals.c,v 1.2 2018/01/11 19:04:17 dechavez Exp $"
 /*======================================================================
  *
  * Signal handling thread.
@@ -7,6 +7,8 @@
 #include "i10dld.h"
 
 #define MY_MOD_ID MOD_SIGNALS
+
+static SEMAPHORE semaphore;
 
 static THREAD_FUNC SignalHandlerThread(void *dummy)
 {
@@ -17,6 +19,8 @@ static char *fid = "SignalHandlerThread";
     LogMsg("signal handler installed");
 
     sigfillset(&set); /* catch all signals defined by the system */
+
+    SEM_POST(&semaphore);
 
     while (1) {
 
@@ -73,10 +77,12 @@ static char *fid = "StartSignalHandler";
 
 /* Create signal handling thread to catch all nondirected signals */
 
+    SEM_INIT(&semaphore, 0, 1);
     if (!THREAD_CREATE(&tid, SignalHandlerThread, (void *) NULL)) {
         LogMsg("%s: THREAD_CREATE: %s", fid, strerror(errno));
         exit(1);
     }
+    SEM_WAIT(&semaphore);
 }
 
 /*-----------------------------------------------------------------------+
@@ -106,6 +112,9 @@ static char *fid = "StartSignalHandler";
 /* Revision History
  *
  * $Log: signals.c,v $
+ * Revision 1.2  2018/01/11 19:04:17  dechavez
+ * added a semaphore to block return of StartSignalHandler() until thread is ready
+ *
  * Revision 1.1  2018/01/10 21:20:18  dechavez
  * created
  *

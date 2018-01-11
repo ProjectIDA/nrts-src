@@ -1,4 +1,4 @@
-#pragma ident "$Id: main.c,v 1.2 2018/01/10 23:52:16 dechavez Exp $"
+#pragma ident "$Id: main.c,v 1.3 2018/01/11 19:04:55 dechavez Exp $"
 /*======================================================================
  *
  *  Listen for IDA10 packets coming in via ISI push and write to local dl
@@ -21,6 +21,7 @@ static int help(char *myname)
     fprintf(stderr, "log=spec    => log file name or syslog specification\n");
     fprintf(stderr, "-laxnrts    => relax NRTS disk loop time stamp sanity requirements\n");
     fprintf(stderr, "-noseedlink => disable SeedLink support\n");
+    fprintf(stderr, "-v          => verbose packet logging (can later turn off with HUP)\n");
     fprintf(stderr, "-bd         => run in the background\n");
 
     Exit(MY_MOD_ID + 1);
@@ -43,6 +44,7 @@ char *dbspec = DEFAULT_DB;
 char *slink  = ISI_DL_DEFAULT_SLINK_CFGSTR;
 
 BOOL daemon  = DEFAULT_DAEMON;
+BOOL verbose = DEFAULT_VERBOSE;
 
 ISI_DL *dl = NULL;
 
@@ -65,6 +67,8 @@ ISI_DL *dl = NULL;
             slink = NULL;
         } else if (strncmp(argv[i], "seedlink=", strlen("seedlink=")) == 0) {
             slink = argv[i] + strlen("seedlink=");
+        } else if (strcmp(argv[i], "-v") == 0) {
+            verbose = TRUE;
         } else if (strcmp(argv[i], "-bd") == 0) {
             daemon = TRUE;
         } else if (strcmp(argv[i], "-h") == 0) {
@@ -117,7 +121,7 @@ ISI_DL *dl = NULL;
 
 /* Open the disk loop (do this after background so process id will match what's in the dl sys files) */
 
-    dl = OpenDiskLoop(dbspec, myname, site, lp, options, slink);
+    dl = OpenDiskLoop(dbspec, myname, site, lp, options, slink, verbose);
 
 /* Launch the signal handler */
 
@@ -169,6 +173,9 @@ ISI_DL *dl = NULL;
 /* Revision History
  *
  * $Log: main.c,v $
+ * Revision 1.3  2018/01/11 19:04:55  dechavez
+ * added -v option to turn on verbose packet logging on lauch
+ *
  * Revision 1.2  2018/01/10 23:52:16  dechavez
  * first production release
  *
