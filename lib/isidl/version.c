@@ -1,4 +1,4 @@
-#pragma ident "$Id: version.c,v 1.74 2017/12/21 00:02:32 dechavez Exp $"
+#pragma ident "$Id: version.c,v 1.75 2018/01/08 23:44:46 dauerbach Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,9 +6,12 @@
  *====================================================================*/
 #include "isi/dl.h"
 
-static VERSION version = {1, 26, 0};
+static VERSION version = {1, 26, 1};
 
 /* isidl library release notes
+
+1.26.1 01/08/2018 dauerbach
+       slink.c:isiFeedSeedLink:  moved call to IDA1012BranchTaken() to after check for raw == NULL
 
 1.26.0 12/20/2017
        dl.c: added NRTS support for IDA10.12 (in NRTSCompatiblePacket()) (untested)

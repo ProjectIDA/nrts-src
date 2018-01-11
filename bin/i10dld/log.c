@@ -1,60 +1,58 @@
-#pragma ident "$Id: siomet.h,v 1.1 2018/01/11 00:32:42 dauerbach Exp $"
-/*
- * SIO met sensor support 
- */
+#pragma ident "$Id: log.c,v 1.1 2018/01/10 21:20:18 dechavez Exp $"
+/*======================================================================
+ *
+ *  Logging facility
+ *
+ *====================================================================*/
+#include "i10dld.h"
 
-#ifndef siomet_h_defined
-#define siomet_h_defined
+static LOGIO lp;
 
-#include "platform.h"
-#include "ttyio.h"
-#include "logio.h"
+void LogMsg(char *format, ...)
+{
+va_list marker;
+char *ptr, msgbuf[LOGIO_MAX_MSG_LEN];
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+    ptr = msgbuf;
+    va_start(marker, format);
+    vsnprintf(ptr, LOGIO_MAX_MSG_LEN, format, marker);
+    va_end(marker);
 
-/* Constants */
-
-#define SIOMET_BUFLEN     80
-#define SIOMET_DEFAULT_TO  5
-
-/* Structure templates */
-
-typedef struct {
-    TTYIO *tty;
-    LOGIO *lp;
-    char buf[SIOMET_BUFLEN];
-    BOOL debug;
-} SIOMET;
-
-/* Function return codes */
-
-#define SIOMET_OK          0
-#define SIOMET_TIMED_OUT  -1
-#define SIOMET_CRC_ERROR  -2
-#define SIOMET_BAD_STRING -3
-
-/* Function prototypes */
- 
-/* siomet.c */
-SIOMET *siometOpen(char *port, int speed, LOGIO *lp, BOOL debug);
-BOOL siometRead(SIOMET *handle, REAL64 *Ta, REAL64 *Ua, REAL64 *Pa);
-void siometClose(SIOMET *handle);
- 
-/* version.c */
-char *siometVersionString(void);
-VERSION *siometVersion(void);
- 
- #ifdef __cplusplus
+    logioMsg(&lp, LOG_INFO, msgbuf);
 }
-#endif
- 
-#endif /* siomet_h_included */
- 
+
+void LogCommandLine(int argc, char **argv)
+{
+int i;
+char message[MAXPATHLEN+1];
+
+    sprintf(message, "working directory: ");
+    getcwd(message+strlen(message), MAXPATHLEN-strlen(message));
+    LogMsg(message);
+
+    sprintf(message, "command line:     ");
+    for (i = 0; i < argc; i++) sprintf(message+strlen(message), " %s", argv[i]);
+    LogMsg(message);
+}
+
+LOGIO *InitLogging(char *myname, char *spec, char *SITE)
+{
+static char *fid = "InitLogging";
+
+    if (!logioInit(&lp, spec, NULL, myname)) {
+        fprintf(stderr, "%s: logioInit: %s\n", fid, strerror(errno));
+        exit(1);
+    }
+    logioSetPrefix(&lp, SITE);
+    logioMsg(&lp, LOG_INFO, "IDA10 disk loop writer %s - %s", myname, VersionIdentString);
+    logioMsg(&lp, LOG_INFO, "Build %s %s", __DATE__, __TIME__);
+
+    return &lp;
+}
+
 /*-----------------------------------------------------------------------+
  |                                                                       |
- | Copyright (C) 2017 Regents of the University of California            |
+ | Copyright (C) 2018 Regents of the University of California            |
  |                                                                       |
  | This software is provided 'as-is', without any express or implied     |
  | warranty.  In no event will the authors be held liable for any        |
@@ -78,8 +76,8 @@ VERSION *siometVersion(void);
 
 /* Revision History
  *
- * $Log: siomet.h,v $
- * Revision 1.1  2018/01/11 00:32:42  dauerbach
- * add header file; somehow missing from repo
+ * $Log: log.c,v $
+ * Revision 1.1  2018/01/10 21:20:18  dechavez
+ * created
  *
  */

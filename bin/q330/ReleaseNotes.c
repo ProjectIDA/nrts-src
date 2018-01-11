@@ -1,8 +1,11 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.96 2017/10/11 22:44:15 dechavez Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.97 2018/01/09 01:09:13 dechavez Exp $"
 
-char *VersionIdentString = "Release 2.11.2";
+char *VersionIdentString = "Release 2.11.3";
 
 /* Release notes
+
+2.11.3  01/08/2018
+        link with libqdp 3.17.1 to fix bug loading XML files with control detector entries
 
 2.11.2  10/11/2017
         Print "library standard" message when reporting on EP firmware incompatibility
