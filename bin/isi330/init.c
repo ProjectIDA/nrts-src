@@ -10,11 +10,11 @@
 void help(char *myname)
 {
     fprintf(stderr, "\n");
-    fprintf(stderr, "usage: %s sitename q330=HostnameOrIP:DataPort[:debug] [q330=HostnameOrIP:DataPort[:debug]] dl=server:port \n", myname);
+    fprintf(stderr, "usage: %s sitename q330=HostnameOrIP:DataPort dl=server:port \n", myname);
     fprintf(stderr, "\n");
     fprintf(stderr, "Required:\n");
     fprintf(stderr, "    sitename               => Station code\n");
-    fprintf(stderr, "    q330=name:port[:debug] => Quanterra Q330 input (may be repeated)\n");
+    fprintf(stderr, "    q330=name:port[:debug] => Quanterra Q330 input\n");
     fprintf(stderr, "    dl=server:port         => ISI Disk Loop server and port\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Options:\n");
@@ -38,7 +38,6 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     int depth = DEFAULT_PACKET_QUEUE_DEPTH;
     Q330_CFG *q330cfg = NULL;  /* q330 database info */
     int errcode;
-    LNKLST q330Hosts;
 
 
     if ((cfg = (ISI330_CONFIG *) malloc(sizeof(ISI330_CONFIG))) == NULL) {
@@ -47,20 +46,20 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     }
     cfg->site = NULL;
     cfg->port = -1;
-
-    listInit(&q330Hosts);
+    memset(cfg->q330HostArgstr, 0, sizeof(cfg->q330HostArgstr));
 
 /*  Get command line arguments  */
-
-    for (int i = 1; i < argc; i++) {
+    int i;
+    for (i = 1; i < argc; i++) {
         printf("arg %d of %d: %s\n", i, argc, argv[i]);
 
         if (strncmp(argv[i], "q330=", strlen("q330=")) == 0) {
 
-            if (!listAppend(&q330Hosts, argv[i] + strlen("q330="), (UINT32)(strlen(argv[i]) - strlen("q330=") + 1))) {
-                fprintf(stderr, "%s: listAppend: %s for string: %s\n", fid, strerror(errno), argv[i] + strlen("q330="));
-                exit(MY_MOD_ID + 2);
+            if (strlen(cfg->q330HostArgstr) > 0) {
+                 fprintf(stderr, "ERROR: multilple instances of q330 argument are not allowed\n");
+                 exit(MY_MOD_ID + 2);
             }
+            strcpy(cfg->q330HostArgstr, argv[i] + strlen("q330="));
 
         } else if (strncmp(argv[i], "cfg=", strlen("cfg=")) == 0) {
 
@@ -106,24 +105,12 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
         }
     }
 
-    /* make list of Q330s */
-
-    if (!listSetArrayView(&cfg->q330list)) {
-        fprintf(stderr, "%s: listSetArrayView: %s", myname, strerror(errno));
-        exit(MY_MOD_ID + 6);
-    }
-
     /* Read ida q330 database */
 
     if ((q330cfg = q330ReadCfg(cfgpath, &errcode)) == NULL) {
         q330PrintErrcode(stderr, "q330ReadCfg: ", cfgpath, errcode);
         exit(MY_MOD_ID + 7);
     }
-
-    /* Get DB info for each q330 specified on cmd line
-     * and set up initialization structures for each */
-
-    LoadQ330Hosts(cfg, &q330Hosts, q330cfg);
 
 /* Must specify site name */
 
@@ -150,6 +137,10 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
          exit(MY_MOD_ID + 9);
      }
 
+    /* Initialize lib330 cfg structs */
+
+    LoadQ330Host(cfg, q330cfg);
+
 /* Start signal handling thread */
 
     StartSignalHandler();
@@ -174,7 +165,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     StartRecordPusher(cfg->server, cfg->port, cfg->lp, depth, cfg->site, cfg->netname);
 
     // start Q330 readers
-    StartQ330Readers(cfg);
+    StartQ330Reader(cfg);
 
     LogMsg("%s: initialization complete", util_ucase(myname));
 
