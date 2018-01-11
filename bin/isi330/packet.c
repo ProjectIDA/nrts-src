@@ -1,4 +1,4 @@
-#pragma ident "$Id: packet.c,v 1.1 2017/12/29 23:38:52 dauerbach Exp $"
+#pragma ident "$Id: packet.c,v 1.2 2018/01/11 23:29:27 dauerbach Exp $"
 /*======================================================================
  *
  *  proto-packet functions
