@@ -17,6 +17,7 @@ all: \
      isi \
      isi330 \
      isid \
+     i10dld \
      isidl \
      isildl \
      isimkdl \
@@ -103,6 +104,9 @@ isid: FORCE
 
 isidb: FORCE
 	cd isidb; $(MAKE) install
+
+i10dld: FORCE
+	cd i10dld; $(MAKE) install
 
 isidl: FORCE
 	cd isidl; $(MAKE) install
@@ -249,6 +253,7 @@ clean: FORCE
 	cd isi;        $(MAKE) $@
 	cd isi330;     $(MAKE) $@
 	cd isid;       $(MAKE) $@
+	cd i10dld;     $(MAKE) $@
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
@@ -294,6 +299,7 @@ remove: FORCE
 	cd isi;        $(MAKE) $@
 	cd isi330;     $(MAKE) $@
 	cd isid;       $(MAKE) $@
+	cd i10dld;     $(MAKE) $@
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
@@ -341,6 +347,7 @@ REMOVE: FORCE
 	cd isi;        $(MAKE) $@
 	cd isi330;     $(MAKE) $@
 	cd isid;       $(MAKE) $@
+	cd i10dld;     $(MAKE) $@
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
