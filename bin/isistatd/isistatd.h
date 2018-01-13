@@ -1,7 +1,11 @@
 #pragma ident "$Id: isistatd.h,v 1.4 2015/12/18 18:51:41 dechavez Exp $"
 #ifndef isistatd_h_included
 #define isistatd_h_included
+
+#include <curl/curl.h>
+#include "jansson.h"
 #include "isi.h"
+#include "util.h"
 
 extern char *VersionIdentString;
 
@@ -57,6 +61,10 @@ void StartSignalHandler(void);
 
 /* soh.c */
 void ProcessSohCnfLists(LNKLST *soh_list, LNKLST *cnf_list, char *apiurl);
+
+/* soh2json.c */
+void ProcessIsiInfo(char *server, char *apiurl, ISI_SOH_REPORT *soh, ISI_CNF_REPORT *cnf);
+
 
 #endif /* isistatd_h_included */
 

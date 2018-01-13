@@ -3,7 +3,7 @@
  *  HTTP Post IDA NRTS SOH info to IDA STATUS WEB SERVICE API
  *
  *====================================================================*/
-#include "soh2json.h"
+#include "isistatd.h"
 
 extern char *VersionIdentString;
 
