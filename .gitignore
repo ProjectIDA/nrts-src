@@ -10,5 +10,6 @@ windows
 *.a
 *.o
 cmake-*
+CMakeLists.txt
 .idea
 **/CLOSET
