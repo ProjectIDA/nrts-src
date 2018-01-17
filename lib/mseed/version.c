@@ -1,4 +1,4 @@
-#pragma ident "$Id: version.c,v 1.26 2017/11/21 21:09:24 dechavez Exp $"
+#pragma ident "$Id: version.c,v 1.27 2018/01/13 01:00:16 dechavez Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,9 +6,14 @@
  *====================================================================*/
 #include "mseed.h"
 
-static VERSION version = {2, 7, 1};
+static VERSION version = {2, 8, 0};
 
 /* mseed library release notes
+
+2.8.0  01/12/2018
+       mseed.h: updated mseed512ToIDA1012() prototype to include sname and nname arguments
+       ida1012.c: added optional replacement of station and network code in the MiniSeed and
+                  IDA10.12 headers with app supplied values
 
 2.7.1  11/21/2017
        mseed.h: changed mseed512ToIDA1012() to return UINT8 * instead of BOOL

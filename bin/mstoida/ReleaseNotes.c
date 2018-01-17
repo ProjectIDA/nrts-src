@@ -1,8 +1,10 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.3 2017/11/21 21:07:37 dechavez Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.4 2018/01/13 01:02:02 dechavez Exp $"
 
-char *VersionIdentString = "Release 1.1.1";
+char *VersionIdentString = "Release 1.2.0";
 
 /* Release notes
+
+1.2.0   added sta=sname and net=nname overrides of packet header options
 
 1.1.1   reworked to use mseed512ToIDA1012() from libmseed 2.7.1
 

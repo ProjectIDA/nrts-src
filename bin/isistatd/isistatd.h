@@ -1,4 +1,4 @@
-#pragma ident "$Id: isistatd.h,v 1.4 2015/12/18 18:51:41 dechavez Exp $"
+#pragma ident "$Id: isistatd.h,v 1.5 2018/01/17 17:20:15 dauerbach Exp $"
 #ifndef isistatd_h_included
 #define isistatd_h_included
 
@@ -96,6 +96,9 @@ void ProcessIsiInfo(char *server, char *apiurl, ISI_SOH_REPORT *soh, ISI_CNF_REP
 /* Revision History
  *
  * $Log: isistatd.h,v $
+ * Revision 1.5  2018/01/17 17:20:15  dauerbach
+ * make includes consistent with other ida/nrts application
+ *
  * Revision 1.4  2015/12/18 18:51:41  dechavez
  * changed sylogd facility from LOG_USER to LOG_LOCAL0
  *

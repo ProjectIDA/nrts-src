@@ -1,4 +1,4 @@
-#pragma ident "$Id: mseed.h,v 1.17 2017/11/21 21:05:14 dechavez Exp $"
+#pragma ident "$Id: mseed.h,v 1.18 2018/01/13 00:59:57 dechavez Exp $"
 /*======================================================================
  *
  * Defines, templates, and prototypes for MiniSEED library
@@ -553,7 +553,7 @@ BOOL mseedConvertIDA9(MSEED_HANDLE *handle, MSEED_RECORD *dest, UINT8 *src);
 BOOL mseedConvertIDA10(MSEED_HANDLE *handle, MSEED_RECORD *dest, UINT8 *src);
 
 /* ida1012.c */
-UINT8 *mseed512ToIDA1012(UINT8 *mseed512, UINT8 *dest);
+UINT8 *mseed512ToIDA1012(UINT8 *mseed512, UINT8 *dest, char *sname, char *nname);
 
 /* log.c */
 VOID mseedLog(MSEED_HANDLE *handle, int level, CHAR *format, ...);
@@ -645,6 +645,9 @@ VERSION *mseedVersion(VOID);
 /* Revision History
  *
  * $Log: mseed.h,v $
+ * Revision 1.18  2018/01/13 00:59:57  dechavez
+ * updated mseed512ToIDA1012() prototype to include sname and nname arguments
+ *
  * Revision 1.17  2017/11/21 21:05:14  dechavez
  * changed mseed512ToIDA1012() to return UINT8 * instead of BOOL
  *
