@@ -572,6 +572,7 @@ UINT32 util_today(VOID);
 char *utilTimeString(INT64 value, int code, char *buf, int buflen);
 INT64 utilConvertFrom1970SecsTo1999Nsec(double tstamp);
 REAL64 utilConvertFrom1999NsecTo1970Secs(INT64 nsec);
+INT64 utilConvertFrom2000SecsTo1999Nsec(double tstamp);
 
 /* timer.c */
 void utilDelayMsec(UINT32 interval);

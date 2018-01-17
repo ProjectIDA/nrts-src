@@ -231,7 +231,8 @@ static char *fid = "utilAttodt";
 }
 
 /***********************************************************************/
-#define SAN_EPOCH_TO_1970_EPOCH 915148800
+#define SAN_EPOCH_TO_1970_EPOCH 915148800 /* also defined in sanio.h */
+#define SAN_EPOCH_TO_2000_EPOCH (-31536000) /* 2000 is 946684800 from 1970 */
 
 char *utilDttostr(double dtime, int code, char *buf)
 {
@@ -624,6 +625,17 @@ INT64 isec, frac;
     rsec = isec + SAN_EPOCH_TO_1970_EPOCH + (frac / (REAL64) NANOSEC_PER_SEC);
 
     return rsec;
+}
+
+INT64 utilConvertFrom2000SecsTo1999Nsec(double tstamp)
+{
+INT64 sec, frac, nsec;
+
+    sec = (INT64) tstamp - SAN_EPOCH_TO_1970_EPOCH;
+    frac = (tstamp - (double) ((INT64) tstamp)) * (double) NANOSEC_PER_SEC;
+    nsec = (sec * NANOSEC_PER_SEC) + frac; 
+
+    return nsec;
 }
 
 /* Revision History
