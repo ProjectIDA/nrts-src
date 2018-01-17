@@ -108,6 +108,7 @@ BOOL BackGround(ISI330_CONFIG *cfg);
 void isi330_state_callback(pointer p);
 void isi330_msg_callback(pointer p);
 void isi330_miniseed_callback(pointer p);
+void isi330_one_second_callback(pointer p);
 
 /* exit.c */
 void GracefulExit(INT32 status);

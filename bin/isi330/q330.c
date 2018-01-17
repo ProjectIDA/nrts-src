@@ -101,7 +101,7 @@ BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db)
     cfg->q330->tpc.resp_err = LIBERR_NOERR;
     cfg->q330->tpc.call_state = isi330_state_callback;         // state change callback??? Will probably want this
     cfg->q330->tpc.call_messages = isi330_msg_callback;      // message callback, will want this later
-    cfg->q330->tpc.call_secdata = NULL;       // not collecting 1-sec data;
+    cfg->q330->tpc.call_secdata = isi330_one_second_callback;       // 1-sec data callback;
     cfg->q330->tpc.call_lowlatency = NULL;    // NYI
     cfg->q330->tpc.call_baler = NULL;         // not using
     cfg->q330->tpc.file_owner = NULL;         // until better understood. Used in libsupport
