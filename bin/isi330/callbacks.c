@@ -6,10 +6,32 @@
 #include <libclient.h>
 #include "isi330.h"
 
+static MSEED_HANDLE *mshandle = NULL;
+
+void SetMSEEDHandle(MSEED_HANDLE *h) {
+    mshandle = h;
+}
+
+void mseed_callback(void *unused, MSEED_PACKED *packed)
+{
+    // MSEED_RECORD mseed;
+
+    // if (!mseedUnpackRecord(&mseed, (UINT8 *)packed)) {
+    //     LogMsg("ERROR Unpacking MINISEED Record\n");
+    //     break;
+    // }
+
+    FlushRecord((UINT8 *)packed);
+
+    free(packed); /* don't forget to free! */
+}
+
+
 void isi330_one_second_callback(pointer p)
 {
     static char *fid = "isi33_one_second_callback";
     tonesec_call *ponesec;
+    MSEED_RECORD mseed;
 
     /* LogMsg("%s: called\n", fid); */
 
@@ -17,6 +39,15 @@ void isi330_one_second_callback(pointer p)
         LogMsg("%s: NULL pointer received.\n", fid);
         return;
     }
+
+    OneSecPacketToMSEED_RECORD(mshandle, &mseed, ponesec);
+
+    if (!mseedAddRecordToHandle(mshandle, &mseed)) {
+        LogMsg("*** ERROR *** %s: mseedAddRecordToHandle: %s", fid, strerror(errno));
+        return;
+    }
+
+
 
     /* LogMsg("%s:         total_size: %u\n", fid, ponesec->total_size); */
     /* LogMsg("%s:       station_name: %s\n", fid, ponesec->station_name); */

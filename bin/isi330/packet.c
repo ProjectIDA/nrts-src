@@ -19,7 +19,7 @@ static BOOL FirstRecord = TRUE;
 
     if (rawmseed == NULL) return;
 
-    if (mseed512ToIDA1012(rawmseed, ida1012) == NULL) {
+    if (mseed512ToIDA1012(rawmseed, ida1012, NULL, NULL) == NULL) {
         LogMsg("ERROR: %s: mseed512ToIDA1012: %s", fid, strerror(errno));
         return;
     }

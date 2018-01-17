@@ -54,6 +54,9 @@ static char *Copyright = "Copyright (C) 2017 - Regents of the University of Cali
 #define DEFAULT_NETID              "II"
 #define DEFAULT_PACKET_QUEUE_DEPTH 50
 
+#define DEFAULT_MSEED_RECLEN 512
+#define DEFAULT_MSEED_QCODE  'R'
+#define DEFAULT_MSEED_SEQNO  1
 
 
 typedef struct {
@@ -109,6 +112,11 @@ void isi330_state_callback(pointer p);
 void isi330_msg_callback(pointer p);
 void isi330_miniseed_callback(pointer p);
 void isi330_one_second_callback(pointer p);
+void SetMSEEDHandle(MSEED_HANDLE *h);
+void mseed_callback(void *unused, MSEED_PACKED *packed);
+
+/* convert.c */
+void OneSecPacketToMSEED_RECORD(MSEED_HANDLE *handle, MSEED_RECORD *dest, tonesec_call *src);
 
 /* exit.c */
 void GracefulExit(INT32 status);
