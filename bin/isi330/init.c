@@ -132,7 +132,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 /* Start logging facility */
 
      if (log == NULL) log = daemon ? DEFAULT_BACKGROUND_LOG : DEFAULT_FOREGROUND_LOG;
-     if ((cfg->lp = InitLogging(myname, log, util_lcase(cfg->site), debug)) == NULL) {
+     if ((cfg->lp = InitLogging(myname, log, util_ucase(cfg->site), debug)) == NULL) {
          perror("InitLogging");
          exit(MY_MOD_ID + 9);
      }
@@ -167,7 +167,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     // start Q330 readers
     StartQ330Reader(cfg);
 
-    LogMsg("%s: initialization complete", util_ucase(myname));
+    LogMsg("%s: initialization complete", myname);
 
     return cfg;
 }
