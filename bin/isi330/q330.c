@@ -86,7 +86,7 @@ BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db)
     cfg->q330->tpc.opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_AUXMSG | VERB_PACKET;
     cfg->q330->tpc.opt_verbose = VERB_RETRY | VERB_REGMSG | VERB_AUXMSG;
     cfg->q330->tpc.opt_zoneadjust = 1;        // no need, on UTC
-    cfg->q330->tpc.opt_secfilter = OSF_DATASERV;         // not using 1-sec callback
+    cfg->q330->tpc.opt_secfilter = OSF_ALL;         // not using 1-sec callback
     cfg->q330->tpc.opt_client_msgs = 10;      // set to min, NOT SURE HOW THIS IS USED
     cfg->q330->tpc.opt_minifilter = OMF_ALL;  // send all messages
     cfg->q330->tpc.opt_aminifilter = 0;       // disabling, I think...
