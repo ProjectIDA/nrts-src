@@ -11,27 +11,29 @@ void isi330_one_second_callback(pointer p)
     static char *fid = "isi33_one_second_callback";
     tonesec_call *ponesec;
 
+    /* LogMsg("%s: called\n", fid); */
+
     if ((ponesec = (tonesec_call *)p) == NULL) {
         LogMsg("%s: NULL pointer received.\n", fid);
         return;
     }
 
-    LogMsg("%s:         total_size: %u\n", fid, ponesec->total_size);
-    LogMsg("%s:       station_name: %s\n", fid, ponesec->station_name);
-    LogMsg("%s:           location: %s\n", fid, ponesec->location);
-    LogMsg("%s:        chan_number: %hhu\n", fid, ponesec->chan_number);
-    LogMsg("%s:            channel: %s\n", fid, ponesec->channel);
-    LogMsg("%s:               rate: %d\n", fid, ponesec->rate);
-    LogMsg("%s:         cl_session: %lu\n", fid, ponesec->cl_session);
-    LogMsg("%s:          cl_offset: %lg\n", fid, ponesec->cl_offset);
-    LogMsg("%s:          timestamp: %lg\n", fid, ponesec->timestamp);
-    LogMsg("%s:        filter_bits: %hu\n", fid, ponesec->filter_bits);
-    LogMsg("%s:          qual_perc: %hu\n", fid, ponesec->qual_perc);
-    LogMsg("%s:     activity_flags: %hu\n", fid, ponesec->activity_flags);
-    LogMsg("%s:           io_flags: %hu\n", fid, ponesec->io_flags);
-    LogMsg("%s: data_quality_flags: %hu\n", fid, ponesec->data_quality_flags);
-    LogMsg("%s:        src_channel: %u\n", fid, ponesec->src_channel);
-    LogMsg("%s:        src_subchan: %u\n", fid, ponesec->src_subchan);
+    /* LogMsg("%s:         total_size: %u\n", fid, ponesec->total_size); */
+    /* LogMsg("%s:       station_name: %s\n", fid, ponesec->station_name); */
+    /* LogMsg("%s:           location: %s\n", fid, ponesec->location); */
+    /* LogMsg("%s:        chan_number: %hhu\n", fid, ponesec->chan_number); */
+    /* LogMsg("%s:            channel: %s\n", fid, ponesec->channel); */
+    /* LogMsg("%s:               rate: %d\n", fid, ponesec->rate); */
+    /* LogMsg("%s:         cl_session: %lu\n", fid, ponesec->cl_session); */
+    /* LogMsg("%s:          cl_offset: %lg\n", fid, ponesec->cl_offset); */
+    /* LogMsg("%s:          timestamp: %f\n", fid, ponesec->timestamp); */
+    /* LogMsg("%s:        filter_bits: %hu\n", fid, ponesec->filter_bits); */
+    /* LogMsg("%s:          qual_perc: %hu\n", fid, ponesec->qual_perc); */
+    /* LogMsg("%s:     activity_flags: %hu\n", fid, ponesec->activity_flags); */
+    /* LogMsg("%s:           io_flags: %hu\n", fid, ponesec->io_flags); */
+    /* LogMsg("%s: data_quality_flags: %hu\n", fid, ponesec->data_quality_flags); */
+    /* LogMsg("%s:        src_channel: %u\n", fid, ponesec->src_channel); */
+    /* LogMsg("%s:        src_subchan: %u\n", fid, ponesec->src_subchan); */
 }
 
 void isi330_miniseed_callback(pointer p)
