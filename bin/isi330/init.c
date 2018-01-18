@@ -19,8 +19,10 @@ void help(char *myname)
     fprintf(stderr, "\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "    cfg=<path>  => Location of q330.cfg configuration file\n");
-    fprintf(stderr,"     net=netid   => set network code (default: 'II' \n");
+    fprintf(stderr, "    net=netid   => set network code (default: 'II')\n");
+    fprintf(stderr, "    sta=staid   => override station code in data with this value\n");
     fprintf(stderr, "    log=name    => set log file name\n");
+    fprintf(stderr, "    dropvh      => drop VH? records from data stream\n");
     fprintf(stderr, "    -bd         => run in the background\n");
     fprintf(stderr, "\n");
     exit(1);
@@ -47,6 +49,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     }
     cfg->site = NULL;
     cfg->port = -1;
+    cfg->dropvh = FALSE;
     memset(cfg->q330HostArgstr, 0, sizeof(cfg->q330HostArgstr));
 
 /*  Get command line arguments  */
@@ -84,6 +87,10 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
         } else if (strncmp(argv[i], "log=", strlen("log=")) == 0) {
 
             log = argv[i] + strlen("log=");
+
+        } else if (strcmp(argv[i], "dropvh") == 0) {
+
+            cfg->dropvh = TRUE;
 
         } else if (strcmp(argv[i], "-bd") == 0) {
 
@@ -149,6 +156,10 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 /* Initialize the exit facility */
 
     InitExit(cfg);
+
+/* Initialize the callback facility */
+
+    InitCallbacks(cfg);
 
     // dump config for review
     /* PrintISI330Config(cfg); */

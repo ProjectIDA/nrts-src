@@ -6,6 +6,12 @@
 #include <libclient.h>
 #include "isi330.h"
 
+static ISI330_CONFIG *lcfg = NULL;
+
+void InitCallbacks(ISI330_CONFIG *cfg) {
+    lcfg = cfg;
+}
+
 void isi330_miniseed_callback(pointer p)
 {
     static char* fid = "isi330_miniseed_callback";
@@ -23,6 +29,10 @@ void isi330_miniseed_callback(pointer p)
 
     if (msp->chan_number == 0xFF) LogMsg("DP STATISTICS\n");
 
+    /* Don't pass VH? channels through if unwanted */
+    if (lcfg->dropvh && (strncmp(msp->channel, "VH", 2) == 0)) return;
+
+
     /* LogMsg("LIB330 CALLBACK (MINISEED): with pointer %p; %s %s-%s (sr: %d)\n", */
     /*         p, msp->station, msp->channel, msp->location msp->rate); */
     /* LogMsg("            station_name: %s", msp->station_name); */
@@ -30,8 +40,8 @@ void isi330_miniseed_callback(pointer p)
     /* LogMsg("   chan_number (token #): %u", msp->chan_number); */
     /* LogMsg("                 channel: %s", msp->channel); */
     /* LogMsg("                    rate: %d", msp->rate); */
-//  LogMsg("             cl_session: %lu", msp->cl_session);
-//  LogMsg("               cl_offset: %f", msp->cl_offset);
+    //  LogMsg("             cl_session: %lu", msp->cl_session);
+    //  LogMsg("               cl_offset: %f", msp->cl_offset);
     /* LogMsg("               timestamp: %f", msp->timestamp); */
     /* LogMsg("             filter_bits: %u", msp->filter_bits); */
     /* LogMsg("            packet_class: %s [%u]", */
@@ -57,15 +67,15 @@ void isi330_miniseed_callback(pointer p)
                 LogMsg("ERROR Unpacking MINISEED Record\n");
                 break;
             }
+
             /* LogMsg("Unpacked miniseed info: %s %s-%s (nsamp: %d, nsint: %lld, sr: %g)\n", */
             /*         mseed.hdr.staid, mseed.hdr.chnid, mseed.hdr.locid, mseed.hdr.nsamp, mseed.hdr.nsint, */
             /*         1e9 / (UINT32)mseed.hdr.nsint ); */
 
-            /* if (mseed512ToIDA1012(mseed, ida1012) == NULL) { */
-            /*     fprintf(stderr, "%s: mseed512ToIDA1012: %s\n", argv[0], strerror(errno)); */
-            /*     exit(1); */
-            /* } */
-            FlushRecord((UINT8 *)msp->data_address);
+            /* Don't pass VH? channels through if unwanted */
+            if ((!lcfg->dropvh) || (strncmp(msp->channel, "BH1", 3) != 0)) {
+                FlushRecord((UINT8 *)msp->data_address);
+            }
 
             break;
         case PKC_EVENT: break;

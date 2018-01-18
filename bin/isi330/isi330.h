@@ -83,8 +83,9 @@ typedef struct {
 
 
 typedef struct {
-    char *site;           /* Disk Loop Name */
-    char *cfgpath;        /* Q330 configuration file */
+    char *site;               /* Disk Loop Name */
+    char *cfgpath;            /* Q330 configuration file */
+    bool dropvh;              /* drop vh flag, passed on command line */
     char q330HostArgstr[255]; /* cmd line q330 host:dp parameter as passed */
     ISI330_Q330 *q330;
     LOGIO *lp;
@@ -108,12 +109,10 @@ typedef struct thread_params {
 BOOL BackGround(ISI330_CONFIG *cfg);
 
 /* callbacks.c */
+void InitCallbacks(ISI330_CONFIG *cfg);
 void isi330_state_callback(pointer p);
 void isi330_msg_callback(pointer p);
 void isi330_miniseed_callback(pointer p);
-
-/* convert.c */
-void OneSecPacketToMSEED_RECORD(MSEED_HANDLE *handle, MSEED_RECORD *dest, tonesec_call *src);
 
 /* exit.c */
 void GracefulExit(INT32 status);
