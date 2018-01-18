@@ -34,8 +34,7 @@ char *staid, *netid, netidbuf[MSEED_NNAMLEN+1];
     dest->hdr.asint = 0; // no "actual" sint since no drift available (unless cl_offset is it)
 
 /* station and network names are either as-is from the data or user specified via the handle */
-
-    staid = (handle->staid != NULL) ? handle->staid : src->station_name + 3; /* skip over NN- */
+    staid = (handle->staid != NULL) ? handle->staid : (src->station_name + 3); /* skip over NN- */
     netid = (handle->netid != NULL) ? handle->netid : ExtractNetid(src->station_name, netidbuf);
 
     strncpy(dest->hdr.staid, staid, MSEED_SNAMLEN);
@@ -56,6 +55,7 @@ char *staid, *netid, netidbuf[MSEED_NNAMLEN+1];
     dest->hdr.flags.act = src->activity_flags;
     dest->hdr.flags.ioc = src->io_flags;
     dest->hdr.flags.dat = src->data_quality_flags;
+    dest->hdr.format = MSEED_FORMAT_INT_32;
     mseedCopyINT32(dest->dat.int32, src->samples, dest->hdr.nsamp);
 
     mseedSetEndtime(&dest->hdr);

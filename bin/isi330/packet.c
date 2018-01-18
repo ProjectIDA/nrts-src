@@ -14,8 +14,8 @@ static ISI_PUSH *ph = NULL;
 void FlushRecord(UINT8 *rawmseed)
 {
     static char *fid = "FlushRecord";
-UINT8 ida1012[IDA10_FIXEDRECLEN];
-static BOOL FirstRecord = TRUE;
+    UINT8 ida1012[IDA10_FIXEDRECLEN];
+    static BOOL FirstRecord = TRUE;
 
     if (rawmseed == NULL) return;
 

@@ -111,9 +111,6 @@ BOOL BackGround(ISI330_CONFIG *cfg);
 void isi330_state_callback(pointer p);
 void isi330_msg_callback(pointer p);
 void isi330_miniseed_callback(pointer p);
-void isi330_one_second_callback(pointer p);
-void SetMSEEDHandle(MSEED_HANDLE *h);
-void mseed_callback(void *unused, MSEED_PACKED *packed);
 
 /* convert.c */
 void OneSecPacketToMSEED_RECORD(MSEED_HANDLE *handle, MSEED_RECORD *dest, tonesec_call *src);

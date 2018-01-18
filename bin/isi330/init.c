@@ -142,14 +142,6 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
     LoadQ330Host(cfg, q330cfg);
 
-    /* Init mseed handle for mseed library packet builder queue */
-
-    if ((mshandle = mseedCreateHandle(cfg->lp, DEFAULT_MSEED_RECLEN, DEFAULT_MSEED_QCODE, DEFAULT_MSEED_SEQNO, mseed_callback, NULL)) == NULL) {
-        perror("ERROR: mseedCreateHandle");
-        return FALSE;
-    }
-
-
 /* Start signal handling thread */
 
     StartSignalHandler();

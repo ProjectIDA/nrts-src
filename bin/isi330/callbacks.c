@@ -6,69 +6,9 @@
 #include <libclient.h>
 #include "isi330.h"
 
-static MSEED_HANDLE *mshandle = NULL;
-
-void SetMSEEDHandle(MSEED_HANDLE *h) {
-    mshandle = h;
-}
-
-void mseed_callback(void *unused, MSEED_PACKED *packed)
-{
-    // MSEED_RECORD mseed;
-
-    // if (!mseedUnpackRecord(&mseed, (UINT8 *)packed)) {
-    //     LogMsg("ERROR Unpacking MINISEED Record\n");
-    //     break;
-    // }
-
-    FlushRecord((UINT8 *)packed);
-
-    free(packed); /* don't forget to free! */
-}
-
-
-void isi330_one_second_callback(pointer p)
-{
-    static char *fid = "isi33_one_second_callback";
-    tonesec_call *ponesec;
-    MSEED_RECORD mseed;
-
-    /* LogMsg("%s: called\n", fid); */
-
-    if ((ponesec = (tonesec_call *)p) == NULL) {
-        LogMsg("%s: NULL pointer received.\n", fid);
-        return;
-    }
-
-    OneSecPacketToMSEED_RECORD(mshandle, &mseed, ponesec);
-
-    if (!mseedAddRecordToHandle(mshandle, &mseed)) {
-        LogMsg("*** ERROR *** %s: mseedAddRecordToHandle: %s", fid, strerror(errno));
-        return;
-    }
-
-
-
-    /* LogMsg("%s:         total_size: %u\n", fid, ponesec->total_size); */
-    /* LogMsg("%s:       station_name: %s\n", fid, ponesec->station_name); */
-    /* LogMsg("%s:           location: %s\n", fid, ponesec->location); */
-    /* LogMsg("%s:        chan_number: %hhu\n", fid, ponesec->chan_number); */
-    /* LogMsg("%s:            channel: %s\n", fid, ponesec->channel); */
-    /* LogMsg("%s:               rate: %d\n", fid, ponesec->rate); */
-    /* LogMsg("%s:         cl_session: %lu\n", fid, ponesec->cl_session); */
-    /* LogMsg("%s:          cl_offset: %lg\n", fid, ponesec->cl_offset); */
-    /* LogMsg("%s:          timestamp: %f\n", fid, ponesec->timestamp); */
-    /* LogMsg("%s:        filter_bits: %hu\n", fid, ponesec->filter_bits); */
-    /* LogMsg("%s:          qual_perc: %hu\n", fid, ponesec->qual_perc); */
-    /* LogMsg("%s:     activity_flags: %hu\n", fid, ponesec->activity_flags); */
-    /* LogMsg("%s:           io_flags: %hu\n", fid, ponesec->io_flags); */
-    /* LogMsg("%s: data_quality_flags: %hu\n", fid, ponesec->data_quality_flags); */
-    /* LogMsg("%s:        src_channel: %u\n", fid, ponesec->src_channel); */
-    /* LogMsg("%s:        src_subchan: %u\n", fid, ponesec->src_subchan); */
-}
-
 void isi330_miniseed_callback(pointer p)
 {
+    static char* fid = "isi330_miniseed_callback";
     tminiseed_call *msp;
     char buf[256];
     MSEED_RECORD mseed;
@@ -76,7 +16,12 @@ void isi330_miniseed_callback(pointer p)
 
     msp = (tminiseed_call *)p;
 
-    if (msp->chan_number == 0xFF) LogMsg("\nDP STATISTICS\n");
+    if (msp == NULL) {
+        LogMsg("%s: lib330 miniseed callback called with NULL pointer.\n", fid);
+        return;
+    }
+
+    if (msp->chan_number == 0xFF) LogMsg("DP STATISTICS\n");
 
     /* LogMsg("LIB330 CALLBACK (MINISEED): with pointer %p; %s %s-%s (sr: %d)\n", */
     /*         p, msp->station, msp->channel, msp->location msp->rate); */

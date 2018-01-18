@@ -86,12 +86,12 @@ BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db)
     cfg->q330->tpc.opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_AUXMSG | VERB_PACKET;
     cfg->q330->tpc.opt_verbose = VERB_RETRY | VERB_REGMSG | VERB_AUXMSG;
     cfg->q330->tpc.opt_zoneadjust = 1;        // no need, on UTC
-    cfg->q330->tpc.opt_secfilter = OSF_ALL;         // not using 1-sec callback
+    cfg->q330->tpc.opt_secfilter = OSF_ALL;   // no callback specified, not using 1-sec callback
     cfg->q330->tpc.opt_client_msgs = 10;      // set to min, NOT SURE HOW THIS IS USED
     cfg->q330->tpc.opt_minifilter = OMF_ALL;  // send all messages
     cfg->q330->tpc.opt_aminifilter = 0;       // disabling, I think...
     cfg->q330->tpc.opt_compat = 0;            // using flag bits in tokens
-    cfg->q330->tpc.amini_exponent = 12;        // not using 'archival' ms, but set to 512 byte records
+    cfg->q330->tpc.amini_exponent = 12;       // not using 'archival' ms, but set to 512 byte records
     cfg->q330->tpc.amini_512highest = 20;     // 40hz, but not relevant
     cfg->q330->tpc.mini_embed = 1;            // embed calibration and event blockettes in miniseed
     cfg->q330->tpc.mini_separate = 0;         // generate sSEPARATE mniniseed records for cal and event blockettes
@@ -101,7 +101,7 @@ BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db)
     cfg->q330->tpc.resp_err = LIBERR_NOERR;
     cfg->q330->tpc.call_state = isi330_state_callback;         // state change callback??? Will probably want this
     cfg->q330->tpc.call_messages = isi330_msg_callback;      // message callback, will want this later
-    cfg->q330->tpc.call_secdata = isi330_one_second_callback;       // 1-sec data callback;
+    cfg->q330->tpc.call_secdata = NULL;       // not using 1-sec data callback;
     cfg->q330->tpc.call_lowlatency = NULL;    // NYI
     cfg->q330->tpc.call_baler = NULL;         // not using
     cfg->q330->tpc.file_owner = NULL;         // until better understood. Used in libsupport
