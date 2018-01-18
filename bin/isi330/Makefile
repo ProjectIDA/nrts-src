@@ -45,7 +45,6 @@ OBJS  = ReleaseNotes.o
 OBJS += bground.o
 OBJS += main.o
 OBJS += callbacks.o
-OBJS += convert.o
 OBJS += q330.o
 OBJS += exit.o
 OBJS += init.o
