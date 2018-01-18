@@ -94,7 +94,7 @@
 #ifndef leap_year
 #define leap_year(i) ((i % 4 == 0 && i % 100 != 0) || i % 400 == 0)
 #endif
- 
+
 #ifndef daysize
 #define daysize(i) (365 + leap_year(i))
 #endif
@@ -106,7 +106,7 @@ static char daytab[2][13] = {
 
 static char *month_name[] = {
     "   ", /* cause we increment it after gmtime_r() */
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
@@ -175,7 +175,7 @@ static char *fid = "utilAttodt";
     ntoken = utilParse(copy, token, "-/.:(),; ", 6, 0);
 
     yr = hr = mn = sc = ms = 0; da = 1;
-        
+
 /* Check for special case where string is of the form "year/mo/dom hr:mn:sc" */
 
     if (strlen(string) == strlen(special_case) && string[4] == '/' && string[7] == '/') {
@@ -218,7 +218,7 @@ static char *fid = "utilAttodt";
     if (mn < 0 || mn >  59) ++errors;
     if (sc < 0 || sc >  59) ++errors;
     if (ms < 0 || ms > 999) ++errors;
-    
+
     if (errors) {
         errno = EINVAL;
         return -2.0;
@@ -324,7 +324,7 @@ static char mtunsafe[] = "xxxxxxxxxxxxxxxxxxxxxxxxx plus some extra";
             sprintf((char *) buf,"%04d%03d %s %d, %04d %02d:%02d:%02d", tm.tm_year, tm.tm_yday, month_name[tm.tm_mon], tm.tm_mday, tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec);
             break;
 
-        default: 
+        default:
             return UnsupportedCode;
     }
 
@@ -453,7 +453,7 @@ INT64 days = 0, secs;
     } else if (year < SAN_EPOCH_YEAR) {
         while (year < SAN_EPOCH_YEAR) { days -= ISLEAP(year) ? 366 : 365; year++; };
     }
-    days += (day-1); 
+    days += (day-1);
 
     secs = (days * 86400) + (hr * 3600) + (mn * 60) + sc;
     return (secs * NANOSEC_PER_SEC) + ns;
@@ -484,7 +484,7 @@ VOID utilJdtomd(int year, int day, int *m_no, int *d_no)
 int i, leap;
 
     leap = leap_year(year);
-    
+
     for (i = 1; day > daytab[leap][i]; i++) day -= daytab[leap][i];
 
     *m_no = i;
@@ -610,7 +610,7 @@ INT64 sec, frac, nsec;
 
     sec = (INT64) tstamp - SAN_EPOCH_TO_1970_EPOCH;
     frac = (tstamp - (double) ((INT64) tstamp)) * (double) NANOSEC_PER_SEC;
-    nsec = (sec * NANOSEC_PER_SEC) + frac; 
+    nsec = (sec * NANOSEC_PER_SEC) + frac;
 
     return nsec;
 }
@@ -631,9 +631,9 @@ INT64 utilConvertFrom2000SecsTo1999Nsec(double tstamp)
 {
 INT64 sec, frac, nsec;
 
-    sec = (INT64) tstamp - SAN_EPOCH_TO_1970_EPOCH;
+    sec = (INT64) tstamp - SAN_EPOCH_TO_2000_EPOCH;
     frac = (tstamp - (double) ((INT64) tstamp)) * (double) NANOSEC_PER_SEC;
-    nsec = (sec * NANOSEC_PER_SEC) + frac; 
+    nsec = (sec * NANOSEC_PER_SEC) + frac;
 
     return nsec;
 }
