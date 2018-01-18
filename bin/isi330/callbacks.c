@@ -72,10 +72,7 @@ void isi330_miniseed_callback(pointer p)
             /*         mseed.hdr.staid, mseed.hdr.chnid, mseed.hdr.locid, mseed.hdr.nsamp, mseed.hdr.nsint, */
             /*         1e9 / (UINT32)mseed.hdr.nsint ); */
 
-            /* Don't pass VH? channels through if unwanted */
-            if ((!lcfg->dropvh) || (strncmp(msp->channel, "BH1", 3) != 0)) {
-                FlushRecord((UINT8 *)msp->data_address);
-            }
+            FlushRecord((UINT8 *)msp->data_address);
 
             break;
         case PKC_EVENT: break;
