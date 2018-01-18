@@ -1,7 +1,11 @@
-char *VersionIdentString = "Release 0.9.1";
+char *VersionIdentString = "Release 0.9.8";
 
 /* Release Notes */
 /*
+
+0.9.8   2018-01-17 dauerbach
+        Added 'dropvh' option
+        ms data wrapped in ida10 and pushed to isi disk loop in lib330 miniseed callback
 
 0.9.1   2018-01-11 dauerbach
         change logging init to use lowercase site/station id
