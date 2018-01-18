@@ -1,4 +1,4 @@
-#pragma ident "$Id: util.h,v 1.64 2017/10/04 23:53:38 dechavez Exp $"
+#pragma ident "$Id: util.h,v 1.65 2018/01/18 02:43:44 dauerbach Exp $"
 /*======================================================================
  *
  *  Defines, data structures, and function prototypes for use
@@ -602,6 +602,9 @@ char *utilVersionString(VOID);
 /* Revision History
  *
  * $Log: util.h,v $
+ * Revision 1.65  2018/01/18 02:43:44  dauerbach
+ * add utilConvertFrom2000SecsTo1999Nsec, and req'd constants, to libutil
+ *
  * Revision 1.64  2017/10/04 23:53:38  dechavez
  * deleted some trailing spaces
  *

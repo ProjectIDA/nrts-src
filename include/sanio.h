@@ -1,4 +1,4 @@
-#pragma ident "$Id: sanio.h,v 1.18 2006/11/10 05:46:45 dechavez Exp $"
+#pragma ident "$Id: sanio.h,v 1.19 2018/01/18 02:43:44 dauerbach Exp $"
 /*======================================================================
  *
  *  SANIO library include file.
@@ -436,6 +436,9 @@ BOOL sanioSendTimeout(SAN_HANDLE *san, int timeout, UINT8 *buf);
 /* Revision History
  *
  * $Log: sanio.h,v $
+ * Revision 1.19  2018/01/18 02:43:44  dauerbach
+ * add utilConvertFrom2000SecsTo1999Nsec, and req'd constants, to libutil
+ *
  * Revision 1.18  2006/11/10 05:46:45  dechavez
  * defined SANIO_TT_TYPE_NMEA and SANIO_TT_TYPE_TSIP constants
  *

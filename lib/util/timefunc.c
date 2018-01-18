@@ -1,4 +1,4 @@
-#pragma ident "$Id: timefunc.c,v 1.29 2015/08/24 19:13:48 dechavez Exp $"
+#pragma ident "$Id: timefunc.c,v 1.30 2018/01/18 02:43:44 dauerbach Exp $"
 /*======================================================================
  *
  *  Misc. time related functions.
@@ -641,6 +641,9 @@ INT64 sec, frac, nsec;
 /* Revision History
  *
  * $Log: timefunc.c,v $
+ * Revision 1.30  2018/01/18 02:43:44  dauerbach
+ * add utilConvertFrom2000SecsTo1999Nsec, and req'd constants, to libutil
+ *
  * Revision 1.29  2015/08/24 19:13:48  dechavez
  * introduced utilYearDay()
  *
