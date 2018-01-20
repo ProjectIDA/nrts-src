@@ -1,7 +1,12 @@
-char *VersionIdentString = "Release 0.9.8";
+char *VersionIdentString = "Release 1.0.0";
 
 /* Release Notes */
 /*
+
+1.0.0   2018-01-19 dauerbach
+        Update call to mseed512toIDA1012 to include serial number
+        Pass netname and sta to mseed512toIDA1012 to override data when not null
+        link with enhanced IDA 10.12 format definition (ida10 version 2.25.0)
 
 0.9.8   2018-01-17 dauerbach
         Added 'dropvh' option
