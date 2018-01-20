@@ -1,5 +1,5 @@
 /*======================================================================
-#pragma ident "$Id: ida10.h,v 1.58 2017/10/20 01:30:53 dauerbach Exp $"
+#pragma ident "$Id: ida10.h,v 1.59 2018/01/18 23:29:35 dechavez Exp $"
  *
  *  IDA rev 10 include file.
  *
@@ -59,8 +59,9 @@ extern "C" {
 #define IDA10_FIXEDHDRLEN   64 /* fixed header length */
 #define IDA10_DEFDATALEN   960 /* default data length */
 #define IDA10_FIXEDRECLEN (IDA10_FIXEDHDRLEN + IDA10_DEFDATALEN)
-#define IDA10_CNAMLEN        6 /* max channel name length (less NULL)  */
-#define IDA10_SNAMLEN        6 /* max station name length (less NULL)  */
+#define IDA10_CNAMLEN        6 /* max channel name length (less NULL) */
+#define IDA10_SNAMLEN        6 /* max station name length (less NULL) */
+#define IDA10_NNAMELEN       2 /* max network name length (less NULL) */
 
 /* The following is used for implementation convenience.  It is not
  * part of the IDA 10.x format specification.  Increase as desired
@@ -107,6 +108,7 @@ extern "C" {
 #define IDA10_TIMER_IDA9    4
 #define IDA10_TIMER_OBS     5
 #define IDA10_TIMER_OBS2    6
+#define IDA10_TIMER_SEED    7
 
 /* SAN time tag */
 
@@ -215,6 +217,18 @@ typedef struct {
     IDA10_SBDHDR sbd; /* SBD header excerpt */
 } IDA10_OBSTAG2;
 
+/* Timetag pulled from SEED FSDH and blockette 1001 */
+
+typedef struct {
+    UINT64 tstamp;  /* nanoseconds since 1/1/1999 */
+    struct {
+        INT8 percent;  /* blockette 1001 percentage, or -1 */
+#define IDA10_TT_SEED_LOCKED     0x01
+#define IDA10_TT_SEED_SUSPICIOUS 0x02
+        UINT8 bitmap;  /* status bitmap */
+    } status;
+} IDA10_SEEDTAG;
+
 /* Device independent clock status */
 
 typedef struct {
@@ -227,7 +241,7 @@ typedef struct {
     int  percent;   /* if positive then GPS clock quality as a percentage */
 } IDA10_CLOCK_STATUS;
 
-/* 10.[0-11] time tag  */
+/* 10.[0-13] time tag  */
 
 #define Q330_TO_SAN_EPOCH (QDP_EPOCH_TO_1970_EPOCH - SAN_EPOCH_TO_1970_EPOCH)
 
@@ -239,6 +253,7 @@ typedef struct {
     IDA10_GENTAG gen;   /* raw data from generic time tag */
     IDA10_OBSTAG obs;   /* raw data from OBS time tag */
     IDA10_OBSTAG2 obs2; /* raw data from OBS time tag, including filter delay */
+    IDA10_SEEDTAG seed; /* raw data from SEED FSDH + blockette 1001 */
     IDA_TIME_TAG ida9;  /* raw data from IDA9 time tag */
     /* the following are derived from the raw data above */
     UINT64 ext;    /* external time in nanosec since SAN epoch (1999) */
@@ -260,7 +275,7 @@ typedef struct {
     UINT32 flags;
 } IDA10_TTAG_HISTORY;
 
-/* 10.[0-11] common header */
+/* 10.[0-12] common header */
 
 #define IDA10_PREAMBLE_LEN        4
 #define IDA10_SUBFORMAT_0_HDRLEN  50
@@ -287,13 +302,13 @@ typedef struct {
 #define IDA108_RESERVED_BYTES (IDA105_RESERVED_BYTES - 8)
 #define IDA1010_RESERVED_BYTES 2
 #define IDA1011_RESERVED_BYTES 2
-#define IDA1012_RESERVED_BYTES 20
+#define IDA1012_RESERVED_BYTES 11
 
 #define IDA105_SNAME_LEN 4
 #define IDA105_NNAME_LEN 2
 #define IDA108_SNAME_LEN IDA105_SNAME_LEN
 #define IDA108_NNAME_LEN IDA105_NNAME_LEN
-#define IDA1012_SNAME_LEN IDA108_SNAME_LEN
+#define IDA1012_SNAME_LEN 5
 #define IDA1012_NNAME_LEN IDA108_NNAME_LEN
 
 /* The following have meaning only for TS records */
@@ -572,6 +587,9 @@ VERSION *ida10Version(VOID);
 /* Revision History
  *
  * $Log: ida10.h,v $
+ * Revision 1.59  2018/01/18 23:29:35  dechavez
+ * reworked IDA10.12 support (new definition includes serialno, SEED_TAG and longer sname)
+ *
  * Revision 1.58  2017/10/20 01:30:53  dauerbach
  * added support for IDA 10.12 MSEED 512-byte payloads
  * removed include of liss.h

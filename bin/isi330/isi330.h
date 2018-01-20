@@ -90,6 +90,7 @@ typedef struct {
     ISI330_Q330 *q330;
     LOGIO *lp;
     char netname[ISI_NETLEN + 1];
+    char sta[ISI_STALEN + 1];
     char server[MAXPATHLEN+1];
     int port;
 } ISI330_CONFIG;
@@ -144,7 +145,7 @@ void StartQ330Reader(ISI330_CONFIG *cfg);
 void ShutdownQ330Reader(ISI330_CONFIG *cfg);
 
 /* packet.c */
-void StartRecordPusher(char *server, int port, LOGIO *lp, int depth, char *sname, char *nname);
+void StartRecordPusher(ISI330_CONFIG *cfg, int depth);
 void FlushRecord(UINT8 *rawmseed);
 
 /* signals.c */

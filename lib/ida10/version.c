@@ -1,4 +1,4 @@
-#pragma ident "$Id: version.c,v 1.58 2017/10/20 00:10:02 dauerbach Exp $"
+#pragma ident "$Id: version.c,v 1.59 2018/01/18 23:31:20 dechavez Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,9 +6,15 @@
  *====================================================================*/
 #include "ida10.h"
 
-static VERSION version = {2, 24, 0};
+static VERSION version = {2, 25, 0};
 
 /* ida10 library release notes
+
+2.25.0 01/18/2018
+       ida10.txt reworked IDA10.12 definition to include serial number, SEED_TAG, and longer station name
+       ida10.h:  changes to support rework of IDA10.12 definition
+       ttag.c:   IDA10_TIMER_SEED support (part of IDA10.12 redefinition)
+       unpack.c: changes to support rework of IDA10.12 definition
 
 2.24.0 10/19/2017
        Makefile  Removed pack.c from build since not referenced anywhere. Leaving source code here for now.

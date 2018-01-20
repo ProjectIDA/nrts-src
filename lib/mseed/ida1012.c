@@ -1,4 +1,4 @@
-#pragma ident "$Id: ida1012.c,v 1.3 2018/01/13 00:58:39 dechavez Exp $"
+#pragma ident "$Id: ida1012.c,v 1.4 2018/01/18 23:37:37 dechavez Exp $"
 /*======================================================================
  *
  *  Convert a 512-byte MiniSEED record to 1024-byte IDA10.12
@@ -12,27 +12,29 @@
 #include "mseed.h"
 #include "util.h"
 
-#define IDA1012_SNAME_LEN     4
-#define IDA1012_NNAME_LEN     2
-#define IDA1012_CNAME_LEN     6
+#define tIDA1012_SNAME_LEN     5
+#define tIDA1012_NNAME_LEN     2
+#define tIDA1012_CNAME_LEN     6
 #define tIDA10_FIXEDHDRLEN    64
 #define tIDA10_FIXED_NBYTES  974
 #define tIDA10_FIXED_RECLEN 1024
 #define tIDA10_COMP_NONE       0
 #define tIDA10_EPOCH_TO_1970_EPOCH 915148800
+#define tIDA10_TT_SEED_LOCKED     0x01
+#define tIDA10_TT_SEED_SUSPICIOUS 0x02
+#define tIDA1012_RESERVED_BYTES 11
 
 #define FSDH_SNAME_OFFSET  8
 #define FSDH_NNAME_OFFSET 18
 
-UINT8 *mseed512ToIDA1012(UINT8 *mseed512, UINT8 *dest, char *sname, char *nname)
+UINT8 *mseed512ToIDA1012(UINT8 *mseed512, UINT8 *dest, char *sname, char *nname, UINT64 serialno)
 {
 char *ptr;
 int srfact, srmult;
 char chnloc[MSEED_CHNLOCLEN+1];
 char staid[MSEED_SNAMLEN+1];
 char netid[MSEED_NNAMLEN+1];
-UINT8 clock_stat;
-UINT32 timestamp;
+UINT8 clockbitmap = 0;
 MSEED_RECORD mseed;
 
     if (mseed512 == NULL || dest == NULL) {
@@ -65,26 +67,27 @@ MSEED_RECORD mseed;
 
     mseedChnLocToChnloc(mseed.hdr.chnid, mseed.hdr.locid, chnloc); util_lcase(chnloc);
     mseedNsintToFactMult(mseed.hdr.nsint, &srfact, &srmult);
-    clock_stat = (mseed.hdr.flags.ioc & (1 << 5)) ? 1 : 0;
-    timestamp = (UINT32) time(NULL) - tIDA10_EPOCH_TO_1970_EPOCH;
+    if (mseed.hdr.flags.ioc & MSEED_IOC_CLOCK_LOCKED) clockbitmap |= tIDA10_TT_SEED_LOCKED;
+    if (mseed.hdr.flags.dat & MSEED_DAT_TIME_SUSPECT) clockbitmap |= tIDA10_TT_SEED_SUSPICIOUS;
 
     memset(dest, 0x00, tIDA10_FIXED_RECLEN);
     ptr = dest;
     ptr += utilPackBytes(ptr, (UINT8 *) "TS", 2);
     *ptr++ = 10;
     *ptr++ = 12;
-    ptr += utilPackBytes(ptr, (UINT8 *) staid, IDA1012_SNAME_LEN);
-    ptr += utilPackBytes(ptr, (UINT8 *) netid, IDA1012_NNAME_LEN);
+    ptr += utilPackUINT64(ptr, serialno);
+    ptr += utilPackBytes(ptr, (UINT8 *) staid, tIDA1012_SNAME_LEN);
+    ptr += utilPackBytes(ptr, (UINT8 *) netid, tIDA1012_NNAME_LEN);
     ptr += utilPackUINT64(ptr, mseed.hdr.tstamp);
-    ptr++; /* skipping device clock specific status */
-    *ptr++ = clock_stat;
+    *ptr++ = mseed.hdr.tqual;
+    *ptr++ = clockbitmap;
     ptr += utilPackUINT32(ptr, mseed.hdr.seqno);
-    ptr += utilPackUINT32(ptr, timestamp);
-    ptr += 20;  /* skipping reserved portion of header */
+    ptr += 4; /* skip host time stamp (DL writer will insert that) */
+    ptr += tIDA1012_RESERVED_BYTES;  /* skipping reserved portion of header */
     ptr += utilPackUINT16(ptr, tIDA10_FIXED_NBYTES);
 
-    ptr += utilPackBytes(ptr, chnloc, IDA1012_CNAME_LEN);
-    *ptr++ = tIDA10_COMP_NONE; /* data format not used for IDA10.12 MSEED payloads */
+    ptr += utilPackBytes(ptr, chnloc, tIDA1012_CNAME_LEN);
+    *ptr++ = 0; /* data format not used for IDA10.12 MSEED payloads */
     *ptr++ = 1; /* gain */
     ptr += utilPackUINT16(ptr, mseed.hdr.nsamp);
     ptr += utilPackINT16(ptr, srfact);
@@ -135,6 +138,9 @@ MSEED_RECORD mseed;
 
 /* Revision History
  * $Log: ida1012.c,v $
+ * Revision 1.4  2018/01/18 23:37:37  dechavez
+ * reworked mseed512ToIDA1012() to support updated IDA10.12 definition
+ *
  * Revision 1.3  2018/01/13 00:58:39  dechavez
  * added optional replacement of station and network code in the MiniSeed and
  * IDA10.12 headers with app supplied values

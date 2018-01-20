@@ -1,7 +1,7 @@
-$Id: ida10.txt,v 1.3 2017/11/02 21:00:43 dechavez Exp $
+$Id: ida10.txt,v 1.5 2018/01/18 23:26:19 dechavez Exp $
 
                       IDA REV 10 DATA PACKET FORMAT
-                      Last modified: October 19, 2017
+                      Last modified: January 18, 2018
 
 The description below refers to the following data types:
 
@@ -15,11 +15,12 @@ UINT8   - unsigned 8-bit integer
 BYTE    - an 8-bit quantity
 CHAR    - ascii character
 
-TIMETAG - 22 byte time tag specific to the SAIC SAN20xx digitizer (aka MK8)
-OFISTAG - 22 byte time tag specific to the IGPP femtometer
-Q330TAG - 24 byte time tag specific to the Quanterra Q330 digitizer
-GENTAG  - 10 byte general purpose time tag
-OBSTAG  - 34 byte time tag specific to ADDOSS OBS digitizer
+TIMETAG   - 22 byte time tag specific to the SAIC SAN20xx digitizer (aka MK8)
+OFISTAG   - 22 byte time tag specific to the IGPP femtometer
+Q330TAG   - 24 byte time tag specific to the Quanterra Q330 digitizer
+GENTAG    - 10 byte general purpose time tag
+OBSTAG    - 34 byte time tag specific to ADDOSS OBS digitizer
+SEEDTAG   - 10 byte time tag derived from MiniSeed
 
 =======
 TIMETAG
@@ -95,7 +96,7 @@ This is the SAN20xx's best GUESS at the "true" external time associated
 with the system time.  If the status indicates that the clock is locked
 and working, then it is in fact the true external time.  However, if the
 GPS time is unavailable, or suspect, then the SAN20xx attempts to
-infer true epoch time by consulting time history information stored in 
+infer true epoch time by consulting time history information stored in
 NVRAM.  If such time history is unavailable, then the epoch time field
 will be zero.
 
@@ -200,7 +201,7 @@ This can be either a positive or negative quantity.
 lock time
 ---------
 Minutes since the clock has been unlocked.  This is taken from the most
-recent DT_DATA packet which contains the 0x98 blockette with the offsets. 
+recent DT_DATA packet which contains the 0x98 blockette with the offsets.
 The Quanterra documentation refers to this parameter as the "loss" (as well
 as incorrectly describing it as minutes since the clock has been locked).
 
@@ -229,7 +230,7 @@ result of that calculation.
 ======
 GENTAG
 ======
-The GENTAG is a general purpose time tag, useful for converting data from 
+The GENTAG is a general purpose time tag, useful for converting data from
 other formats which lack the foresight of decoupling GPS and system time
 (MiniSEED, for example)
 
@@ -321,6 +322,21 @@ SBD header
 Header info associated with the SBD frame that delivered these data.  Note
 that a single SBD message can contain multiple OBS frames.
 
+=======
+SEEDTAG
+=======
+The SEEDTAG is a timetag containing derived from the SEED FSDH
+header and blockette 1001 (if present)
+
+Offset  Length   Type       Description
+  0       8      UINT64     nanoseconds since January 1, 1999
+  8       1        INT8     if non-negative, blockette 1001 quality percentage
+  9       1       UINT8     clock status bitmap
+
+    bit 0 is the lock status:      1 = locked, else unlocked
+    bit 1 is the suspicious bit    1 = time might be bogus
+    bits 4-7 are reserved and should be set to zero
+
 ===================
 IDA10 COMMON HEADER
 ===================
@@ -364,7 +380,7 @@ Offset  Length   Type       Description
   4       2      UINT16     unit identifier
   6      22      TIMETAG    packet start time
  28      22      TIMETAG    packet end time
- 
+
 unit identifier
 ---------------
 A number that uniquely indentifies the data logger.  This will come
@@ -418,7 +434,7 @@ This is the low order 32 bits of the ISI disk loop sequence number.
 
 host time stamp
 ---------------
-This is the time, expressed as seconds since Jan 1, 1999, when the 
+This is the time, expressed as seconds since Jan 1, 1999, when the
 packet was received at its first hop after leaving the digitizer.  This
 value is the host computer's notion of time and since it is not required
 that the host computer clock be synchronized or disciplined in any way,
@@ -444,7 +460,7 @@ Offset  Length   Type       Description
 =====================
 IDA10.4 COMMON HEADER
 =====================
-The IDA 10.4 common header is used for Q330 data.  It is similar to 
+The IDA 10.4 common header is used for Q330 data.  It is similar to
 10.2 and 10.3 except for the time stamp, and also the unit identifier
 is the much larger 64 bit serial number.
 
@@ -589,17 +605,29 @@ Offset  Length   Type       Description
 IDA10.12 COMMON HEADER
 ======================
 The IDA 10.12 common header is used to indicate encapsulated MiniSeed.
-The header has the same format as 10.8.
 
 Offset  Length   Type       Description
-  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 12)
-  4       4      CHAR       station code (NULL terminated if less than 4 chars)
-  8       2      CHAR       network code (NULL terminated if less than 2 chars)
- 10      10      GENTAG     packet start time
- 20       4      UINT32     sequence number
- 24       4      UINT32     host time stamp
- 28      20      CHAR       reserved
+  0       4      UINT8      IDA10 Common Header (byte at offset 3 == 13)
+  4       8      UINT64     unit identifier
+ 12       5      CHAR       station code (NULL terminated if less than 5 chars)
+ 17       2      CHAR       network code (NULL terminated if less than 2 chars)
+ 19      10      SEEDTAG    packet start time
+ 29       4      UINT32     sequence number
+ 33       4      UINT32     host time stamp
+ 37      11      CHAR       reserved
  48       2      UINT16     number of bytes to follow
+
+unit identifier
+---------------
+The internal serial number of the Q330 which generated the payload (via
+Quanterra's lib330), else 0.
+
+packet start time
+-----------------
+The timestamp in the packet time start is converted directly from the MiniSeed
+begin time.  The status bits are derived from the MiniSeed FSDH I/O+clock and
+data quality status bytes. The time quality percentage, if non-negative comes
+from the Blockette 1001, if present.
 
 =============================
 IDA10.[0-12] TS PACKET FORMAT
@@ -608,7 +636,7 @@ The IDA10.[0-12] TS packet is completely self-contained, and can be unpacked
 without need for external data base references or metaknowledge of any kind.
 
 Offset  Length   Type       Description
-  0      50      CMNHDR     IDA 10.[0-11] common header
+  0      50      CMNHDR     IDA 10.[0-12] common header
  50       6      CHAR       stream name
  56       1      UINT8      data format/status descriptor
  57       1      UINT8      conversion gain
@@ -618,8 +646,8 @@ Offset  Length   Type       Description
  64   variable   UINT8      the data
 
  The data format/status descriptor at offset 56 Does Not Apply for IDA10.12
- data.  The equivalent information is encoded in the FSDH header inside
- the Miniseed payload.  The IDA libida10 library takes care of hiding this.
+ The equivalent information is encoded in the FSDH header inside the
+ Miniseed payload.  The IDA libida10 library takes care of hiding this.
 
 stream name
 ------------
@@ -628,7 +656,7 @@ and decimated output.  This is that name.  This is intended to eliminate
 the need for a "channel map", as is currently the case.  It incorporates
 both the channel and filter pair which is in the current headers.  The
 channel and filter pair, being redundant, is purposely _not_ given here.
-Up to 6 characters are allowed.  This is enough space to implement the 
+Up to 6 characters are allowed.  This is enough space to implement the
 SEED 3+2 (channel id + location id) convention, if desired.
 
 data format/status descriptor
@@ -656,7 +684,7 @@ This is a is a bit mask with the following fields:
 conversion gain
 ---------------
 This is the factor the raw DSP output was multiplied by before
-converting from float to integer. 
+converting from float to integer.
 
 nominal sample rate
 -------------------

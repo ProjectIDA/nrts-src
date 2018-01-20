@@ -1,4 +1,4 @@
-#pragma ident "$Id: main.c,v 1.4 2018/01/13 01:01:15 dechavez Exp $"
+#pragma ident "$Id: main.c,v 1.5 2018/01/18 23:52:31 dechavez Exp $"
 /*======================================================================
  *
  * MiniSEED to IDA10 Conversion Application
@@ -52,7 +52,7 @@ char *myname;
 
     while (mseedReadPackedRecord(stdin, &packed_record)) {
 
-        if (mseed512ToIDA1012(packed_record.data, ida10, sname, nname) == NULL) {
+        if (mseed512ToIDA1012(packed_record.data, ida10, sname, nname, 0) == NULL) {
             fprintf(stderr, "%s: mseed512ToIDA1012: %s\n", argv[0], strerror(errno));
             exit(1);
         }
@@ -99,6 +99,9 @@ char *myname;
 /* Revision History
  *
  * $Log: main.c,v $
+ * Revision 1.5  2018/01/18 23:52:31  dechavez
+ * mseed512ToIDA1012() needs serialno with new IDA10.12 definition, set to 0
+ *
  * Revision 1.4  2018/01/13 01:01:15  dechavez
  * added sta=sname and net=nname overrides of packet header options
  *

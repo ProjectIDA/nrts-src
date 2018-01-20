@@ -50,6 +50,8 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     cfg->site = NULL;
     cfg->port = -1;
     cfg->dropvh = FALSE;
+    memset(cfg->sta, 0, sizeof(cfg->sta));
+    memset(cfg->netname, 0, sizeof(cfg->netname));
     memset(cfg->q330HostArgstr, 0, sizeof(cfg->q330HostArgstr));
 
 /*  Get command line arguments  */
@@ -82,7 +84,11 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
         } else if (strncmp(argv[i], "net=", strlen("net=")) == 0) {
 
-            strcpy(cfg->netname, argv[i] + strlen("net="));
+            strncpy(cfg->netname, argv[i] + strlen("net="), ISI_NETLEN);
+
+        } else if (strncmp(argv[i], "sta=", strlen("sta=")) == 0) {
+
+            strncpy(cfg->sta, argv[i] + strlen("sta="), ISI_STALEN);
 
         } else if (strncmp(argv[i], "log=", strlen("log=")) == 0) {
 
@@ -174,7 +180,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     }
 
     // start record pusher
-    StartRecordPusher(cfg->server, cfg->port, cfg->lp, depth, cfg->site, cfg->netname);
+    StartRecordPusher(cfg,  depth);
 
     // start Q330 readers
     StartQ330Reader(cfg);

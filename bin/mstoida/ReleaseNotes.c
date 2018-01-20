@@ -1,8 +1,10 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.4 2018/01/13 01:02:02 dechavez Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.5 2018/01/18 23:52:47 dechavez Exp $"
 
-char *VersionIdentString = "Release 1.2.0";
+char *VersionIdentString = "Release 1.3.0";
 
 /* Release notes
+
+1.3.0   link with libida10 2.25.0 for updated IDA10.12 definition
 
 1.2.0   added sta=sname and net=nname overrides of packet header options
 

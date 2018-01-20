@@ -1,4 +1,4 @@
-#pragma ident "$Id: unpack.c,v 1.44 2017/10/19 23:49:58 dauerbach Exp $"
+#pragma ident "$Id: unpack.c,v 1.45 2018/01/18 23:31:09 dechavez Exp $"
 /*======================================================================
  *
  *  Unpack various objects into host byte order.
@@ -229,6 +229,20 @@ UINT8 *ptr;
     ptr += utilUnpackINT32(ptr, &obs2->delay);
     ptr += utilUnpackUINT32(ptr, &obs2->ticrate);
     ptr += UnpackSBDHDR(ptr, &obs2->sbd);
+
+    return (int) (ptr - start);
+}
+
+/* Unpack a MiniSeed time tag */
+
+static int UnpackSEEDtag(UINT8 *start, IDA10_SEEDTAG *seed)
+{
+UINT8 *ptr;
+
+    ptr = start;
+    ptr += utilUnpackUINT64(ptr, &seed->tstamp);
+    seed->status.percent = *ptr++;
+    seed->status.bitmap = *ptr++;
 
     return (int) (ptr - start);
 }
@@ -604,27 +618,27 @@ IDA10_TTAG *ttag;
 
 static int UnpackCmnHdr12(UINT8 *start, IDA10_CMNHDR *cmnhdr)
 {
-UINT8 *sname, *nname;
 UINT16 stmp;
 UINT8 *ptr;
 IDA10_TTAG *ttag;
-LISS_PKT pkt;
+char sname[IDA1012_SNAME_LEN+1];
 
     cmnhdr->subformat = IDA10_SUBFORMAT_12;
 
     ptr = &start[4];
     cmnhdr->boxid = IDA10_64BIT_BOXID;
+    ptr += utilUnpackUINT64(ptr, &cmnhdr->serialno);
+    if (cmnhdr->serialno == 0) {
+        ptr += utilUnpackBytes(ptr, sname, IDA1012_SNAME_LEN); sname[IDA1012_SNAME_LEN] = 0;
+        sprintf((char *)&cmnhdr->serialno, "%s", sname);
+    } else {
+        ptr += IDA1012_SNAME_LEN; /* skip over station name */
+    }
+    ptr += IDA1012_NNAME_LEN; /* skip over network code */
 
-/* The IDA10.12 "serial number" is the station name and network code */
-
-    cmnhdr->serialno = 0;
-    sname = (UINT8 *) &cmnhdr->serialno; /* point to start of serialno buffer */
-    nname = sname + IDA1012_SNAME_LEN + 1; /* skip a byte, which will be null, and get ptr to starting loc of NNAME buffer */
-    ptr += utilUnpackBytes(ptr, sname, IDA1012_SNAME_LEN);
-    ptr += utilUnpackBytes(ptr, nname, IDA1012_NNAME_LEN);
-
-    ptr += UnpackGenericTtag(ptr, &cmnhdr->ttag.beg.gen);
-    cmnhdr->ttag.beg.type = IDA10_TIMER_GENERIC;
+    ptr += UnpackSEEDtag(ptr, &cmnhdr->ttag.beg.seed);
+    cmnhdr->ttag.beg.type = IDA10_TIMER_SEED;
+    cmnhdr->ttag.beg.derived = FALSE;
 
     ptr += utilUnpackUINT32(ptr, &cmnhdr->extra.seqno);
     ptr += utilUnpackUINT32(ptr, &cmnhdr->extra.tstamp);
@@ -859,7 +873,7 @@ BOOL ida10UnpackTS(UINT8 *start, IDA10_TS *ts)
 int subformat;
 int i, AvailableDataSpace;
 UINT8 *ptr;
-
+BOOL VariableLengthData = FALSE;
 
     subformat = ida10SubFormatCode(start);
 
@@ -940,6 +954,7 @@ UINT8 *ptr;
       case IDA10_DATA_MSEED512:
         ts->hdr.datatype = UnpackMSEED512(ptr, ts);
         ts->hdr.nbytes = ts->hdr.nsamp * sizeof(INT32);
+        VariableLengthData = TRUE;
 
         break;
 
@@ -950,8 +965,12 @@ UINT8 *ptr;
 
 /* Set the short packet flag */
 
-    AvailableDataSpace = ts->hdr.cmn.nbytes - (IDA10_TSHEADLEN - IDA10_CMNHEADLEN);
-    ts->hdr.unused = AvailableDataSpace - ts->hdr.nbytes;
+    if (VariableLengthData) {
+        ts->hdr.unused = 0;
+    } else {
+        AvailableDataSpace = ts->hdr.cmn.nbytes - (IDA10_TSHEADLEN - IDA10_CMNHEADLEN);
+        ts->hdr.unused = AvailableDataSpace - ts->hdr.nbytes;
+    }
 
 /* Initialize the time stamp increment error memory */
 
@@ -1023,6 +1042,9 @@ UINT8 *ptr;
 /* Revision History
  *
  * $Log: unpack.c,v $
+ * Revision 1.45  2018/01/18 23:31:09  dechavez
+ * changes to support rework of IDA10.12 definition
+ *
  * Revision 1.44  2017/10/19 23:49:58  dauerbach
  * Added support for subformat 10.12 which has mseed 512 records as it's payload
  *

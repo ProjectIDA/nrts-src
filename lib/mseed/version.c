@@ -1,4 +1,4 @@
-#pragma ident "$Id: version.c,v 1.27 2018/01/13 01:00:16 dechavez Exp $"
+#pragma ident "$Id: version.c,v 1.28 2018/01/18 23:37:49 dechavez Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,9 +6,13 @@
  *====================================================================*/
 #include "mseed.h"
 
-static VERSION version = {2, 8, 0};
+static VERSION version = {2, 9, 0};
 
 /* mseed library release notes
+
+2.9.0  01/18/2018
+       mseed.h: updated mseed512ToIDA1012() prototype to include serial number
+       ida1012.c: reworked mseed512ToIDA1012() to support updated IDA10.12 definition
 
 2.8.0  01/12/2018
        mseed.h: updated mseed512ToIDA1012() prototype to include sname and nname arguments

@@ -1,10 +1,13 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.42 2017/10/20 00:18:33 dauerbach Exp $"
+#pragma ident "$Id: ReleaseNotes.c,v 1.43 2018/01/18 23:33:20 dechavez Exp $"
 
-char *VersionIdentString = "Release 3.1.0";
+char *VersionIdentString = "Release 3.2.0";
 
 /*
 
 i10dmx Release Notes
+
+3.2.0  01/18/2018
+       Link with libida10 2.25.0 for updated IDA10.12 definition
 
 3.1.0  10/19/2017
        linked with libida10 2.24.0 for IDA format 10.12 support

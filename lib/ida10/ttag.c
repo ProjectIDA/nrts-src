@@ -1,4 +1,4 @@
-#pragma ident "$Id: ttag.c,v 1.33 2015/12/04 22:06:27 dechavez Exp $"
+#pragma ident "$Id: ttag.c,v 1.34 2018/01/18 23:30:39 dechavez Exp $"
 /*======================================================================
  *
  *  Time tag operations
@@ -128,7 +128,7 @@ UINT64 nsec_per_tic, EpochYearFactor = 0;
         break;
 
       case IDA10_TIMER_OBS:
-        ttag->sys = 
+        ttag->sys =
         ttag->ext =
         ttag->hz  =
             (UINT64) ((REAL64) NANOSEC_PER_SEC * ((REAL64) ttag->obs.sys / (REAL64) ttag->obs.ticrate)) + ttag->obs.ref;
@@ -142,7 +142,7 @@ UINT64 nsec_per_tic, EpochYearFactor = 0;
 
       case IDA10_TIMER_OBS2:
         ttag->sys = ttag->ext = ttag->hz  =
-            (UINT64) ((REAL64) NANOSEC_PER_SEC * ((REAL64) ttag->obs2.sys / (REAL64) ttag->obs2.ticrate)) + 
+            (UINT64) ((REAL64) NANOSEC_PER_SEC * ((REAL64) ttag->obs2.sys / (REAL64) ttag->obs2.ticrate)) +
             (UINT64) ttag->obs2.ref * NANOSEC_PER_SEC -
             (INT64) ttag->obs2.delay * NANOSEC_PER_USEC;
         ttag->status.receiver = 0;
@@ -151,6 +151,17 @@ UINT64 nsec_per_tic, EpochYearFactor = 0;
         ttag->status.suspect = FALSE;
         ttag->status.locked  = TRUE;
         ttag->status.derived = FALSE;
+        break;
+
+      case IDA10_TIMER_SEED:
+        ttag->sys = ttag->ext = ttag->hz = ttag->seed.tstamp;
+        ttag->status.receiver = ttag->seed.status.bitmap;
+        ttag->status.init = TRUE;
+        ttag->status.avail = TRUE;
+        ttag->status.derived = FALSE;
+        ttag->status.locked = (ttag->seed.status.bitmap & IDA10_TT_SEED_LOCKED) ? TRUE : FALSE;
+        ttag->status.suspect = (ttag->seed.status.bitmap & IDA10_TT_SEED_SUSPICIOUS) ? TRUE : FALSE;
+        ttag->status.percent = ttag->seed.status.percent;
         break;
 
       default:
@@ -478,6 +489,9 @@ void ida10InitTtagHistory(IDA10_TTAG_HISTORY *history)
 /* Revision History
  *
  * $Log: ttag.c,v $
+ * Revision 1.34  2018/01/18 23:30:39  dechavez
+ * IDA10_TIMER_SEED support (part of IDA10.12 redefinition)
+ *
  * Revision 1.33  2015/12/04 22:06:27  dechavez
  * casts and format fixes to calm OS X compiles
  *

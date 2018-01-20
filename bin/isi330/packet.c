@@ -10,6 +10,7 @@
 #define MY_MOD_ID ISI330_MOD_PACKET
 
 static ISI_PUSH *ph = NULL;
+static ISI330_CONFIG *lcfg = NULL;
 
 void FlushRecord(UINT8 *rawmseed)
 {
@@ -19,7 +20,8 @@ void FlushRecord(UINT8 *rawmseed)
 
     if (rawmseed == NULL) return;
 
-    if (mseed512ToIDA1012(rawmseed, ida1012, NULL, NULL) == NULL) {
+    if (mseed512ToIDA1012(rawmseed, ida1012, lcfg->netname, lcfg->sta, lcfg->q330->sn) == NULL) {
+
         LogMsg("ERROR: %s: mseed512ToIDA1012: %s", fid, strerror(errno));
         return;
     }
@@ -36,12 +38,14 @@ void FlushRecord(UINT8 *rawmseed)
     return;
 }
 
-void StartRecordPusher(char *server, int port, LOGIO *lp, int depth, char *sname, char *nname)
+void StartRecordPusher(ISI330_CONFIG *cfg, int depth)
 {
 IACP_ATTR attr = IACP_DEFAULT_ATTR;
 static char *fid = "StartRecordPusher";
 
-    if ((ph = isiPushInit(server, port, &attr, lp, LOG_INFO, IDA10_FIXEDRECLEN, depth, FALSE)) == NULL) {
+    lcfg = cfg;
+
+    if ((ph = isiPushInit(cfg->server, cfg->port, &attr, cfg->lp, LOG_INFO, IDA10_FIXEDRECLEN, depth, FALSE)) == NULL) {
         LogMsg("ERROR: %s:isiPushInit: %s", fid, strerror(errno));
         GracefulExit(MY_MOD_ID + 2);
     }
