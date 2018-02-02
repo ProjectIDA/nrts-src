@@ -1,5 +1,5 @@
-/*======================================================================
 #pragma ident "$Id: ida10.h,v 1.59 2018/01/18 23:29:35 dechavez Exp $"
+/*======================================================================
  *
  *  IDA rev 10 include file.
  *
@@ -311,6 +311,8 @@ typedef struct {
 #define IDA1012_SNAME_LEN 5
 #define IDA1012_NNAME_LEN IDA108_NNAME_LEN
 
+#define IDA10_IDENT_LEN 4
+
 /* The following have meaning only for TS records */
 
 #define IDA10_MAXSTREAMS    128  /* max number of unique streams per sta */
@@ -371,14 +373,9 @@ typedef struct {
     int type;           /* IDA10_TYPE_xx */
     int format;         /* raw packet format identifier (should always be 10) */
     int subformat;      /* raw packet subformat identifer (0 - 3 currently supported) */
-    UINT16 boxid;       /* original IDA10 box id (if IDA10_64BIT_BOXID) then use serialno instead) */
-#define IDA10_64BIT_BOXID 0xffff
-    UINT64 serialno;    /* 64-bit box id (if IDA10_16BIT_BOXID then use boxid instead) */
-#ifdef _WIN32
-#define IDA10_16BIT_BOXID 0xffffffffffffffff
-#else
-#define IDA10_16BIT_BOXID 0xffffffffffffffffLL
-#endif
+    UINT16 boxid;       /* if non-zero, original IDA10 box id */
+    UINT64 serialno;    /* if non-zero 64-bit box id (eg, Q330 serial number) */
+    char   ident[IDA10_IDENT_LEN+1]; /* either the 16-bit box id, low order bits of 64-bit serial number, or sname */
     struct {
         IDA10_TTAG beg; /* time stamp at begining of packet */
         IDA10_TTAG end; /* time stamp at end of packet */
