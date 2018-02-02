@@ -2,7 +2,7 @@
 /*======================================================================
  *
  *  Simple minded filter to extract data packets based on channel
- *  and filter codes. 
+ *  and filter codes.
  *
  *====================================================================*/
 #include "util.h"
@@ -28,10 +28,10 @@ static int ncf = -1;
 static void help(char *myname)
 {
     fprintf(stderr,"\n");
-    fprintf(stderr,"usage: %s [if=input_file of=output_file rev=code -v] { cf=C,F[:C,F...] | keep=chn,[chn,...] | reject=chn[,chn...] | boxid=boxid }\n", myname);
+    fprintf(stderr,"usage: %s [if=input_file of=output_file rev=code -v] { cf=C,F[:C,F...] | keep=chn,[chn,...] | reject=chn[,chn...] | ident=ident }\n", myname);
     fprintf(stderr, "defaults: if=stdin of=stdout (revision autosensed)\n");
-    fprintf(stderr, "boxid: 4 character numeric boxid of digitizer of data packets to keep/reject. For Q330, is hexadecimal. \n");
-    fprintf(stderr, "       Only availablef or IDA10 format input. \n");
+    fprintf(stderr, "ident: ident string (see ida10 -v output)\n");
+    fprintf(stderr, "       Only available for IDA10 format input. \n");
     fprintf(stderr,"\n");
     exit(1);
 }
@@ -154,15 +154,13 @@ static struct {
     return FALSE;
 }
 
-static BOOL WantRecord(char *buf, int rev, CF *cf, char *boxid, BOOL MatchAction)
+static BOOL WantRecord(char *buf, int rev, CF *cf, char *ident, BOOL MatchAction)
 {
 int i;
 UINT16 chan, filt;
 static IDA10_TSHDR hdr;
 BOOL ChanMatch;
-BOOL BoxIDMatch;
-UINT16 boxid_bits; // low order 16 bits of boxid or serialno
-char boxid_str[5]; // low order 16 bits converted to uppercase string for coparison
+BOOL IdentMatch;
 
     if (rev == 10) {
 
@@ -173,34 +171,15 @@ char boxid_str[5]; // low order 16 bits converted to uppercase string for copari
 
         // check for boxid filter match, if specified...
 
-        if (boxid[0] != '\0') {
-           // convert filter to upper
-           int ndx;
-           for (ndx = 0; ndx < strlen(boxid); ndx++) 
-              boxid[ndx] = toupper(boxid[ndx]);
-
-           // get boxid from data buffer, checking for 16 vs 64 bit values
-
-           if (hdr.cmn.boxid != IDA10_64BIT_BOXID) {
-               // convert 16-bit boxid to 4 digit string
-               boxid_bits = (UINT16)hdr.cmn.boxid;
-               sprintf(boxid_str, "%d", boxid_bits);
-           } else {
-               // using 64-bit bit boxid. 
-               // convert low-order 16 bits to 4 digit uppercase hex string
-               boxid_bits = hdr.cmn.serialno & 0xffff;
-               sprintf(boxid_str, "%X", boxid_bits);
-           }
-
-           // compare with boxid filter value
-           BoxIDMatch = (strcmp(boxid_str, boxid) == 0);
+        if (ident[0] != '\0') {
+           IdentMatch = (strcmp(hdr.sname, ident) == 0);
         } else {
            // match all boxid's if filter not specified
-           BoxIDMatch = TRUE;
+           IdentMatch = TRUE;
         }
 
         // check for channel filter match
-        if (ncf == 0) 
+        if (ncf == 0)
            ChanMatch = TRUE; // no chan filter specified, keep or reject all
         else {
            ChanMatch = FALSE;
@@ -209,7 +188,7 @@ char boxid_str[5]; // low order 16 bits converted to uppercase string for copari
                ChanMatch |= (strcmp(hdr.cname, cf[i].cname) == 0);
         }
 
-        if (ChanMatch && BoxIDMatch)
+        if (ChanMatch && IdentMatch)
            return MatchAction;
         else
            return !MatchAction;
@@ -236,7 +215,7 @@ char buffer[IDA10_MAXRECLEN];
 BOOL MatchAction = TRUE;
 char *KeepString = NULL;
 char *SubformatString = NULL;
-char *boxid = "";
+char *ident = "";
 
     for (i = 1; i < argc; i++) {
         if (strncmp(argv[i], "rev=", strlen("rev=")) == 0) {
@@ -268,8 +247,8 @@ char *boxid = "";
             if (KeepString != NULL) help(argv[0]);
             KeepString = argv[i] + strlen("reject=");
             MatchAction = FALSE;
-        } else if (strncmp(argv[i], "boxid=", strlen("boxid=")) == 0) {
-            boxid = argv[i] + strlen("boxid=");
+        } else if (strncmp(argv[i], "ident=", strlen("ident=")) == 0) {
+            ident = argv[i] + strlen("ident=");
         } else if (strcasecmp(argv[i], "-h") == 0) {
             help(argv[0]);
         } else if (strcasecmp(argv[i], "-v") == 0) {
@@ -292,7 +271,7 @@ char *boxid = "";
     }
 
     if (rev == UNDEFINED_REV) {
-        if ((rev = idaPacketFormat((UINT8 *) buffer)) == 0) { 
+        if ((rev = idaPacketFormat((UINT8 *) buffer)) == 0) {
             fprintf(stderr, "%s: unable to infer data format from input\n", argv[0]);
         } else {
             fprintf(stderr, "assuming rev=%d\n", rev);
@@ -317,7 +296,7 @@ char *boxid = "";
     }
 
     do {
-        if (WantRecord(buffer, rev, cf, boxid, MatchAction)) {
+        if (WantRecord(buffer, rev, cf, ident, MatchAction)) {
             if (fwrite(buffer, 1, IDA_BUFLEN, ofp) != IDA_BUFLEN) {
                 fprintf(stderr, "%s: ", argv[0]);
                 perror("fwrite");
