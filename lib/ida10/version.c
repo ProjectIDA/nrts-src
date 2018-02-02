@@ -6,9 +6,15 @@
  *====================================================================*/
 #include "ida10.h"
 
-static VERSION version = {2, 25, 0};
+static VERSION version = {2, 25, 1};
 
 /* ida10 library release notes
+
+2.25.1 02/02/2018
+       ida10.h: added ident[] to TSHDR, changed convention wrt to boxid and serialno (0 means not set)
+       misc.c: added support for IDA10.12 offsets
+       string.c: support for ident[] field added to TSHDR
+       unpack.c: support for ident[] field added to TSHDR
 
 2.25.0 01/18/2018
        ida10.txt reworked IDA10.12 definition to include serial number, SEED_TAG, and longer station name
