@@ -257,7 +257,8 @@ UINT8 *ptr;
 
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
-    cmnhdr->serialno = IDA10_16BIT_BOXID;
+    cmnhdr->serialno = 0;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = cmnhdr->ttag.end.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -279,7 +280,8 @@ UINT8 *ptr;
 
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
-    cmnhdr->serialno = IDA10_16BIT_BOXID;
+    cmnhdr->serialno = 0;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -308,7 +310,8 @@ IDA10_TTAG *ttag;
 
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
-    cmnhdr->serialno = IDA10_16BIT_BOXID;
+    cmnhdr->serialno = 0;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -344,7 +347,8 @@ IDA10_TTAG *ttag;
 
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
-    cmnhdr->serialno = IDA10_16BIT_BOXID;
+    cmnhdr->serialno = 0;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_OFIS;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackOfisTtag(ptr, &cmnhdr->ttag.beg.ofis);
@@ -381,7 +385,8 @@ static UINT8 UndefinedSrc[4] = {0x31, 0x30, 0x2E, 0x34}; /* "10.4" */
 
     ptr = &start[4];
     ptr += utilUnpackUINT64(ptr, &cmnhdr->serialno);
-    cmnhdr->boxid = IDA10_64BIT_BOXID;
+    cmnhdr->boxid = 0;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->serialno & 0x0000ffff);
     cmnhdr->ttag.beg.type = IDA10_TIMER_Q330;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackQ330Ttag(ptr, &cmnhdr->ttag.beg.q330);
@@ -411,22 +416,19 @@ static UINT8 UndefinedSrc[4] = {0x31, 0x30, 0x2E, 0x34}; /* "10.4" */
 static int UnpackCmnHdr5(UINT8 *start, IDA10_CMNHDR *cmnhdr)
 {
 UINT16 stmp;
-UINT8 *ptr, *sname, *nname;
+UINT8 *ptr, sname[IDA105_SNAME_LEN+1], nname[IDA105_NNAME_LEN+1];
 char tmp[1024], *tmpstr;
 IDA10_TTAG *ttag;
 
     cmnhdr->subformat = IDA10_SUBFORMAT_5;
 
     ptr = &start[4];
-    cmnhdr->boxid = IDA10_64BIT_BOXID;
 
-/* The IDA10.5 "serial number" is the station name and network code */
-
+    cmnhdr->boxid = 0;
     cmnhdr->serialno = 0;
-    sname = (UINT8 *) &cmnhdr->serialno;
-    nname = sname + IDA105_SNAME_LEN + 1;
-    ptr += utilUnpackBytes(ptr, sname, IDA105_SNAME_LEN);
-    ptr += utilUnpackBytes(ptr, nname, IDA105_NNAME_LEN);
+    ptr += utilUnpackBytes(ptr, sname, IDA105_SNAME_LEN); sname[IDA105_SNAME_LEN] = 0;
+    ptr += utilUnpackBytes(ptr, nname, IDA105_NNAME_LEN); nname[IDA105_NNAME_LEN] = 0;
+    sprintf(cmnhdr->ident, "%4s", sname);
     ptr += UnpackGenericTtag(ptr, &cmnhdr->ttag.beg.gen);
     cmnhdr->ttag.beg.type = IDA10_TIMER_GENERIC;
     ptr += IDA105_RESERVED_BYTES;
@@ -455,7 +457,8 @@ IDA10_TTAG *ttag;
 
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
-    cmnhdr->serialno = IDA10_16BIT_BOXID;
+    cmnhdr->serialno = 0;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -488,7 +491,8 @@ IDA10_TTAG *ttag;
 
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
-    cmnhdr->serialno = IDA10_16BIT_BOXID;
+    cmnhdr->serialno = 0;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_OFIS;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackOfisTtag(ptr, &cmnhdr->ttag.beg.ofis);
@@ -517,22 +521,19 @@ IDA10_TTAG *ttag;
 static int UnpackCmnHdr8(UINT8 *start, IDA10_CMNHDR *cmnhdr)
 {
 UINT16 stmp;
-UINT8 *ptr, *sname, *nname;
+UINT8 *ptr, sname[IDA108_SNAME_LEN+1], nname[IDA108_NNAME_LEN+1];
 char tmp[1024], *tmpstr;
 IDA10_TTAG *ttag;
 
     cmnhdr->subformat = IDA10_SUBFORMAT_8;
 
     ptr = &start[4];
-    cmnhdr->boxid = IDA10_64BIT_BOXID;
 
-/* The IDA10.8 "serial number" is the station name and network code */
-
+    cmnhdr->boxid = 0;
     cmnhdr->serialno = 0;
-    sname = (UINT8 *) &cmnhdr->serialno;
-    nname = sname + IDA108_SNAME_LEN + 1;
-    ptr += utilUnpackBytes(ptr, sname, IDA108_SNAME_LEN);
-    ptr += utilUnpackBytes(ptr, nname, IDA108_NNAME_LEN);
+    ptr += utilUnpackBytes(ptr, sname, IDA108_SNAME_LEN); sname[IDA108_SNAME_LEN] = 0;
+    ptr += utilUnpackBytes(ptr, nname, IDA108_NNAME_LEN); nname[IDA108_NNAME_LEN] = 0;
+    sprintf(cmnhdr->ident, "%4s", sname);
     ptr += UnpackGenericTtag(ptr, &cmnhdr->ttag.beg.gen);
     cmnhdr->ttag.beg.type = IDA10_TIMER_GENERIC;
     ptr += utilUnpackUINT32(ptr, &cmnhdr->extra.seqno);
@@ -571,8 +572,9 @@ IDA10_TTAG *ttag;
 
 /* 10.10 serial number is the IMEI number from the SBD header */
 
-    cmnhdr->boxid = IDA10_64BIT_BOXID;
+    cmnhdr->boxid = 0;
     cmnhdr->serialno = cmnhdr->ttag.beg.obs.sbd.imei;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->serialno & 0x0000ffff);
 
 /* 10.10 doesn't have end time tag... set to beginning for now.
  * Packets which care about end time will overwrite later.
@@ -604,8 +606,9 @@ IDA10_TTAG *ttag;
 
 /* 10.11 serial number is the IMEI number from the SBD header */
 
-    cmnhdr->boxid = IDA10_64BIT_BOXID;
+    cmnhdr->boxid = 0;
     cmnhdr->serialno = cmnhdr->ttag.beg.obs.sbd.imei;
+    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->serialno & 0x0000ffff);
 
 /* 10.11 doesn't have end time tag... set to beginning for now.
  * Packets which care about end time will overwrite later.
@@ -622,19 +625,20 @@ UINT16 stmp;
 UINT8 *ptr;
 IDA10_TTAG *ttag;
 char sname[IDA1012_SNAME_LEN+1];
+char nname[IDA1012_NNAME_LEN+1];
 
     cmnhdr->subformat = IDA10_SUBFORMAT_12;
 
     ptr = &start[4];
-    cmnhdr->boxid = IDA10_64BIT_BOXID;
+    cmnhdr->boxid = 0;
     ptr += utilUnpackUINT64(ptr, &cmnhdr->serialno);
-    if (cmnhdr->serialno == 0) {
-        ptr += utilUnpackBytes(ptr, sname, IDA1012_SNAME_LEN); sname[IDA1012_SNAME_LEN] = 0;
-        sprintf((char *)&cmnhdr->serialno, "%s", sname);
+    ptr += utilUnpackBytes(ptr, sname, IDA1012_SNAME_LEN); sname[IDA1012_SNAME_LEN] = 0;
+    ptr += utilUnpackBytes(ptr, nname, IDA1012_NNAME_LEN); nname[IDA1012_NNAME_LEN] = 0;
+    if (cmnhdr->serialno != 0) {
+        sprintf(cmnhdr->ident, "%4x", cmnhdr->serialno & 0x0000ffff);
     } else {
-        ptr += IDA1012_SNAME_LEN; /* skip over station name */
+        sprintf(cmnhdr->ident, "%4s", sname);
     }
-    ptr += IDA1012_NNAME_LEN; /* skip over network code */
 
     ptr += UnpackSEEDtag(ptr, &cmnhdr->ttag.beg.seed);
     cmnhdr->ttag.beg.type = IDA10_TIMER_SEED;
@@ -689,7 +693,7 @@ IDA_DHDR dhdr;
     cmnhdr->nbytes = IDA10_DEFDATALEN;
 
     cmnhdr->extra = dhdr.extra;
-    cmnhdr->boxid = IDA10_64BIT_BOXID;
+    cmnhdr->boxid = 0;
 
 /* The IDA10.9 "serial number" is TBD */
 
@@ -796,13 +800,7 @@ UINT8 *ptr;
 
 /* Now derive the derived stuff */
 
-    if (tshdr->cmn.subformat == IDA10_SUBFORMAT_5 || tshdr->cmn.subformat == IDA10_SUBFORMAT_8 || tshdr->cmn.subformat == IDA10_SUBFORMAT_12) {
-        strlcpy(tshdr->sname, (char *) &tshdr->cmn.serialno, IDA10_SNAMLEN+1);
-    } else if (tshdr->cmn.boxid == IDA10_64BIT_BOXID) {
-        sprintf(tshdr->sname, "%04x", (int) tshdr->cmn.serialno & 0xffff);
-    } else {
-        sprintf(tshdr->sname, "%04x", tshdr->cmn.boxid);
-    }
+    strlcpy(tshdr->sname, tshdr->cmn.ident, IDA10_SNAMLEN+1);
     tshdr->dl.strm[IDA10_CNAMLEN] = 0;
     strlcpy(tshdr->cname, tshdr->dl.strm, IDA10_CNAMLEN+1);
     tshdr->nsint = mseedFactMultToNsint(tshdr->dl.srate.factor, tshdr->dl.srate.multiplier);

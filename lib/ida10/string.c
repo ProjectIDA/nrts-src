@@ -85,11 +85,8 @@ static char mt_unsafe_buffer[1024];
 
     sprintf(msgbuf + strlen(msgbuf), " %d.%d", hdr->format, hdr->subformat);
 
-    if (hdr->boxid == IDA10_64BIT_BOXID) {
-        sprintf(msgbuf + strlen(msgbuf), " %015llX", hdr->serialno);
-    } else {
-        sprintf(msgbuf + strlen(msgbuf), " %04X", hdr->boxid);
-    }
+    sprintf(msgbuf + strlen(msgbuf), " %4s", hdr->ident);
+
     sprintf(msgbuf + strlen(msgbuf), " %s", utilDttostr(hdr->beg, 0, tbuf));
     sprintf(msgbuf + strlen(msgbuf), " %4d", hdr->nbytes);
 
