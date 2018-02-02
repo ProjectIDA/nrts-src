@@ -77,6 +77,7 @@ static char *fid = "WritePacketToDisk";
         if (dl->options.flags & ISI_OPTION_INSERT_32BIT_SEQNO)  dl->options.offset.seqno  = ida10SeqnoOffset(raw->payload);
         if (dl->options.flags & ISI_OPTION_INSERT_32BIT_TSTAMP) dl->options.offset.tstamp = ida10TstampOffset(raw->payload);
         ok = isidlWriteToDiskLoop(dl, raw);
+        ++count;
     ReleaseGlobalMutex(fid);
 
     if (!ok) {

@@ -10,11 +10,15 @@
 
 void LogIDA10PacketHeader(UINT8 *raw, UINT64 count)
 {
-IDA10_TSHDR hdr;
-char msgbuf[1024];
+int i;
+IDA10_TS ts;
+char msgbuf[1024], *message;
 
-    ida10UnpackTSHdr(raw, &hdr);
-    LogMsg("%llu: %s", count, ida10TSHDRtoString(&hdr, msgbuf));
+    ida10UnpackTS(raw, &ts);
+    message = ida10TStoString(&ts, msgbuf);
+    // replace % (as in 100%) to avoid confusing the LogMsg() variable arg processor
+    for (i = 0; i < strlen(message); i++) if (message[i] == '%') message[i] = 'p';
+    LogMsg("%llu: %s", count, message);
 }
 
 /*-----------------------------------------------------------------------+
