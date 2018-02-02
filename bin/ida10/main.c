@@ -186,33 +186,21 @@ typedef struct {
 } CHANNEL;
 
 typedef struct {
-    UINT64 ident;
+    char ident[IDA10_IDENT_LEN+1];
     LNKLST *clist;
 } STATION;
 
 LNKLST *head;
 
-static UINT64 BoxId(IDA10_TSHDR *hdr)
-{
-    if (hdr->cmn.boxid == IDA10_64BIT_BOXID) {
-        return hdr->cmn.serialno;
-    } else {
-        return (UINT64) hdr->cmn.boxid;
-    }
-}
-
 static STATION *LookupStation(IDA10_TSHDR *hdr)
 {
-UINT64 ident;
 STATION *station;
 LNKLST_NODE *crnt;
-
-    ident = BoxId(hdr);
 
     crnt = listFirstNode(head);
     while (crnt != NULL) {
         station = (STATION *) crnt->payload;
-        if (ident == station->ident) return station;
+        if (strcmp(hdr->sname, station->ident) == 0) return station;
         crnt = listNextNode(crnt);
     }
 
@@ -225,7 +213,7 @@ STATION *station, new;
 
     if ((station = LookupStation(hdr)) != NULL) return station;
 
-    new.ident = BoxId(hdr);
+    strcpy(new.ident, hdr->sname);
     if ((new.clist = listCreate()) == NULL) {
         perror("listCreate");
         exit(1);
