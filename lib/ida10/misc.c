@@ -14,12 +14,15 @@ int ida10SeqnoOffset(UINT8 *packet)
     if (packet[2] != 10) return -1;
 
     switch (packet[3]) {
-      case 2:
-      case 3:
-      case 6:
-      case 7: return 28;
-      case 4: return 36;
-      case 8: return 20;
+      case  2:
+      case  3:
+      case  6:
+      case  7: return 28;
+      case  4: return 36;
+      case  8: return 20;
+      case 10: return 38;
+      case 11: return 38;
+      case 12: return 29;
     }
 
     return -1;
@@ -39,6 +42,9 @@ int ida10TstampOffset(UINT8 *packet)
       case 7: return 32;
       case 4: return 40;
       case 8: return 24;
+      case 10: return 42;
+      case 11: return 42;
+      case 12: return 33;
     }
 
     return -1;
