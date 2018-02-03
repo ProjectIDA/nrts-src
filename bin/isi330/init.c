@@ -16,12 +16,12 @@ void help(char *myname)
     fprintf(stderr, "    sitename               => Station code\n");
     fprintf(stderr, "    q330=name:port[:debug] => Quanterra Q330 input\n");
     fprintf(stderr, "    dl=server:port         => ISI Disk Loop server and port\n");
+    fprintf(stderr, "    sta=staid              => set station code in data\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "    cfg=<path>  => Location of q330.cfg configuration file\n");
-    fprintf(stderr, "    net=netid   => set network code (default: 'II')\n");
-    fprintf(stderr, "    sta=staid   => override station code in data with this value\n");
     fprintf(stderr, "    log=name    => set log file name\n");
+    fprintf(stderr, "    net=netid   => set network code (default: 'II')\n");
     fprintf(stderr, "    dropvh      => drop VH? records from data stream\n");
     fprintf(stderr, "    -bd         => run in the background\n");
     fprintf(stderr, "\n");
@@ -129,8 +129,22 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 /* Must specify site name */
 
     if (cfg->site == NULL) {
+        fprintf(stderr,"%s: missing site code(s)\n", myname);
+        help(myname);
+    }
+
+
+/* Must specify station code */
+
+    if (strlen(cfg->sta) == 0) {
         fprintf(stderr,"%s: missing station code(s)\n", myname);
         help(myname);
+    }
+
+/* Set network to 'II' if not specified */
+
+    if (strlen(cfg->netname) == 0) {
+        strcpy(cfg->netname, "II");
     }
 
 
