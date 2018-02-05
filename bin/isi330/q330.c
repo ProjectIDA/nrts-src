@@ -79,9 +79,9 @@ BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db)
     cfg->q330->tpc.q330id_serial[0] = snlo;
     cfg->q330->tpc.q330id_serial[1] = snhi;
     cfg->q330->tpc.q330id_dataport = (UINT16)dp - 1; // lib330 uses 0-based dataport enumeration
-    strncpy(cfg->q330->tpc.q330id_station, cfg->site, 6);
+    strncpy(cfg->q330->tpc.q330id_station, cfg->sta, ISI_STALEN+1);
     cfg->q330->tpc.host_timezone = 0;         // using UTC on host systems
-    strcpy(cfg->q330->tpc.host_software, "IDA:isi330");         // host application name
+    strcpy(cfg->q330->tpc.host_software, "ida:isi330");         // host application name
     strcpy(cfg->q330->tpc.opt_contfile, "");       // disable for now
     cfg->q330->tpc.opt_verbose = VERB_SDUMP | VERB_RETRY | VERB_REGMSG | VERB_LOGEXTRA | VERB_AUXMSG | VERB_PACKET;
     cfg->q330->tpc.opt_verbose = VERB_RETRY | VERB_REGMSG | VERB_AUXMSG;
@@ -260,7 +260,7 @@ void StartQ330Reader(ISI330_CONFIG *cfg)
 
     LogMsg("Q330 Argstr = %s", cfg->q330HostArgstr);
     LogMsg("Q330 config file = %s", cfg->cfgpath);
-    LogMsg("Q330 site = %s", cfg->site);
+    LogMsg("Q330 Sta = %s", cfg->sta);
     LogMsg("Q330 registration retry interval = %d sec", DEFAULT_RETRY_SEC);
     LogMsg("Q330 watchdog interval = %d sec", DEFAULT_WATCHDOG_SEC);
 
@@ -292,7 +292,7 @@ void ShutdownQ330Reader(ISI330_CONFIG *cfg)
     tz.tz_dsttime = 0;
 
     if (cfg->q330 != NULL) {
-        LogMsg("Deregistering from site %s Q330: %s:%d\n", cfg->site, cfg->q330->host, cfg->q330->dp);
+        LogMsg("Deregistering from Q330: %s:%d\n", cfg->q330->host, cfg->q330->dp);
 
         gettimeofday(&tv1, &tz);
 
@@ -308,7 +308,7 @@ void ShutdownQ330Reader(ISI330_CONFIG *cfg)
 
         lib_destroy_context(cfg->q330->ct);
 
-        LogMsg("Disconnected from site %s Q330: %s:%d\n", cfg->site, cfg->q330->host, cfg->q330->dp);
+        LogMsg("Disconnected from Q330: %s:%d\n", cfg->q330->host, cfg->q330->dp);
     }
 
 }

@@ -66,7 +66,7 @@ void PrintISI330Config(ISI330_CONFIG *cfg) {
 
     ISI330_Q330 *q330;
 
-    LogMsg("site: %s\n", cfg->site);
+    LogMsg("sta: %s\n", cfg->sta);
     LogMsg("cfgpath: %s\n\n", cfg->cfgpath);
 
     q330 = cfg->q330;

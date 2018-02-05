@@ -10,11 +10,10 @@
 void help(char *myname)
 {
     fprintf(stderr, "\n");
-    fprintf(stderr, "usage: %s sitename q330=HostnameOrIP:DataPort dl=server:port \n", myname);
+    fprintf(stderr, "usage: %s q330=HostnameOrIP:DataPort dl=server:port \n", myname);
     fprintf(stderr, "\n");
     fprintf(stderr, "Required:\n");
-    fprintf(stderr, "    sitename               => Station code\n");
-    fprintf(stderr, "    q330=name:port[:debug] => Quanterra Q330 input\n");
+    fprintf(stderr, "    q330=name:port         => Quanterra Q330 input\n");
     fprintf(stderr, "    dl=server:port         => ISI Disk Loop server and port\n");
     fprintf(stderr, "    sta=staid              => set station code in data\n");
     fprintf(stderr, "\n");
@@ -47,7 +46,6 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
         perror("malloc ISI330_CONFIG");
         exit(MY_MOD_ID + 1);
     }
-    cfg->site = NULL;
     cfg->port = -1;
     cfg->dropvh = FALSE;
     memset(cfg->sta, 0, sizeof(cfg->sta));
@@ -106,13 +104,6 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
             debug = TRUE;
 
-        } else if (cfg->site == NULL) {  // this must be last
-
-            if ((cfg->site = strdup(argv[i])) == NULL) {
-                fprintf(stderr, "%s: strdup: %s\n", myname, strerror(errno));
-                exit(MY_MOD_ID + 5);
-            }
-
         } else {
             fprintf(stderr, "%s: unrecognized argument '%s'\n", myname, argv[i]);
             help(myname);
@@ -125,14 +116,6 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
         q330PrintErrcode(stderr, "q330ReadCfg: ", cfgpath, errcode);
         exit(MY_MOD_ID + 7);
     }
-
-/* Must specify site name */
-
-    if (cfg->site == NULL) {
-        fprintf(stderr,"%s: missing site code(s)\n", myname);
-        help(myname);
-    }
-
 
 /* Must specify station code */
 
@@ -160,7 +143,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 /* Start logging facility */
 
      if (log == NULL) log = daemon ? DEFAULT_BACKGROUND_LOG : DEFAULT_FOREGROUND_LOG;
-     if ((cfg->lp = InitLogging(myname, log, util_ucase(cfg->site), debug)) == NULL) {
+     if ((cfg->lp = InitLogging(myname, log, util_ucase(cfg->sta), debug)) == NULL) {
          perror("InitLogging");
          exit(MY_MOD_ID + 9);
      }
