@@ -20,7 +20,7 @@ void FlushRecord(UINT8 *rawmseed)
 
     if (rawmseed == NULL) return;
 
-    if (mseed512ToIDA1012(rawmseed, ida1012, lcfg->netname, lcfg->sta, lcfg->q330->sn) == NULL) {
+    if (mseed512ToIDA1012(rawmseed, ida1012, lcfg->sta, lcfg->netname, lcfg->q330->sn) == NULL) {
 
         LogMsg("ERROR: %s: mseed512ToIDA1012: %s", fid, strerror(errno));
         return;
@@ -32,6 +32,7 @@ void FlushRecord(UINT8 *rawmseed)
     }
     if (FirstRecord) {
         LogMsg("initial packet enqueued to ISI push server@%s:%d\n", ph->server, ph->port);
+        LogMsg("initial packet sta=%s  net=%s  sn=%016llx\n", lcfg->sta, lcfg->netname, lcfg->q330->sn);
         FirstRecord = FALSE;
     }
 
