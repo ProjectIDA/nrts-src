@@ -3,9 +3,10 @@
 #
 # Manage SSH tunnels
 
-set debug  = 0
+set debug  = 1
 set myname = CheckTunnels
 set lock   = /var/tmp/$myname.lock
+set match  = /var/tmp/$myname.matches.$$
 
 if ($debug) logger -t $myname"[$$]" -p user.info "begin"
 
@@ -64,24 +65,28 @@ else
 endif
 
 # Get the port numbers from the lookup table
-
 if (! -e $TunnelPorts) then
     if ($debug) logger -t $myname"[$$]" -p user.info "$TunnelPorts not present"
     exit 1
 endif
 
-set PortString = `stripcat $TunnelPorts | grep -i " $TunnelName " `
+# Find host matches in Tunnels file
+stripcat $TunnelPorts | grep -i " $TunnelName " > $match
 set exitstatus = $status
 if ($exitstatus != 0) then
     if ($debug) logger -t $myname"[$$]" -p user.info "can't extract ports for $TunnelName from $TunnelPorts"
+    rm -rf $match
     exit 1
 endif
+set PortStrings = ( "`cat $match`" )
+rm -rf $match
 
 # Make sure no other instance of this script is running
 
 filelock $lock $$
 if ($status != 0) then
     if ($debug) logger -t $myname"[$$]" -p user.info "another instance already active"
+    rm -rf $match
     exit 0
 endif
 
@@ -89,14 +94,62 @@ endif
 
 foreach RemoteHost ($RemoteHostList)
 
-        set RemoteData = `echo $PortString | awk '{print $2}'`
-        if ($debug) logger -t $myname"[$$]" -p user.info "RemoteData = $RemoteData"
-        set RemoteShell = `echo $PortString | awk '{print $3}'`
-        if ($debug) logger -t $myname"[$$]" -p user.info "RemoteShell = $RemoteShell"
+    # need to do loop like this cause PortStrings is a list of lines with multiple words
+    @ ndx = 0
+    while ( $ndx < ${#PortStrings} )
 
+        @ ndx++
+
+        set PortString = (`echo ${PortStrings[$ndx]} | lcase`)
+
+        # reinitialize defaults
+        set LocalData    = 39136
+        set LocalShell   = 22
+        set TunnelUser   = tunnel
+        set TunnelHost   = $RemoteHost
+        set RemoteData = `echo $PortString | awk '{print $2}'`
+        set RemoteShell = `echo $PortString | awk '{print $3}'`
+
+        if (${#PortString} == 3) then
+            # if PortString only has 3 parts it is the standard, simple situation using default above.
+            # this is tunnel record for current host, this is standard/simplest case
+            # use defaults no need to do/override  anything
+
+        else if (${#PortString} == 7) then
+            # this record has gateway info in it.
+            # Need to check whether current host IS the gateway-host (in column 5)
+
+            if ($TunnelName == ${PortString[1]}) then
+                # this is primary record for current host
+                # But need to use gateway port
+                set TunnelUser = $PortString[4]
+                set TunnelHost = $PortString[5]
+                set RemoteData = $PortString[6]
+                set RemoteShell = $PortString[7]
+
+            else if ($TunnelName == ${PortString[5]}) then
+                # this is a gateway record for a gateway host (e.g. cmla1 <dataport> <shellport> <gwuser> cmla-gw ...)
+                set LocalData = $PortString[6]
+                set LocalShell = $PortString[7]
+            else 
+                if ($debug) logger -t $myname"[$$]" -p user.info "can't find $TunnelName in invalid record $PortString"
+            endif
+
+        else
+            if ($debug) logger -t $myname"[$$]" -p user.info "invalid record $PortString"
+            continue
+        endif
+
+        if ($debug) logger -t $myname"[$$]" -p user.info "LocalData = $LocalData"
+        if ($debug) logger -t $myname"[$$]" -p user.info "LocalShell = $LocalShell"
+        if ($debug) logger -t $myname"[$$]" -p user.info "RemoteData = $RemoteData"
+        if ($debug) logger -t $myname"[$$]" -p user.info "RemoteShell = $RemoteShell"
+        if ($debug) logger -t $myname"[$$]" -p user.info "TunnelUser = $TunnelUser"
+        if ($debug) logger -t $myname"[$$]" -p user.info "TunnelHost = $TunnelHost"
 
         logger -t $myname"[$$]" -p user.notice "Starting SSH tunnels into $RemoteHost"
-        set command = "ssh ${TunnelUser}@${RemoteHost} -f -N -R ${RemoteData}:localhost:${LocalData} -R ${RemoteShell}:localhost:${LocalShell}"
+        # NOTE: Do not change the order of the ssh parameters without consider BounceTunnels
+        set command = "ssh -f -N -R ${RemoteData}:localhost:${LocalData} -R ${RemoteShell}:localhost:${LocalShell} ${TunnelUser}@${TunnelHost}"
         logger -t $myname"[$$]" -p user.notice "$command"
 
         # Create tunnel only if not already running
@@ -108,6 +161,8 @@ foreach RemoteHost ($RemoteHostList)
             # Launch the tunnel
             $command
         endif
+    end
+
 end
 
 exit 0
