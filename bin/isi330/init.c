@@ -21,7 +21,7 @@ void help(char *myname)
     fprintf(stderr, "    cfg=<path>  => Location of q330.cfg configuration file\n");
     fprintf(stderr, "    log=name    => set log file name\n");
     fprintf(stderr, "    net=netid   => set network code (default: 'II')\n");
-    fprintf(stderr, "    dropvh      => drop VH? records from data stream\n");
+    fprintf(stderr, "    -dropvh     => drop VH? records from data stream\n");
     fprintf(stderr, "    -bd         => run in the background\n");
     fprintf(stderr, "\n");
     exit(1);
@@ -92,7 +92,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
             log = argv[i] + strlen("log=");
 
-        } else if (strcmp(argv[i], "dropvh") == 0) {
+        } else if (strcmp(argv[i], "-dropvh") == 0) {
 
             cfg->dropvh = TRUE;
 
