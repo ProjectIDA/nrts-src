@@ -15,14 +15,16 @@ void help(char *myname)
     fprintf(stderr, "Required:\n");
     fprintf(stderr, "    q330=name:port         => Quanterra Q330 input\n");
     fprintf(stderr, "    dl=server:port         => ISI Disk Loop server and port\n");
+    fprintf(stderr, "                              ignored if '-stdout' option used\n");
     fprintf(stderr, "    sta=staid              => set station code in data\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "    cfg=<path>  => Location of q330.cfg configuration file\n");
     fprintf(stderr, "    log=name    => set log file name\n");
     fprintf(stderr, "    net=netid   => set network code (default: 'II')\n");
+    fprintf(stderr, "    -stdout     => send ms output to stdout\n");
     fprintf(stderr, "    -dropvh     => drop VH? records from data stream\n");
-    fprintf(stderr, "    -bd         => run in the background\n");
+    fprintf(stderr, "    -bd         => run in the background (incompatible with '-stdout' option)\n");
     fprintf(stderr, "\n");
     exit(1);
 }
@@ -36,7 +38,6 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
     ISI330_CONFIG *cfg;
     char *user = ISI330_DEFAULT_USER;
     char *cfgpath = NULL;
-    int depth = DEFAULT_PACKET_QUEUE_DEPTH;
     MSEED_HANDLE *mshandle = NULL;
     Q330_CFG *q330cfg = NULL;  /* q330 database info */
     int errcode;
@@ -46,8 +47,12 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
         perror("malloc ISI330_CONFIG");
         exit(MY_MOD_ID + 1);
     }
+
+/* initialize some configuration values */
+
     cfg->port = -1;
     cfg->dropvh = FALSE;
+    cfg->outputType = ISI330_DEFAULT_OUTPUT_TYPE;
     memset(cfg->sta, 0, sizeof(cfg->sta));
     memset(cfg->netname, 0, sizeof(cfg->netname));
     memset(cfg->q330HostArgstr, 0, sizeof(cfg->q330HostArgstr));
@@ -55,7 +60,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 /*  Get command line arguments  */
     int i;
     for (i = 1; i < argc; i++) {
-        printf("arg %d of %d: %s\n", i, argc, argv[i]);
+        /* fprintf(stderr, "arg %d of %d: %s\n", i, argc, argv[i]); */
 
         if (strncmp(argv[i], "q330=", strlen("q330=")) == 0) {
 
@@ -96,6 +101,11 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
             cfg->dropvh = TRUE;
 
+        } else if (strcmp(argv[i], "-stdout") == 0) {
+
+            cfg->outputType = ISI330_OUTPUT_TYPE_STDOUT;
+            cfg->outfl = stdout;
+
         } else if (strcmp(argv[i], "-bd") == 0) {
 
             daemon = TRUE;
@@ -108,6 +118,12 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
             fprintf(stderr, "%s: unrecognized argument '%s'\n", myname, argv[i]);
             help(myname);
         }
+    }
+
+    /* check output_type and background status */
+    if (cfg->outputType == ISI330_OUTPUT_TYPE_STDOUT && daemon) {
+        fprintf(stderr,"%s: options '-bd' and '-stdout' are incompatible\n", myname);
+        help(myname);
     }
 
     /* Read ida q330 database */
@@ -142,7 +158,7 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
 /* Start logging facility */
 
-     if (log == NULL) log = daemon ? DEFAULT_BACKGROUND_LOG : DEFAULT_FOREGROUND_LOG;
+     if (log == NULL) log = (daemon || (cfg->outputType != ISI330_OUTPUT_TYPE_ISISVR)) ? DEFAULT_BACKGROUND_LOG : DEFAULT_FOREGROUND_LOG;
      if ((cfg->lp = InitLogging(myname, log, util_ucase(cfg->sta), debug)) == NULL) {
          perror("InitLogging");
          exit(MY_MOD_ID + 9);
@@ -171,13 +187,13 @@ ISI330_CONFIG *init(char *myname, int argc, char **argv)
 
     if (cfg->netname == NULL) strncpy(cfg->netname, DEFAULT_NETID, ISI_NETLEN + 1);
 
-    if (cfg->port < 0) {
+    if ((cfg->outputType == ISI330_OUTPUT_TYPE_ISISVR) && (cfg->port < 0)) {
         fprintf(stderr, "ERROR: missing or incomplete dl=server:port argument\n");
         help(argv[0]);
     }
 
-    // start record pusher
-    StartRecordPusher(cfg,  depth);
+    // Initialize output facility
+    InitOutput(cfg);
 
     // start Q330 readers
     StartQ330Reader(cfg);

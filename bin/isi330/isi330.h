@@ -43,20 +43,24 @@ static char *Copyright = "Copyright (C) 2017 - Regents of the University of Cali
 #define ISI330_HOST_CTRLPORT_BASE ((UINT16) 6330)
 #define ISI330_HOST_DATAPORT_BASE ((UINT16) 6530)
 
-#define DEFAULT_USER           "nrts"
-#define DEFAULT_DAEMON         FALSE
-#define DEFAULT_SOURCE         SOURCE_UNDEFINED
-#define DEFAULT_HOME           "/usr/nrts"
-#define DEFAULT_TIMEOUT        30
-#define DEFAULT_BACKGROUND_LOG "syslogd:local0"
-#define DEFAULT_FOREGROUND_LOG "-"
-#define DEFAULT_DEBUG          FALSE
+#define ISI330_OUTPUT_TYPE_ISISVR  1
+#define ISI330_OUTPUT_TYPE_STDOUT  2
+#define ISI330_DEFAULT_OUTPUT_TYPE ISI330_OUTPUT_TYPE_ISISVR
+
+#define DEFAULT_USER               "nrts"
+#define DEFAULT_DAEMON             FALSE
+#define DEFAULT_SOURCE             SOURCE_UNDEFINED
+#define DEFAULT_HOME               "/usr/nrts"
+#define DEFAULT_TIMEOUT            30
+#define DEFAULT_BACKGROUND_LOG     "syslogd:local0"
+#define DEFAULT_FOREGROUND_LOG     "-"
+#define DEFAULT_DEBUG              FALSE
 #define DEFAULT_NETID              "II"
 #define DEFAULT_PACKET_QUEUE_DEPTH 50
 
-#define DEFAULT_MSEED_RECLEN 512
-#define DEFAULT_MSEED_QCODE  'R'
-#define DEFAULT_MSEED_SEQNO  1
+#define DEFAULT_MSEED_RECLEN       512
+#define DEFAULT_MSEED_QCODE        'R'
+#define DEFAULT_MSEED_SEQNO        1
 
 
 typedef struct {
@@ -93,6 +97,8 @@ typedef struct {
     char sta[ISI_STALEN + 1];
     char server[MAXPATHLEN+1];
     int port;
+    UINT8 outputType;
+    FILE *outfl;
 } ISI330_CONFIG;
 
 /* For passing command line to MainThread */
@@ -145,7 +151,7 @@ void StartQ330Reader(ISI330_CONFIG *cfg);
 void ShutdownQ330Reader(ISI330_CONFIG *cfg);
 
 /* packet.c */
-void StartRecordPusher(ISI330_CONFIG *cfg, int depth);
+void InitOutput(ISI330_CONFIG *cfg);
 void FlushRecord(UINT8 *rawmseed);
 
 /* signals.c */

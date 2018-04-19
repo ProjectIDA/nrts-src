@@ -1,7 +1,13 @@
-char *VersionIdentString = "Release 1.1.0";
+char *VersionIdentString = "Release 1.2.0 (beta)";
 
 /* Release Notes */
 /*
+
+1.2.0b  2018-04-18 dauerbach
+        packet.c: split Init and 'Push' logic to check OUTPUT_TYPE in isi330 cfg struct
+                  can output to an ISI server (e.g. i10ldl) or stream to a file. Only stdout supported atm.
+        init.c:   change 'dropvh' cmdline option to '-dropvh'
+                  add '-stdout' option to send ms output to stdout.
 
 1.1.0   2018-02-05 dauerbach
         packet.c: fix call to mssed512ToIda10; Log sta/net/sn upon 1st packet
