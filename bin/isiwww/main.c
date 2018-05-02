@@ -401,7 +401,7 @@ char *parchstr="parchment.jpg";
 char parchvar[MAXPATHLEN+1];
 parchvar[0]=0;
 
-    fprintf(fp, "<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">\n");
+    fprintf(fp, "<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
     fprintf(fp, "<title>IDA/NRTS (%s)</title>\n",isiserver);
 
     fprintf(fp, "<!-- Bootstrap core CSS -->");
@@ -656,7 +656,7 @@ ackpage[0]=0;
 
     sprintf(weblink, "%s/%s",webstuff,isiserver);
     sprintf(ackpage, "%s/%s/%s",webstuff,isiserver,str1);
-    fprintf(fp, "<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"10\">\n");
+    fprintf(fp, "<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
     fprintf(fp, "<title>\nIDA/NRTS (%s)\n</title>\n",isiserver);
     fprintf(fp, "<!-- Bootstrap core CSS -->");
     fprintf(fp, "   <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css\" integrity=\"sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4\" crossorigin=\"anonymous\">\n");
