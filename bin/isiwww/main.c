@@ -411,6 +411,7 @@ parchvar[0]=0;
 
     sprintf(parchvar,"https://%s/%s",webstuff,parchstr);
     fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
+    fprintf(fp, "<script src=/web/js/sorttable.js></script>");
     fprintf(fp, "<DIV class=\'container\'> <!-- container -->");
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col-10 offset-1\'>\n");
@@ -428,7 +429,7 @@ parchvar[0]=0;
 
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col-10 offset-1\'>\n");
-    fprintf(fp, "\n<TABLE class=\'resultstbl table table-sm thead-dark\'>");
+    fprintf(fp, "\n<TABLE class=\'resultstbl sortable table table-sm\'>");
     fprintf(fp, "\n<thead class=\'thead-dark\'><tr>\n");
     fprintf(fp, "<th>STA</th><th>%% CHN</th><th>NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH>\n");
     fprintf(fp, "</tr></thead>\n");
@@ -662,6 +663,7 @@ ackpage[0]=0;
     fprintf(fp, "</HEAD>\n");
     sprintf(parchvar,"https://%s/%s",webstuff,parchstr);
     fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
+    fprintf(fp, "<script src=/web/js/sorttable.js></script>\n");
     fprintf(fp, "<DIV class=\'container\'> <!-- container -->");
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col\'>\n");
@@ -696,7 +698,7 @@ ackpage[0]=0;
 
     PrintChnPgLegend(fp);
 
-    fprintf(fp, "<TABLE class=\'resultstbl table table-sm\'>");
+    fprintf(fp, "<TABLE class=\'resultstbl sortable table table-sm\'>");
     fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA</th><th>CHAN</th><th>RATE</th><th>NSEG</th><th>LAST DATUM</th><th>DATA LATENCY</TH><TH>LINK LATENCY</B></th></tr></thead>\n");
     fprintf(fp, "<tbody>");
 }
