@@ -259,11 +259,7 @@ static void MakeLinkColorSS(FILE *fp)
     fprintf(fp, "color: #fff; \n");
     fprintf(fp, "} \n");
 
-    fprintf(fp, ".resultstbl a.working:link {\n");
-    fprintf(fp, "color: #000; \n");
-    fprintf(fp, "} \n");
-
-    fprintf(fp, ".resultstbl a.working:visited { \n");
+    fprintf(fp, ".resultstbl a { \n");
     fprintf(fp, "color: #000; \n");
     fprintf(fp, "} \n");
     fprintf(fp, "</style>\n");
@@ -476,24 +472,26 @@ chanlink[0]=0;
         latency = time(NULL) - (UINT32) tols;
         fprintf(fp, "<td bgcolor=\"%06x\">",GetBg(latency));
         if (GetBg(latency)) {
+            /* fprintf(fp, "<font size=\"+0\" color=\"%06x\"><B>*</B></font>", GetBg(tslw)); */
+            fprintf(fp, "<font color=\"%06x\"><B>*</B></font>", GetBg(tslw));
             if (stationdir != NULL) {
-                fprintf(fp, "\n<A HREF=\"%s\" class=\"visited\">",stahomelink);
+                fprintf(fp, "\n<a href=\"%s\">", stahomelink);
             }
-            else {
-                fprintf(fp,"\n%s",sta);
+            fprintf(fp, "<font color=\"%06x\"><b>%s</b></font>", GetFg(tslw), util_ucase(sta));
+            if (stationdir != NULL) {
+                fprintf(fp, "</a>\n");
             }
-                fprintf(fp, "<font color=\"%06x\">%s</A>\n<font size=\"+0\" color=\"%06x\"><B>*</B></td>\n",
-                    GetFg(tslw),util_ucase(sta),GetBg(tslw));
         } else {
             if (stationdir != NULL) {
-                fprintf(fp, "\n<A HREF=\"%s\" class=\"visited\">",stahomelink);
+                fprintf(fp, "\n<A HREF=\"%s\" class=\"working visited\">",stahomelink);
             }
             else {
                 fprintf(fp,"\n%s",sta);
             }
-            fprintf(fp, "<font color=\"%06x\">%s</A>\n<font size=\"+3\" color=\"%06x\"><B>*</B></td>\n",
-              WHITE,util_ucase(sta),GetBg(tslw));
+            fprintf(fp, "<font color=\"%06x\"><B>*</B></font>", GetBg(tslw));
+            fprintf(fp, "<font color=\"%06x\">%s</font></A>", WHITE,util_ucase(sta));
         }
+        fprintf(fp, "\n</td>\n", GetFg(tslw),util_ucase(sta));
         fprintf(fp, "<td bgcolor=\"%06x\">",GetPercentbg(livechn));
         fprintf(fp, "<A HREF=\"%s\">",chanlink);
         fprintf(fp, "<font color=\"%06x\">%i</A></td>\n",GetPercentfg(livechn),livechn);
@@ -932,7 +930,7 @@ static char *VerboseHelp =
 "isiserver=string  default: idahub.ucsd.edu \n"
 "webserver=string  default: ida.ucsd.edu \n"
 "webpath=string    default: Telemetry \n"
-"htdocpath=string  default: /export/home/apache/htdocs/ida \n"
+"htdocpath=string  default: /ida/web \n"
 "stationdir=string default: Stations \n"
 ;
     fprintf(stderr, "%s %s\n\n", myname, VersionIdentString);
