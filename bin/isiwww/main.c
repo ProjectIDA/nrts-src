@@ -210,19 +210,8 @@ static VOID SortCnf(ISI_CNF_REPORT *cnf)
 
 static void PrintTimeStamp(FILE *fp)
 {
-    fprintf(fp,"<p class=\"font-italic text-center\">Page last updated %s UTC</p>", utilLttostr(now, 0, gm.buf));
-    /* fprintf(fp, "Page last updated %s UTC ", utilLttostr(now, 0, gm.buf)); */
-    /* fprintf(fp,"</p>\n"); */
+    fprintf(fp,"<p class=\"font-italic text-center\">Page last updated at %s</p>", local.buf);
 }
-
-static void MakeTableforSafari(FILE *fp)
-{
-    fprintf(fp, "<style type=\"text/css\" media=\"all\">\n");
-    fprintf(fp, "TABLE {\n");
-    fprintf(fp, "color: #fff; \n");
-    fprintf(fp, "} \n");
-}
-
 
 static void MakeLinkColorSS(FILE *fp)
 {
@@ -966,9 +955,15 @@ char *mainpage="index.html";
     gmtime_r(&now, &gm.tm);
     asctime_r(&gm.tm, gm.buf);
     gm.buf[strlen(gm.buf)-1] = 0;
+
+    putenv("TZ=America/Los_Angeles");
+    tzset();
     localtime_r(&now, &local.tm);
-    asctime_r(&local.tm, local.buf);
-    local.buf[strlen(local.buf)-1] = 0;
+    strftime(local.buf, 64, "%a, %Y-%m-%d (%j) %H:%M:%S (%Z)\n", &local.tm);
+    putenv("TZ=");
+    /* localtime_r(&now, &local.tm); */
+    /* asctime_r(&local.tm, local.buf); */
+    /* local.buf[strlen(local.buf)-1] = 0; */
 
     for (i = 1; i < argc; i++) {
         if (strncmp(argv[i], "webserver=", strlen("webserver=")) == 0) {
