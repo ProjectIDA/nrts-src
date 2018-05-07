@@ -1,8 +1,11 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.26 2014/08/28 21:47:06 dechavez Exp $"
 
-char *VersionIdentString = "Release 2.3.2";
+char *VersionIdentString = "Release 2.3.3";
 
 /* Release notes
+
+2.3.3  05/07/2018
+       link with libdbio 3.5.1 to ignore missing deprecated files
 
 2.3.2  08/28/2014
        link with libisidl 1.25.0 (ISI_DL_OTIONS moved into ISI_DL handle), and support for same
@@ -29,7 +32,7 @@ char *VersionIdentString = "Release 2.3.2";
        Fixed "isidlCloseDiskLoop: LockDiskLoop: utilReadLockWait: Invalid argument" error
 
 1.8.0  01/26/2009
-       Don't create QDP state file, fixed annoying "No such file" message 
+       Don't create QDP state file, fixed annoying "No such file" message
        when creating new QDP loop w/o pre-existing metadir
 
 1.7.3  02/20/2008
