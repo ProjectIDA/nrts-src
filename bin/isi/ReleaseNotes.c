@@ -1,8 +1,11 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.41 2015/12/08 18:49:14 dechavez Exp $"
 
-char *VersionIdentString = "Release 2.5.0";
+char *VersionIdentString = "Release 2.5.1";
 
 /* Release notes
+
+2.5.1  05/07/2018
+       link with libdbio 3.5.1 to ignore missing deprecated files in ~nrts/etc
 
 2.5.0  12/08/2015
        Clean DARWIN builds
@@ -38,10 +41,10 @@ char *VersionIdentString = "Release 2.5.0";
 1.11.0 01/10/2008
        Added -q option, include raw header display in raw feeds if -q not specified
 
-1.10.2 06/28/2007 
+1.10.2 06/28/2007
        Made help even more verbose.
 
-1.10.1 06/01/2007 
+1.10.1 06/01/2007
        Fixed secs to samples bug in reporting time tears, report time tears as
        days, hours, minutes, seconds as well as total seconds
 
@@ -97,7 +100,7 @@ char *VersionIdentString = "Release 2.5.0";
        Fixed typo in improved(?) help message
 
 1.4.7  04/26/2004 (cvs rtag isi_1_4_7 isi)
-       Improved(?) help message, default to uncompressed data 
+       Improved(?) help message, default to uncompressed data
 
 1.4.6  01/29/2004 (cvs rtag isi_1_4_6 isi)
        Relink with purified libraries, use new isiFree[Soh,Cnf,Wfdisc]
