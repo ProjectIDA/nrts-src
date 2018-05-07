@@ -483,6 +483,8 @@ char path[MAXPATHLEN+1];
 char buf[MAXPATHLEN+1];
 char *isicfg;
 
+/* Ignore any missing deprecated files */
+
     snprintf(path, MAXPATHLEN+1, "%s%cetc%crevs", spec, PATH_DELIMITER, PATH_DELIMITER);
     if (utilFileExists(path) && LoadRevs(ff, path, buf) != 0) return FALSE;
 
@@ -492,14 +494,8 @@ char *isicfg;
     snprintf(path, MAXPATHLEN+1, "%s%cetc%ctqual", spec, PATH_DELIMITER, PATH_DELIMITER);
     if (utilFileExists(path) && LoadTqual(ff, path, buf) != 0) return FALSE;
 
-    snprintf(path, MAXPATHLEN+1, "%s%cetc%csint", spec, PATH_DELIMITER, PATH_DELIMITER);
-    if (utilFileExists(path) && LoadSint(ff, path, buf) != 0) return FALSE;
-
     snprintf(path, MAXPATHLEN+1, "%s%cetc%cmaps%cAssignments", spec, PATH_DELIMITER, PATH_DELIMITER, PATH_DELIMITER);
     if (utilFileExists(path) && LoadStamap(ff, path, buf) != 0) return FALSE;
-
-    snprintf(path, MAXPATHLEN+1, "%s%cetc%cSystems", spec, PATH_DELIMITER, PATH_DELIMITER);
-    if (LoadSystems(ff, path, buf) != 0) return FALSE;
 
     snprintf(path, MAXPATHLEN+1, "%s%cetc%cimei.map", spec, PATH_DELIMITER, PATH_DELIMITER);
     if (utilFileExists(path) && LoadIMEI(ff, path, buf) != 0) return FALSE;
@@ -507,6 +503,14 @@ char *isicfg;
     snprintf(path, MAXPATHLEN+1, "%s%cetc%cisi.cfg", spec, PATH_DELIMITER, PATH_DELIMITER);
     isicfg = utilFileExists(path) ? path : NULL;
     if (!idaffReadGlobalInitFile(isicfg, &ff->glob)) return FALSE;
+
+/* but make sure required sint and Systems files are present */
+
+    snprintf(path, MAXPATHLEN+1, "%s%cetc%csint", spec, PATH_DELIMITER, PATH_DELIMITER);
+    if (LoadSint(ff, path, buf) != 0) return FALSE;
+
+    snprintf(path, MAXPATHLEN+1, "%s%cetc%cSystems", spec, PATH_DELIMITER, PATH_DELIMITER);
+    if (LoadSystems(ff, path, buf) != 0) return FALSE;
 
     return TRUE;
 }
