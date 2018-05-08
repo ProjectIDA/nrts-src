@@ -1,8 +1,11 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.41 2015/12/08 18:49:14 dechavez Exp $"
 
-char *VersionIdentString = "Release 2.5.1";
+char *VersionIdentString = "Release 2.5.2";
 
 /* Release notes
+
+2.5.2  05/08/2018
+       link with libisidb 1.5.0 to not require revs file for rev=10 systems
 
 2.5.1  05/07/2018
        link with libdbio 3.5.1 to ignore missing deprecated files in ~nrts/etc
