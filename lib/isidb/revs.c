@@ -22,7 +22,16 @@ int i;
             return TRUE;
         }
     }
-            
+
+/* hardcode success for rev 10 queries */
+/* This allows us to ditch the etc/revs file */
+
+    if (value == 10) {
+        buf->value = 10;
+        buf->description[0] = 0;
+        return TRUE;
+    }
+
     return FALSE;
 }
 
