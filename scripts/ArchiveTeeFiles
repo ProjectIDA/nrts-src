@@ -2,22 +2,7 @@
 # $Id: ArchiveTeeFiles,v 1.10 2015/06/17 17:25:44 dechavez Exp $
 #
 # Compress tee files and move them to the archive
-
 set myname = ArchiveTeeFiles
-
-if ($#argv != 1) then
-    logger -t $myname"[$$]" -p user.info "bad command line"
-    echo "usage: $myname archive_dir"
-    goto failure
-endif
-
-set ArchiveDir = $argv[1]
-if (! -d $ArchiveDir) then
-    set message = "missing $ArchiveDir"
-    logger -t $myname"[$$]" -p user.info "$message"
-    echo "${myname}: $message"
-    goto failure
-endif
 
 # General setup
 
@@ -31,11 +16,33 @@ endif
 source $setup
 
 # Check for debug flag
-
 if (-e $DebugDir/$myname) then
     set debug = 1
 else
     set debug = 0
+endif
+
+# Check for another running instance
+set lock   = /var/tmp/$myname.lock
+filelock $lock $$
+if ($status != 0) then
+    if ($debug) logger -t $myname"[$$]" -p user.info "another instance already active"
+    exit 0
+endif
+
+
+if ($#argv != 1) then
+    logger -t $myname"[$$]" -p user.info "bad command line"
+    echo "usage: $myname archive_dir"
+    goto failure
+endif
+
+set ArchiveDir = $argv[1]
+if (! -d $ArchiveDir) then
+    set message = "missing $ArchiveDir"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    goto failure
 endif
 
 if ($debug) logger -t $myname"[$$]" -p user.info "begin"
