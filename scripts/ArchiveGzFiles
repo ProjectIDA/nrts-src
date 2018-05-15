@@ -35,6 +35,7 @@ if ($#argv == 2) then
     set srcdir  = $argv[1]
     set dstroot = $argv[2]
     set site    = `basename $dstroot | ucase`
+    set lsite    = `basename $dstroot | lcase`
 else
     set error = 1
 endif
@@ -109,7 +110,7 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
             endif
 
 
-            set msdir    = ${IDA_MSARCHIVE_RAW_DIR}/${site}/${date}
+            set msdir    = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${date}
             mkdir -p $msdir   # TODO: Add error checking
 
             # conversion to MS and append to whole-day ms filea
@@ -118,30 +119,18 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
             set filepath = `pwd`/$file
             set msfile   = ${msdir}/${sitedayms}                   # append ms data to whole day ms file
             set command  = "$cmd < $filepath >>! $msfile"
-            echo $command >>! ${IDA_MSARCHIVE_RAW_DIR}/converted-to-ms
+            echo $command >>! ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
 
             if ($debug) logger -t $myname"[$$]" -p user.info "$command"
 
             # send stderr output to log file.
-            ($cmd < $filepath >>! $msfile) >>& ${IDA_MSARCHIVE_RAW_DIR}/converted-to-ms
+            ($cmd < $filepath >>! $msfile) >>& ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
             if ($status != 0) then 
                 logger -t $myname"[$$]" -p user.info "FAILED: $command"
                 rm -rf $msfile
                 goto failure
             endif
-            #echo $msout >>! ${IDA_MSARCHIVE_RAW_DIR}/converted-to-ms
-
-#			set command = "dataselect -Sd -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_MSARCHIVE_RAW_DIR}/%s/%Y/%j/%n.%s.%l.%c.%Y.%j $msfile"
-#			if ($debug) logger -t $myname"[$$]" -p user.info "$command"
-#			# echo $command 
-#			$command
-#			if ($status != 0) then
-#				logger -t $myname"[$$]" -p user.info "FAILED: $command"
-#				goto failure
-#			endif
-#			echo $command >>! ${IDA_MSARCHIVE_RAW_DIR}/processed-by-dataselect
-#            # cleanup temp ms file
-#			rm -rf $msfile
+            #echo $msout >>! ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
 
             set command = "chmod 444 $destpath"
             if ($debug) logger -t $myname"[$$]" -p user.info "$command"
@@ -167,27 +156,39 @@ foreach day ($msdays)
 	set year      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
 	set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
 	set sitedayms = ${site}-${year}-${jday}.ms
-	set dayms = ${IDA_MSARCHIVE_RAW_DIR}/${site}/${day}/${sitedayms}
+	set dayms = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/${sitedayms}
 
+    if ($debug) logger -t $myname"[$$]" -p user.info "Moving previous run files into TEMP dir..."
     # first lets move existing files to TEMP dir
-    mkdir -p ${IDA_MSARCHIVE_RAW_DIR}/${site}/${day}/TEMP
-    mv -f ${IDA_MSARCHIVE_RAW_DIR}/${site}/${day}/*.${year}.${jday} ${IDA_MSARCHIVE_RAW_DIR}/${site}/${day}/TEMP/ > /dev/null
+    mkdir -p ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP
+    mv -f ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/*.${year}.${jday} ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP/ > /dev/null
     # TODO: SOme error checking perhaps...
 
+    if ($debug) logger -t $myname"[$$]" -p user.info "Prepping whole-day ms file for run through dataselect..."
 	# now run through dataselect
 	# -Sd - split data on day boundaries
 	# -Ps - prune data at the sample level and collapse overlaps
 	# -ts - start time
 	# -te - end time
-	set command = "dataselect -Sd -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_MSARCHIVE_RAW_DIR}/%s/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
+	set command = "dataselect -Sd -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
 	if ($debug) logger -t $myname"[$$]" -p user.info "$command"
-	# echo $command 
 	$command
 	if ($status != 0) then
 		logger -t $myname"[$$]" -p user.info "FAILED: $command"
 		goto failure
 	endif
-	echo $command >>! ${IDA_MSARCHIVE_RAW_DIR}/processed-by-dataselect
+	echo $command >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
+	
+    set command = "msi -S ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/II.${site}.*.*.${year}.${jday}"
+    set invfn   = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/inventory
+	if ($debug) logger -t $myname"[$$]" -p user.info "$command '>!' $invfn"
+	$command >! $invfn
+    set savestat = $status
+	if ($savestat != 0) then
+		logger -t $myname"[$$]" -p user.info "FAILED: [retcode: $savestat] $command '>!' $invfn"
+		goto failure
+	endif
+	echo "$command '>!' $invfn" >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
 	
 end
 
