@@ -1,14 +1,17 @@
 #pragma ident "$Id: version.c,v 1.22 2016/07/20 23:09:39 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "dbio.h"
 
-static VERSION version = {3, 5, 0};
+static VERSION version = {3, 5, 1};
 
 /* dbio library release notes
+
+3.5.1   05/07/2018
+        ff.c: modified LoadFlatfiles to check not attempt to open missing deprecated files
 
 3.5.0   07/20/2016
         dbio.h: introduce OS specific DBIO_DEFAULT_SPEC
@@ -88,7 +91,7 @@ static VERSION version = {3, 5, 0};
 
 1.0.0   04/22/2004 (cvs rtag libdbio_1_0_0 libdbio)
         Initial release
-  
+
  */
 
 char *dbioVersionString()

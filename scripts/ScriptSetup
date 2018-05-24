@@ -1,27 +1,42 @@
-# $Id: ScriptSetup,v 1.24 2017/01/13 17:34:44 dechavez Exp $
+# $Id: ScriptSetup,v 1.21 2011/12/16 01:00:03 dechavez Exp $
 # General purpose setup for NRTS/ISP scripts
 
 setenv NRTS_HOME /usr/nrts
 if (-e $NRTS_HOME/UNCONFIGURED) exit 0
 
-# Ensure the required ancillary files are all present
+# How may days to keep .gz files after they have been archived in an ISO image
+set DoneZipsFindValue = "+366"
 
-foreach file (.platform .envrc etc/retain)
-    set reqfile = $NRTS_HOME/$file
-    if ( -e $reqfile ) then
-        source $reqfile
+# How many days to keep ISO images after they have been burned to CD
+set DoneIsosFindValue = "+366"
+
+# How many days to keep unburned ISO images
+set IsoDirFindValue   = "+366"
+
+# How many days to keep unprocessed tee files
+set IsiGzTeeFindValue = "+366"
+
+# How many days to keep log files
+set FlushLogFindValue = "+366"
+
+set status = 0
+
+foreach file (.platform .envrc)
+    set dotfile = $NRTS_HOME/$file
+    if ( -e $dotfile ) then
+        source $dotfile
     else
-        echo "FATAL ERROR: missing $reqfile"
+        echo "FATAL ERROR: missing $dotfile"
         exit 1
     endif
 end
-
-set status = 0
 
 set path = ($NRTS_HOME/bin     $path)
 set path = ($NRTS_HOME/scripts $path)
 if (-e /opt/local/bin) set path = (/opt/local/bin $path)
 if (-e /usr/local/bin) set path = (/usr/local/bin $path)
+
+if (-e /ida/local/bin) set path = ($path /ida/local/bin)
 
 set SystemsFile = $NRTS_HOME/etc/Systems
 if (-e $SystemsFile && -e $NRTS_HOME/bin/stripcat) then
@@ -51,18 +66,8 @@ set status = $errors
 
 set DebugDir = $NRTS_HOME/etc/debug
 
-set LogFacility = local0
+# These control tunnel behavior
 
-# Revision History
-#
-# $Log: ScriptSetup,v $
-# Revision 1.24  2017/01/13 17:34:44  dechavez
-# Sigh.  Fixed at Set instead of set error in the change just introduced.  doh
-#
-# Revision 1.23  2017/01/13 17:28:54  dechavez
-# introduced LogFacility, with initial value of local0.  The intent is for
-# scripts which user the logger command to user $LogFacility instead of the
-# currently hard-coded user or local0 facilities.  That will allow one to
-# do a global change of the logging facility without having to edit every
-# single script, which is what I need to do now to add the generalization
-#
+set TunnelFlagDir       = $NRTS_HOME/etc/.tunnel
+set TunnelStopFlag      = $TunnelFlagDir/stop
+set TunnelKeepAliveFlag = $TunnelFlagDir/keepalive

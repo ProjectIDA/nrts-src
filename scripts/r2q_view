@@ -14,12 +14,9 @@ if ($#argv < 1) then
   echo ""
   echo "  For a given day, r2q_view calls 'miniseed2db' to generate wfdisc table from"
   echo "  miniseed data sets created by r2q_proc.  It then runs 'dbpick' on the wfdisc"
-  echo "  to review the data from BH, LH, LN and LD channels.  While running 'dbpick',"
-  echo "  it makes screen dumps from 'dbpick' and saves them to postscrip files which"
-  echo "  can be viewed by 'gs' command."
+  echo "  to review the data from BH, LH, LN and LD channels."
   echo ""
-  echo "  The miniseed data are in /ida/tmp/daily/miniseed/[jday] and the associated db files"
-  echo "  and postscript files are stored in /ida/tmp/daily/miniseed/[jday]/db."
+  echo "  The miniseed data are in /ida/tmp/daily/miniseed/[jday] and the associated db files."
   echo ""
   exit 1
 endif
@@ -90,31 +87,26 @@ foreach x (`echo $mslist`)
   endif
 
   dbpick -nostarttalk -noexist -sc {$sta}:BH._00 -tw 86400 -geom 1600x1000+50+50 $prefix << INN >> & /dev/null
-ps $prefix.BH00.ps
 exec sleep 2
 quit
 INN
 
   dbpick -nostarttalk -noexist -sc {$sta}:BH._10 -tw 86400 -geom 1600x1000+50+50 $prefix << INN >> & /dev/null
-ps $prefix.BH10.ps
 exec sleep 2
 quit
 INN
 
   dbpick -nostarttalk -noexist -sc {$sta}:LH.... -tw 86400 -geom 1600x1000+50+50 $prefix << INN >> & /dev/null
-ps $prefix.LH.ps
 exec sleep 2
 quit
 INN
 
   dbpick -nostarttalk -noexist -sc {$sta}:LN.... -tw 86400 -geom 1600x1000+50+50 $prefix << INN >> & /dev/null
-ps $prefix.LN.ps
 exec sleep 2
 quit
 INN
 
   dbpick -nostarttalk -noexist -sc {$sta}:LD.... -tw 86400 -geom 1600x1000+50+50 $prefix << INN >> & /dev/null
-ps $prefix.LD.ps
 exec sleep 2
 quit
 INN

@@ -1,11 +1,14 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.77 2017/01/26 19:03:24 dechavez Exp $"
 
-char *VersionIdentString = "Release 4.5.6";
+char *VersionIdentString = "Release 4.5.7";
 
 /* Release notes
 
+4.5.7  05/07/2018
+      link with libdbio 3.5.1 to ignore missing deprecated files in ~nrts/etc
+
 4.5.6  01/26/2016
-       link with libq330 3.7.6 to address re-introducing the double free bug in 3.7.5! 
+       link with libq330 3.7.6 to address re-introducing the double free bug in 3.7.5!
 
 4.5.5  01/24/2016
        link with libq330 3.7.5 to address bugs introduced in libq330 3.7.4
@@ -160,7 +163,7 @@ char *VersionIdentString = "Release 4.5.6";
        Cleaned up the logic flow of the trigger state switch.
 
 1.7.1  07/08/2009
-       Fixed multiple Q330 automatic calibration detrigger bug, verify CRC 
+       Fixed multiple Q330 automatic calibration detrigger bug, verify CRC
 
 1.7.0  07/02/2009
        Automatic calibration "triggers"
@@ -195,7 +198,7 @@ char *VersionIdentString = "Release 4.5.6";
 1.3.5  03/05/2008
        CNP316 (aux packet) support
 
-1.3.4  01/07/2008 
+1.3.4  01/07/2008
        *** little-endian support ***
 
 1.3.3  12/20/2007
@@ -212,7 +215,7 @@ char *VersionIdentString = "Release 4.5.6";
 1.3.0  09/25/2007
        Rework trigger framework into a more general "process" path which currently
        just runs the event detector.  The event detector has been generalized into
-       an opaque structure managed by libdetect.  All detector parameters are 
+       an opaque structure managed by libdetect.  All detector parameters are
        specfied via the q330.cfg file.  Linked with libdetect 1.0.0 which includes
        a simple STA/LTA trigger.
 

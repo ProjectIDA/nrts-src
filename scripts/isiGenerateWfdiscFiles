@@ -94,8 +94,6 @@ foreach station ($SystemsList)
     set stawfdisc = $station.wfdisc
     rm -f $stawfdisc
     grep ^$station $master > $stawfdisc
-    echo "css3.0" > $station
-    if ( $?CSS30_DATABASE_PATH ) echo "$CSS30_DATABASE_PATH" >> $station
 end
 
 # Create the network day volumes
@@ -111,8 +109,6 @@ foreach date ($dates)
         set yyyy = `substring $date 1 4`
         set ddd  = `substring $date 5 3`
         wdcut $yyyy-$ddd $yyyy-$ddd-23:59:59.999 $master >> $output
-        echo "css3.0" > $date
-        if ( $?CSS30_DATABASE_PATH ) echo $CSS30_DATABASE_PATH >> $date
     endif
 end
 

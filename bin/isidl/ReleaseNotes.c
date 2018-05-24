@@ -1,8 +1,19 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.157 2017/12/21 00:04:21 dechavez Exp $"
 
-char *VersionIdentString = "Release 4.12.0";
+char *VersionIdentString = "Release 4.12.3";
 
 /* Release Notes
+
+4.12.3  05/08/2018
+        link with libisidb 1.5.0 to not require revs file for rev=10 systems
+
+4.12.2  05/07/2018
+        link with libdbio 3.5.1 to ignore missing deprecated files in ~nrts/etc
+
+4.12.1  02/02/2018
+        Fresh build as 4.12.0 seemed to have some library version skew resulting in a core
+        dump when isidlCloseDiskLoop() was invoking isidlFeedSeedLink() but which doesn't happen
+        when I build it now, bumping version number so I'll know its this one
 
 4.12.0  12/20/2017
         link with libisidl 1.26.0 for IDA10.12 NRTS and Seedlink support (untested)

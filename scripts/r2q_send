@@ -62,17 +62,21 @@ if ($#argv != 1) then
 endif
 
 
+set myname = "r2q_proc"
 #
 # directory contains mini-SEED data
 # 
 set jdate = $1
 set dir   = /ida/tmp/daily/miniseed/$jdate
+set yr  = `echo $jdate | cut -c1-4`
+set dy  = `echo $jdate | cut -c5-7`
+
 
 #
 # host and port are assigned by DMC
 #
 set host  = ringsub.iris.washington.edu
-set port  = 16105
+set port  = 16100
 
 set syncdir = /ida/tmp/daily/SYNC
 
@@ -99,8 +103,9 @@ rm -f /tmp/list.$$
 ls $dir/*.ms | grep -v XPFO > /tmp/list.$$
 rm -f /tmp/ms2dmc.log.$$ 
 
-echo miniseed2dmc -w $syncdir -S statefile.$jdate "$host":"$port" -l /tmp/list.$$
-     miniseed2dmc -w $syncdir -S statefile.$jdate "$host":"$port" -l /tmp/list.$$ >& /tmp/ms2dmc.log.$$
+echo miniseed2dmc -v -w $syncdir -S statefile.$jdate "$host":"$port" -l /tmp/list.$$
+     miniseed2dmc -v -w $syncdir -S statefile.$jdate "$host":"$port" -l /tmp/list.$$ >& /tmp/ms2dmc.log.$$
+
 
 #
 # If everything is sent, move files around and clean it
@@ -118,6 +123,22 @@ if ($status == 0) then			# yes, all data sent to DMC, move them to DONE
   set flag = 'DONE'
   # move ms files
   if (! -d $dir/DONE) mkdir -p $dir/DONE	# make DONE/ first
+
+  echo "${myname}: Copying miniseed and inventory files into $IDA_ARCHIVE_DMC_DIR..."
+  foreach msfn (${dir}/*.ms)
+      # get station: ASSUMES STA_YYYYJJJ.ms name format
+      set sta = `basename $msfn | awk -F"_" '{print $1}' | lcase`
+      set dmc_arc_dir = $IDA_ARCHIVE_DMC_DIR/$sta/$yr/$dy
+      if (! -d $dmc_arc_dir) mkdir -p $dmc_arc_dir
+
+      dataselect -A $dmc_arc_dir/%n.%s.%l.%c.%Y.%j $msfn
+      # TODO: Error checking
+
+      set command = "msi -S $msfn"
+      set invfn   = "$dmc_arc_dir/inventory"
+      $command >! $invfn
+      # TODO: Error checking
+  end
 
   echo "r2q_send: Moving Miniseed files into DONE..."
   \mv $dir/*.ms $dir/DONE		# MOVE/REPLACE ms files in DONE/

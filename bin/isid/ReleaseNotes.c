@@ -1,8 +1,11 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.86 2018/01/03 17:37:58 dechavez Exp $"
 
-char *VersionIdentString = "Release 4.6.0";
+char *VersionIdentString = "Release 4.6.1";
 
 /* Release notes
+
+4.6.1  05/08/2018
+       link with libdbio 3.5.1 and libisidb 1.5.0 to no longer require deprecated lookup tables
 
 4.6.0  01/03/2018
        link with libisidl 1.26.0 for IDA10.12 support

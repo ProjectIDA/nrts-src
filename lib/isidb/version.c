@@ -1,14 +1,17 @@
 #pragma ident "$Id: version.c,v 1.17 2015/12/04 22:09:26 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "isi/db.h"
 
-static VERSION version = {1, 4, 2};
+static VERSION version = {1, 5, 0};
 
 /* isidb library release notes
+
+1.5.0   05/08/2018
+        revs.c: Hardcoded successful return for FlatFileLookup when value==10 (IDA10), revs file not required to exist
 
 1.4.2   12/07/2015
         sitechanflag.c: fixed FALSE instead of NULL return value bug (benign)
