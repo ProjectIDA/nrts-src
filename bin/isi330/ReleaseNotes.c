@@ -1,9 +1,12 @@
-char *VersionIdentString = "Release 1.2.0 (beta)";
+char *VersionIdentString = "Release 1.2.1";
 
 /* Release Notes */
 /*
 
-1.2.0b  2018-04-18 dauerbach
+1.2.1   2018-04-18 dauerbach
+        q330.c:   set Q3330 DATA and CTRL UDP ports to unique based on dataport being used.
+
+1.2.0   2018-04-18 dauerbach
         packet.c: split Init and 'Push' logic to check OUTPUT_TYPE in isi330 cfg struct
                   can output to an ISI server (e.g. i10ldl) or stream to a file. Only stdout supported atm.
         init.c:   change 'dropvh' cmdline option to '-dropvh'
