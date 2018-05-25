@@ -116,8 +116,8 @@ BOOL InitQ330(ISI330_CONFIG *cfg, Q330_CFG *q330db)
     strcpy(cfg->q330->tpr.host_interface, "");
     cfg->q330->tpr.host_mincmdretry = 2;
     cfg->q330->tpr.host_maxcmdretry = 30;
-    cfg->q330->tpr.host_ctrlport = ISI330_HOST_CTRLPORT_BASE + cfg->q330->dp;
-    cfg->q330->tpr.host_dataport = ISI330_HOST_DATAPORT_BASE + cfg->q330->dp;
+    cfg->q330->tpr.host_ctrlport = ISI330_HOST_CTRLPORT_BASE + qcfg.instance * 10 + cfg->q330->dp;
+    cfg->q330->tpr.host_dataport = ISI330_HOST_DATAPORT_BASE + qcfg.instance * 10 + cfg->q330->dp;
     LogMsg("CTRL PORT: %d\n", cfg->q330->tpr.host_ctrlport);
     LogMsg("DATA PORT: %d\n", cfg->q330->tpr.host_dataport);
     // cfg->tpr.serial_flow = 0;
