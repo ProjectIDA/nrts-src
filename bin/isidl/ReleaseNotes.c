@@ -1,8 +1,9 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.157 2017/12/21 00:04:21 dechavez Exp $"
-
-char *VersionIdentString = "Release 4.12.3";
+char *VersionIdentString = "Release 4.12.4";
 
 /* Release Notes
+
+4.12.4  05/31/2018 dauerbach
+        link with libisidl 1.26.3 witch fixes semaphore-init-pre-fork problem
 
 4.12.3  05/08/2018
         link with libisidb 1.5.0 to not require revs file for rev=10 systems
