@@ -1,14 +1,18 @@
 #pragma ident "$Id: version.c,v 1.12 2016/01/23 00:09:50 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "qdp/xml.h"
 
-static VERSION version = {1, 4, 1};
+static VERSION version = {1, 4, 2};
 
 /* qdpxml library release notes
+
+1.4.2   05/25/2018
+        lcq.c: set corresponding LCQ option bits when loading in pebuf, gapthresh, caldly, comfr.  Added missing support for firfix.
+        print.c: removed tabs or trailing spaces
 
 1.4.1   01/22/2016
         envproc.c: changes related to reworking of QDP_TYPE_C2_EPCFG structure layout
