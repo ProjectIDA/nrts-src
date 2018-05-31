@@ -1,11 +1,12 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.77 2017/01/26 19:03:24 dechavez Exp $"
-
-char *VersionIdentString = "Release 4.5.7";
+char *VersionIdentString = "Release 4.5.8";
 
 /* Release notes
 
+4.5.8   05/31/2018 dauerbach
+        link with libisidl 1.26.3 witch fixes semaphore-init-pre-fork problem
+
 4.5.7  05/07/2018
-      link with libdbio 3.5.1 to ignore missing deprecated files in ~nrts/etc
+       link with libdbio 3.5.1 to ignore missing deprecated files in ~nrts/etc
 
 4.5.6  01/26/2016
        link with libq330 3.7.6 to address re-introducing the double free bug in 3.7.5!
