@@ -1,8 +1,9 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.97 2018/01/09 01:09:13 dechavez Exp $"
-
-char *VersionIdentString = "Release 2.11.3";
+char *VersionIdentString = "Release 2.11.4 beta";
 
 /* Release notes
+
+2.11.4  05/25/2018
+        link with libqdpxml 1.4.2 to fix bug in parsing optional token LCQ parameters
 
 2.11.3  01/08/2018
         link with libqdp 3.17.1 to fix bug loading XML files with control detector entries
