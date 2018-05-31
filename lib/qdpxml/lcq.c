@@ -6,6 +6,36 @@
  *====================================================================*/
 #include "protos.h"
 
+static void SetPrecount(QDP_TOKEN_LCQ *lcq, char *value)
+{
+    lcq->pebuf = (INT16) atoi(value);
+    lcq->options |= QDP_LCQ_HAVE_PRE_EVENT_BUFFERS;
+}
+
+static void SetGap(QDP_TOKEN_LCQ *lcq, char *value)
+{
+    lcq->gapthresh = atof(value);
+    lcq->options |= QDP_LCQ_HAVE_GAP_THRESHOLD;
+}
+
+static void SetCaldly(QDP_TOKEN_LCQ *lcq, char *value)
+{
+    lcq->caldly = (INT16) atoi(value);
+    lcq->options |= QDP_LCQ_HAVE_CALIB_DELAY;
+}
+
+static void SetMaxframe(QDP_TOKEN_LCQ *lcq, char *value)
+{
+    lcq->comfr = (INT16) atoi(value);
+    lcq->options |= QDP_LCQ_HAVE_FRAME_COUNT;
+}
+
+static void SetFirfix(QDP_TOKEN_LCQ *lcq, char *value)
+{
+    lcq->firfix = atof(value);
+    lcq->options |= QDP_LCQ_HAVE_FIR_MULTIPLIER;
+}
+
 static void SetAveSamps(QDP_TOKEN_LCQ *lcq, char *value)
 {
     lcq->ave.len = (UINT32) atoi(value);
@@ -57,10 +87,11 @@ char *tag, *value;
     else if (strcmp(tag, "netserv"  ) == 0) lcq->options |= (atoi(value) ? QDP_LCQ_SEND_TO_NET_SERVER    : 0);
     else if (strcmp(tag, "netevt"   ) == 0) lcq->options |= (atoi(value) ? QDP_LCQ_NETSERV_EVENT_ONLY    : 0);
     else if (strcmp(tag, "cnpforce" ) == 0) lcq->options |= (atoi(value) ? QDP_LCQ_FORCE_CNP_BLOCKETTTES : 0);
-    else if (strcmp(tag, "precount" ) == 0) lcq->pebuf = (INT16) atoi(value);
-    else if (strcmp(tag, "gap"      ) == 0) lcq->gapthresh = atof(value);
-    else if (strcmp(tag, "caldly"   ) == 0) lcq->caldly = (INT16) atoi(value);
-    else if (strcmp(tag, "maxframe" ) == 0) lcq->comfr = (INT16) atoi(value);
+    else if (strcmp(tag, "precount" ) == 0) SetPrecount(lcq, value);
+    else if (strcmp(tag, "gap"      ) == 0) SetGap(lcq, value);
+    else if (strcmp(tag, "caldly"   ) == 0) SetCaldly(lcq, value);
+    else if (strcmp(tag, "maxframe" ) == 0) SetMaxframe(lcq, value);
+    else if (strcmp(tag, "firfix"   ) == 0) SetFirfix(lcq, value);
     else if (strcmp(tag, "avgsamps" ) == 0) SetAveSamps(lcq, value);
     else if (strcmp(tag, "avgfilt"  ) == 0) SetAveFilt(lcq, value);
     else if (strcmp(tag, "ctrldet"  ) == 0) SetCtrlDet(lcq, value);
@@ -123,7 +154,7 @@ QDP_TOKEN_LCQ new;
  |    distribution.                                                      |
  |                                                                       |
  +-----------------------------------------------------------------------*/
-     
+
 /* Revision History
  *
  * $Log: lcq.c,v $
