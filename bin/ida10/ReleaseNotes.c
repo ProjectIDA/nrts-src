@@ -1,8 +1,9 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.21 2018/01/18 23:32:20 dechavez Exp $"
-
-char *VersionIdentString = "Release 1.15.1";
+char *VersionIdentString = "Release 1.15.2";
 
 /* Release notes
+
+1.15.2 05/31/2018 dauerbach
+       Link with libida10 2.25.2 for updated IDA10.12 cmnhdr.ident fix
 
 1.15.1 02/02/2018
        use new ident TSHDR field for tracking station
