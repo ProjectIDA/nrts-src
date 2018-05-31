@@ -258,7 +258,7 @@ UINT8 *ptr;
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
     cmnhdr->serialno = 0;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = cmnhdr->ttag.end.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -281,7 +281,7 @@ UINT8 *ptr;
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
     cmnhdr->serialno = 0;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -311,7 +311,7 @@ IDA10_TTAG *ttag;
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
     cmnhdr->serialno = 0;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -348,7 +348,7 @@ IDA10_TTAG *ttag;
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
     cmnhdr->serialno = 0;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_OFIS;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackOfisTtag(ptr, &cmnhdr->ttag.beg.ofis);
@@ -386,7 +386,7 @@ static UINT8 UndefinedSrc[4] = {0x31, 0x30, 0x2E, 0x34}; /* "10.4" */
     ptr = &start[4];
     ptr += utilUnpackUINT64(ptr, &cmnhdr->serialno);
     cmnhdr->boxid = 0;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->serialno & 0x0000ffff);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->serialno & 0x0000ffff);
     cmnhdr->ttag.beg.type = IDA10_TIMER_Q330;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackQ330Ttag(ptr, &cmnhdr->ttag.beg.q330);
@@ -458,7 +458,7 @@ IDA10_TTAG *ttag;
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
     cmnhdr->serialno = 0;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_SAN;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackSanTtag(ptr, &cmnhdr->ttag.beg.san);
@@ -492,7 +492,7 @@ IDA10_TTAG *ttag;
     ptr = &start[4];
     ptr += utilUnpackUINT16(ptr, &cmnhdr->boxid);
     cmnhdr->serialno = 0;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->boxid);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->boxid);
     cmnhdr->ttag.beg.type = IDA10_TIMER_OFIS;
     cmnhdr->ttag.beg.derived = FALSE;
     ptr += UnpackOfisTtag(ptr, &cmnhdr->ttag.beg.ofis);
@@ -574,7 +574,7 @@ IDA10_TTAG *ttag;
 
     cmnhdr->boxid = 0;
     cmnhdr->serialno = cmnhdr->ttag.beg.obs.sbd.imei;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->serialno & 0x0000ffff);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->serialno & 0x0000ffff);
 
 /* 10.10 doesn't have end time tag... set to beginning for now.
  * Packets which care about end time will overwrite later.
@@ -608,7 +608,7 @@ IDA10_TTAG *ttag;
 
     cmnhdr->boxid = 0;
     cmnhdr->serialno = cmnhdr->ttag.beg.obs.sbd.imei;
-    sprintf(cmnhdr->ident, "%04Xx", cmnhdr->serialno & 0x0000ffff);
+    sprintf(cmnhdr->ident, "%04X", cmnhdr->serialno & 0x0000ffff);
 
 /* 10.11 doesn't have end time tag... set to beginning for now.
  * Packets which care about end time will overwrite later.
@@ -626,6 +626,7 @@ UINT8 *ptr;
 IDA10_TTAG *ttag;
 char sname[IDA1012_SNAME_LEN+1];
 char nname[IDA1012_NNAME_LEN+1];
+char ident[IDA1012_SNAME_LEN+1]; /* to protect smaller ident[IDA10_IDENT_LEN+1] in TSHDR */
 
     cmnhdr->subformat = IDA10_SUBFORMAT_12;
 
@@ -637,7 +638,9 @@ char nname[IDA1012_NNAME_LEN+1];
     if (cmnhdr->serialno != 0) {
         sprintf(cmnhdr->ident, "%4x", cmnhdr->serialno & 0x0000ffff);
     } else {
-        sprintf(cmnhdr->ident, "%4s", sname);
+        strcpy(ident, sname);
+        ident[IDA10_IDENT_LEN] = 0;
+        sprintf(cmnhdr->ident, "%4s", ident);
     }
 
     ptr += UnpackSEEDtag(ptr, &cmnhdr->ttag.beg.seed);
