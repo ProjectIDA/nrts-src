@@ -1,4 +1,3 @@
-#pragma ident "$Id: slink.c,v 1.20 2018/01/11 18:52:09 dechavez Exp $"
 /*======================================================================
  *
  * Tee incoming ISI data into an IRIS SeedLink server (ringserver).
@@ -352,18 +351,6 @@ static char *fid = "isidlSetSeedLinkOption";
 
     dl->slink.mseed = handle;
 
-/* Launch the packet forwarding thread */
-
-    SEM_INIT(&dl->slink.sem, 0, 1);
-    if (!THREAD_CREATE(&dl->slink.tid, RingServerWriteThread, (void *) &dl->slink)) {
-        logioMsg(dl->slink.lp, LOG_ERR, "*** ERROR *** %s: can't start RingServerWriteThread!", fid);
-        logioMsg(dl->slink.lp, LOG_WARN, "** NOTICE ** SeedLink feed terminated");
-        dl->slink.enabled = FALSE;
-        return;
-    }
-    THREAD_DETACH(dl->slink.tid);
-    SEM_WAIT(&dl->slink.sem);
-
     return TRUE;
 }
 
@@ -403,6 +390,20 @@ static char *fid = "isidlFeedSeedLink";
 
     if (slink == NULL || !slink->enabled) return;
     handle = (MSEED_HANDLE *) slink->mseed;
+
+/* First time through, launch the packet forwarding thread */
+
+    if (slink->first.acquired) {
+        SEM_INIT(&slink->sem, 0, 1);
+        if (!THREAD_CREATE(&slink->tid, RingServerWriteThread, (void *) slink)) {
+            logioMsg(slink->lp, LOG_ERR, "*** ERROR *** %s: can't start RingServerWriteThread!", fid);
+            logioMsg(slink->lp, LOG_WARN, "** NOTICE ** SeedLink feed terminated");
+            slink->enabled = FALSE;
+            return;
+        }
+        SEM_WAIT(&slink->sem);
+        slink->first.acquired = FALSE;
+    }
 
 /* NULL raw input means flush all incomplete MiniSEED packets */
 
