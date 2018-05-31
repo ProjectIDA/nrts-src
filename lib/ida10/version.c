@@ -1,4 +1,3 @@
-#pragma ident "$Id: version.c,v 1.59 2018/01/18 23:31:20 dechavez Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,9 +5,12 @@
  *====================================================================*/
 #include "ida10.h"
 
-static VERSION version = {2, 25, 1};
+static VERSION version = {2, 25, 2};
 
 /* ida10 library release notes
+
+2.25.2 05/31/2018
+       unpack.c:  fix sprintf '%04Xx' typos and only write 4 chars into cmnhdr.ident for IDA 10.12 packets
 
 2.25.1 02/02/2018
        ida10.h: added ident[] to TSHDR, changed convention wrt to boxid and serialno (0 means not set)
