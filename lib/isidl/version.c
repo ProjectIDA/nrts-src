@@ -1,4 +1,3 @@
-#pragma ident "$Id: version.c,v 1.76 2018/01/11 18:57:38 dechavez Exp $"
 /*======================================================================
  *
  * library version management
@@ -6,9 +5,14 @@
  *====================================================================*/
 #include "isi/dl.h"
 
-static VERSION version = {1, 26, 2};
+static VERSION version = {1, 26, 3};
 
 /* isidl library release notes
+
+1.26.3 05/31/2018 dauerbach
+       slink.c: moved init of slink queue semaphore and startup of RingServerWriteThread back to
+                isiFeedSeedLink() from isidlSetSeedLinkOption() to be sure(?) that semaphore is
+                created after main process is forked when run in background. Discovered problem in qhlp.
 
 1.26.2 01/08/2018
        push.c: changed format of incoming connection message
