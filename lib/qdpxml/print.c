@@ -50,8 +50,8 @@ int dent;
     XmlIndent(xp, indent); XmlStartCRC(xp); XmlPrint(xp, "<global>\n");
     if (basetag != NULL) XmlPrintString(xp, dent, "basetag", basetag);
     XmlPrintInt(xp, dent, "clock_to",      glob->clock_to);
-    XmlPrintInt(xp, dent, "initial_vco",   glob->initial_vco);               
-    XmlPrintInt(xp, dent, "gps_backup",    glob->gps_backup);                 
+    XmlPrintInt(xp, dent, "initial_vco",   glob->initial_vco);
+    XmlPrintInt(xp, dent, "gps_backup",    glob->gps_backup);
                                                                               // 11
                                                                               // 1098 76543210
     XmlPrintInt(xp, dent, "aux_rate",      (glob->samp_rates & 0x0003) >> 0); // 0000 00000011
@@ -738,7 +738,7 @@ char buf[QDP_LCQ_MAX_NAMELEN];
         XmlPrintBint8(xp, dent, "chan", lcq->src[0]);
         XmlPrintInt(xp, dent, "subchan", lcq->src[1]);
         XmlPrintInt(xp, dent, "rate", lcq->rate);
-    
+
         XmlPrintInt(xp, dent, "evonly", lcq->options & QDP_LCQ_TRIGGERED_MODE ? 1 : 0);
         XmlPrintInt(xp, dent, "detpack", lcq->options & QDP_LCQ_WRITE_DETECT_PKTS ? 1 : 0);
         XmlPrintInt(xp, dent, "calpack", lcq->options & QDP_LCQ_WRITE_CALIB_PKTS ? 1 : 0);
@@ -749,10 +749,11 @@ char buf[QDP_LCQ_MAX_NAMELEN];
         XmlPrintInt(xp, dent, "netevt", lcq->options & QDP_LCQ_NETSERV_EVENT_ONLY ? 1 : 0);
         XmlPrintInt(xp, dent, "cnpforce", lcq->options & QDP_LCQ_FORCE_CNP_BLOCKETTTES ? 1 : 0);
 
-        XmlPrintInt(xp, dent, "precount", lcq->pebuf);
-        XmlPrintDouble(xp, dent, "%lf", "gap", lcq->gapthresh);
-        XmlPrintInt(xp, dent, "caldly", lcq->caldly);
-        XmlPrintInt(xp, dent, "maxframe", lcq->comfr);
+        if (lcq->options & QDP_LCQ_HAVE_PRE_EVENT_BUFFERS) XmlPrintInt(xp, dent, "precount", lcq->pebuf);
+        if (lcq->options & QDP_LCQ_HAVE_GAP_THRESHOLD    ) XmlPrintDouble(xp, dent, "%.1lf", "gap", lcq->gapthresh);
+        if (lcq->options & QDP_LCQ_HAVE_CALIB_DELAY      ) XmlPrintInt(xp, dent, "caldly", lcq->caldly);
+        if (lcq->options & QDP_LCQ_HAVE_FRAME_COUNT      ) XmlPrintInt(xp, dent, "maxframe", lcq->comfr);
+        if (lcq->options & QDP_LCQ_HAVE_FIR_MULTIPLIER   ) XmlPrintDouble(xp, dent, "%lf", "firfix", lcq->firfix);
 
         if (lcq->options & QDP_LCQ_HAVE_AVEPAR) {
             XmlPrintInt(xp, dent, "avgsamps", lcq->ave.len);
