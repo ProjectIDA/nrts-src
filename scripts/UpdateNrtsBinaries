@@ -1,6 +1,5 @@
 #!/bin/csh -f
 #
-# $Id: UpdateNrtsBinaries,v 1.2 2016/01/27 16:46:57 dechavez Exp $
 
 set iam = `whoami`
 if ($status != 0) then
@@ -22,22 +21,10 @@ if (! -e $setup ) then
 endif
 source $setup
 
-# Figure out the source root
-
-set envrc = ~ida/.envrc
-if (! -e $envrc) then
-    echo "${myname}: missing $envrc"
-    goto Failure
-endif
-set command = `grep SRC_ROOT $envrc`
-if ($status != 0) then
-    echo "${myname}: can't determine SRC_ROOT from $envrc"
-    goto Failure
-endif
-$command
+# Figure the source
 
 if (! $?SRC_ROOT) then
-    echo "${myname}: can't set SRC_ROOT"
+    echo "${myname}: SRC_ROOT not set"
     goto Failure
 endif
 
@@ -77,10 +64,3 @@ exit 0
 Failure:
 exit 1
 
-# $Log: UpdateNrtsBinaries,v $
-# Revision 1.2  2016/01/27 16:46:57  dechavez
-# lookup SRC_ROOT from ~ida/.envrc and use that to locate the files to copy
-#
-# Revision 1.1  2015/12/22 22:39:06  dechavez
-# initial release
-#
