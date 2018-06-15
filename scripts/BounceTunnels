@@ -3,7 +3,7 @@
 #
 # Kill any ssh tunnels
        
-set list = `/bin/ps -ax -o user,pid,command | egrep "ssh -f -N" | awk '{print$2}'`
+set list = `/bin/ps -ax -o pid,user,command | egrep "nrts +ssh -f -N" | awk '{print $1}'`
 foreach pid ($list)
     kill -TERM $pid  >& /dev/null
 end
