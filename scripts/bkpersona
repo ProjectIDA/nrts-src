@@ -6,9 +6,9 @@
 
 set output = /dev/null/nothing # so failure has something to delete
 set myname = bkpersona
-       
+
 # General setup
-       
+
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     echo "missing $setup"
@@ -44,7 +44,6 @@ if (-e $output) rm -rf $output
 set os = `uname`
 switch ($os)
   case FreeBSD:
-    set nrts = usr/home/nrts
     set candidate = "etc/rc.conf"
     set candidate = "$candidate etc/rc.local"
     set candidate = "$candidate etc/resolv.conf"
@@ -54,7 +53,6 @@ switch ($os)
     set candidate = "$candidate etc/ssh/*key*"
     breaksw
   case SunOS:
-    set nrts = usr/nrts
     set candidate = "etc/rc0.d"
     set candidate = "$candidate etc/rc1.d"
     set candidate = "$candidate etc/rc2.d"
@@ -70,10 +68,25 @@ switch ($os)
     set candidate = "$candidate opt/realport/drp.conf"
     breaksw
   case Linux:
-    set nrts = usr/nrts
-    set candidate = "usr/local"
+    echo "==================================================================================="
+    echo " WARNING: "
+    echo "          This is intended to perform a backup of IDA/NRTS customizations"
+    echo "          of a RedHat/CentOS/Fedora IDAHUB-like system. It should NOT be used to restore a"
+    echo "          live system without further work."
+    echo "==================================================================================="
+    set candidate = "etc/motd"
+    set candidate = "$candidate etc/resolv.conf"
+    set candidate = "$candidate etc/ntp.conf"
     set candidate = "$candidate etc/hosts"
     set candidate = "$candidate etc/motd"
+    set candidate = "$candidate etc/sudoers"
+    set candidate = "$candidate etc/sudo.conf"
+    set candidate = "$candidate etc/rsyslog.conf"
+    set candidate = "$candidate etc/rsyslog.d"
+    set candidate = "$candidate etc/fstab"
+    set candidate = "$candidate etc/exports"
+    set candidate = "$candidate etc/ssh/*key*"
+    set candidate = "$candidate var/spool/cron"
     breaksw
   default:
     echo "'$os' is not a supported operating system."
@@ -82,9 +95,13 @@ switch ($os)
 endsw
 
 # NRTS files
+set nrts = usr/nrts
 
 set candidate = "$candidate $nrts/etc"
 set candidate = "$candidate $nrts/.ssh"
+set candidate = "$candidate $nrts/.tunnel/.ssh"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
+set candidate = "$candidate $nrts/CTBTO/config"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
+set candidate = "$candidate $nrts/CTBTO/StartCD"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
 set candidate = "$candidate $nrts/SeedLink/ring.conf"
 foreach site ($SystemsList)
     set candidate = "$candidate $nrts/$site/cnf"
