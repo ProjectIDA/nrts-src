@@ -174,5 +174,6 @@ foreach RemoteHost ($RemoteHostList)
 
 end
 
+if ($debug) logger -t $myname"[$$]" -p local0.info "end (success)"
 exit 0
 
