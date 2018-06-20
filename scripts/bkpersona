@@ -98,6 +98,13 @@ endsw
 set nrts = usr/nrts
 
 set candidate = "$candidate $nrts/etc"
+set candidate = "$candidate $nrts/.cshrc"
+set candidate = "$candidate $nrts/.tcshrc"
+set candidate = "$candidate $nrts/.bash*"
+set candidate = "$candidate $nrts/.aliases"
+set candidate = "$candidate $nrts/.envrc"
+set candidate = "$candidate $nrts/.pathrc"
+set candidate = "$candidate $nrts/.platform"
 set candidate = "$candidate $nrts/.ssh"
 set candidate = "$candidate $nrts/.tunnel/.ssh"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
 set candidate = "$candidate $nrts/CTBTO/config"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
