@@ -53,7 +53,13 @@ if ($#argv == 1) then
 
             kill -TERM $pid  >& /dev/null
 
-            if ($debug) logger -t $myname"[$$]" -p local0.debug "Bounced: [${pid}]"
+            # lets double check that it's gone.
+            kill -0 $pid
+            if ($status != 0) then
+                if ($debug) logger -t $myname"[$$]" -p local0.debug "UH OH: NOT Bounced: [${pid}]"
+            else
+                if ($debug) logger -t $myname"[$$]" -p local0.debug "Bounced: [${pid}]"
+            endif
 
         end
     else
