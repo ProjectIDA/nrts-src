@@ -1,0 +1,31 @@
+#!/bin/csh -f
+
+set op = `/usr/bin/whoami`
+
+if ( $op != 'nrts' ) then
+  echo "You, $op, can not run this script, bye\!"
+  exit
+endif
+
+if (`hostname` != 'idahub') then
+  echo You are at `hostname`, you need to be at idahub.
+  exit
+endif
+
+#set op = `/usr/ucb/whoami`@ucsd.edu
+set admin = 'eklimczak@ucsd.edu, jchang@ucsd.edu'
+
+set LOG = /tmp/chk_EME.$$
+if (-f $LOG) rm -f $LOG
+touch $LOG
+
+echo checking files at fsuhub .... >> $LOG
+echo "" >> $LOG
+#ssh nrts@fsuhub.gsras.ru ls -Rl images/ida >>& $LOG
+#ssh nrts@fsuhub ls -Rl images/ida >>& $LOG
+/usr/nrts/scripts/tssh fsuhub ls -Rl images/ida >>& $LOG		# 10/29/2013
+
+cat $LOG
+
+/usr/bin/Mail -s "chk_EME completed" "$admin" < $LOG
+rm -f $LOG
