@@ -1,8 +1,6 @@
 #!/bin/csh -f
 #
-# $Id: bkpersona,v 1.8 2016/01/12 22:42:18 dechavez Exp $
-#
-# Backup the files needed to "personify" a station.
+# Backup the files needed to "personify" a station.or a 'hub' system
 
 set output = /dev/null/nothing # so failure has something to delete
 set myname = bkpersona
@@ -80,8 +78,6 @@ switch ($os)
     set candidate = "$candidate etc/hosts"
     set candidate = "$candidate etc/motd"
     set candidate = "$candidate etc/sudoers"
-    set candidate = "$candidate etc/sudo.conf"
-    set candidate = "$candidate etc/rsyslog.conf"
     set candidate = "$candidate etc/rsyslog.d"
     set candidate = "$candidate etc/fstab"
     set candidate = "$candidate etc/exports"
@@ -98,10 +94,19 @@ endsw
 set nrts = usr/nrts
 
 set candidate = "$candidate $nrts/etc"
+set candidate = "$candidate $nrts/.vim"
+set candidate = "$candidate $nrts/.vimrc"
+set candidate = "$candidate $nrts/.cshrc"
+set candidate = "$candidate $nrts/.tcshrc"
+set candidate = "$candidate $nrts/.bash*"
+set candidate = "$candidate $nrts/.aliases"
+set candidate = "$candidate $nrts/.envrc"
+set candidate = "$candidate $nrts/.pathrc"
+set candidate = "$candidate $nrts/.platform"
 set candidate = "$candidate $nrts/.ssh"
 set candidate = "$candidate $nrts/.tunnel/.ssh"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
-set candidate = "$candidate $nrts/CTBTO/config"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
-set candidate = "$candidate $nrts/CTBTO/StartCD"   # NOTE: only valid on IDAHUB-like system accepting ssh tunnel sessions
+set candidate = "$candidate $nrts/CTBTO/config"   # NOTE: only valid on IDAHUB-like systems willbe packing up ctbto data for AFTAC
+set candidate = "$candidate $nrts/CTBTO/StartCD"
 set candidate = "$candidate $nrts/SeedLink/ring.conf"
 foreach site ($SystemsList)
     set candidate = "$candidate $nrts/$site/cnf"
@@ -135,29 +140,3 @@ echo "Files NOT backed up"
 rm -f $output
 exit 1
 
-# Revision History
-#
-# $Log: bkpersona,v $
-# Revision 1.8  2016/01/12 22:42:18  dechavez
-# added ~nrts/SeedLink/ring.conf to the list
-#
-# Revision 1.7  2016/01/12 22:29:25  dechavez
-# added /etc/resolv.conf and /etc/ntp.conf to the FreeBSD list
-#
-# Revision 1.6  2016/01/12 22:11:24  dechavez
-# allow this to be run by any user, not just nrts.
-#
-# Revision 1.5  2016/01/12 21:59:29  dechavez
-# added option to specify output directory on command line
-#
-# Revision 1.4  2016/01/08 22:19:27  dechavez
-# include host keys (/etc/ssh/*key*)
-#
-# Revision 1.3  2013/12/13 22:53:57  dechavez
-# fixed up CVS Log tag
-#
-# Revision 1.2  2013/12/13 22:49:20  dechavez
-# added Linux support
-#
-# Revision 1.1  2011/07/15 22:50:32  dechavez
-# initial release
