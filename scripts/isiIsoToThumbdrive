@@ -6,7 +6,7 @@
 set debug  = 0
 set myname = isiIsoToThumbdrive
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # General setup
 
@@ -45,10 +45,10 @@ set IsoDir  = $SiteDir/iso
 set DoneIsos = "$IsoDir/done/images"
 if (-e $IsoDir) then
     set command = "mkdir -p $DoneIsos"
-    logger -t $myname"[$$]" -p user.info "$command"
+    logger -t $myname"[$$]" -p local0.info "$command"
     $command
     if ($status != 0) then
-        logger -t $myname"[$$]" -p user.info "FAILED"
+        logger -t $myname"[$$]" -p local0.info "FAILED"
         goto failure
     endif
     cd $IsoDir
@@ -230,36 +230,3 @@ echo ""
 
 exit 1
 
-# Revision History
-#
-# $Log: isiIsoToThumbdrive,v $
-# Revision 1.9  2015/12/10 00:00:15  dechavez
-# undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
-# (didn't work in cron, duh)
-#
-# Revision 1.8  2015/12/07 22:18:43  dechavez
-# don't assume user nrts (use NRTS_HOME environment varible instead)
-#
-# Revision 1.7  2014/08/15 16:35:26  dechavez
-# No longer loop over all sites.  Instead copy data for only the named site, or
-# if no arguments are given, then for the default site
-#
-# Revision 1.6  2008/04/02 01:45:13  dechavez
-# spelling typos fixed
-#
-# Revision 1.5  2008/04/02 00:36:57  dechavez
-# added option to make multiple copies of the same image(s)
-# added reiso reminder
-#
-# Revision 1.4  2008/03/26 22:49:17  dechavez
-# improved error handling
-#
-# Revision 1.3  2008/03/24 19:20:11  dechavez
-# removed copy text step (since it just gets clobbered each time there are multiple ISO images)
-#
-# Revision 1.2  2008/03/20 19:11:26  dechavez
-# copy text files to output dir, sleep for 2 seconds after sync and umount
-#
-# Revision 1.1  2008/03/19 20:50:08  dechavez
-# initial release
-#

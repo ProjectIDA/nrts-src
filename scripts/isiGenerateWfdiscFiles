@@ -6,14 +6,14 @@
 set debug  = 0
 set myname = isiGenerateWfdiscFiles
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # General setup
 
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     exit 1
 endif
@@ -40,7 +40,7 @@ else if ($#argv == 2) then
     set wfdir  = $argv[2]
 else
     set message = "bad command line"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     exit 1
 endif
@@ -50,7 +50,7 @@ set sed_string = s\;/usr/nrts\;$wfdir\;
 
 filelock $lock $$
 if ($status != 0) then
-    if ($debug) logger -t $myname"[$$]" -p user.info "another instance already active"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "another instance already active"
     goto success
 endif
 
@@ -64,7 +64,7 @@ mkdir $workdir
 set exitstatus = $status
 if ($exitstatus != 0) then
     set message = "can't mkdir $workdir : status = $exitstatus"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     goto failure
 endif
 
@@ -72,24 +72,24 @@ cd $workdir
 set exitstatus = $status
 if ($exitstatus != 0) then
     set message = "can't cd $workdir : status = $exitstatus"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     goto failure
 endif
 cp /dev/null $master
 
-if ($debug) logger -t $myname"[$$]" -p user.info "creating master wfdisc"
+if ($debug) logger -t $myname"[$$]" -p local0.info "creating master wfdisc"
 set command = "isi server=localhost wd"
-if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 $command | sed $sed_string | sed 's/ i4 / s4 /' >> $master
 set exitstatus = $status
 if ($exitstatus != 0) then
     set message = "command failed : status = $exitstatus"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     goto failure
 endif
 if ( -z $master) goto success
 
-if ($debug) logger -t $myname"[$$]" -p user.info "creating station wfdiscs"
+if ($debug) logger -t $myname"[$$]" -p local0.info "creating station wfdiscs"
 foreach station ($SystemsList)
     set stawfdisc = $station.wfdisc
     rm -f $stawfdisc
@@ -100,7 +100,7 @@ end
 
 set dates = `cat $master | wdjdays | sort | uniq | tail -10`
 
-if ($debug) logger -t $myname"[$$]" -p user.info "creating network day wfdiscs"
+if ($debug) logger -t $myname"[$$]" -p local0.info "creating network day wfdiscs"
 foreach date ($dates)
     validate $date >& /dev/null
     if ($status == 0) then
@@ -135,62 +135,12 @@ rm $outdir/dummy.wfdisc
 success:
 cd $outdir
 rm -rf $workdir
-if ($debug) logger -t $myname"[$$]" -p user.info "exit 0"
+if ($debug) logger -t $myname"[$$]" -p local0.info "exit 0"
 exit 0
 
 failure:
 cd $outdir
 rm -rf $workdir
-logger -t $myname"[$$]" -p user.info "exit 1"
+logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 
-# Revision History
-#
-# $Log: isiGenerateWfdiscFiles,v $
-# Revision 1.15  2017/10/30 19:08:46  dechavez
-# don't bother calling setcalib (it doesn't do anything)
-#
-# Revision 1.14  2015/12/10 00:00:15  dechavez
-# undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
-# (didn't work in cron, duh)
-#
-# Revision 1.13  2015/12/07 22:18:43  dechavez
-# don't assume user nrts (use NRTS_HOME environment varible instead)
-#
-# Revision 1.12  2013/11/05 21:48:46  dechavez
-# default wfdir set to /usr/nrts (explict override on command line if you want to change)
-#
-# Revision 1.11  2013/11/05 21:47:13  dechavez
-# override wfdisc dir to either /ida/nrts or user specified
-#
-# Revision 1.10  2010/06/07 19:46:45  dechavez
-# ensure s4 datatype
-#
-# Revision 1.9  2008/05/05 16:29:05  dechavez
-# fixed bug where pfo and xpfo were both ending up in the pfo.wfdisc file
-#
-# Revision 1.8  2008/03/13 21:34:26  dechavez
-# use filelock instead of lockfile (conflicted with a similar program of the same name)
-#
-# Revision 1.7  2008/03/13 21:22:16  dechavez
-# use lockfile for instance checking
-#
-# Revision 1.6  2008/03/12 21:09:53  dechavez
-# improved self detection
-#
-# Revision 1.5  2008/02/01 22:57:41  dechavez
-# use substring instead of non-portable expr substr
-# use pgrep -x to locate multiple instances of self
-#
-# Revision 1.4  2007/02/09 20:13:00  dechavez
-# source .envrc file
-#
-# Revision 1.3  2007/02/09 19:11:36  dechavez
-# turned off debug flag
-#
-# Revision 1.2  2007/02/09 19:10:08  dechavez
-# added optional output directory argument
-#
-# Revision 1.1  2007/02/09 19:00:33  dechavez
-# initial release
-#

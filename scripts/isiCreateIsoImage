@@ -12,14 +12,14 @@ set MyStageDir = $StageDir.$$
 set command = "mv $StageDir $MyStageDir"
 $command
 if ($status != 0) then
-    logger -t $mysubname"[$$]" -p user.info "ERROR: $command failed"
+    logger -t $mysubname"[$$]" -p local0.info "ERROR: $command failed"
     goto failure
 endif
 
 set command = "mkdir $StageDir"
 $command
 if ($status != 0) then
-    logger -t $mysubname"[$$]" -p user.info "ERROR: $command failed"
+    logger -t $mysubname"[$$]" -p local0.info "ERROR: $command failed"
     goto failure
 endif
 
@@ -28,7 +28,7 @@ endif
 set command = "cd $MyStageDir"
 $command
 if ($status != 0) then
-    logger -t $mysubname"[$$]" -p user.info "ERROR: $command failed"
+    logger -t $mysubname"[$$]" -p local0.info "ERROR: $command failed"
     goto failure
 endif
 
@@ -46,10 +46,10 @@ cd $InitialDirectory
 set WorkImgName = $IsoDir/$ImageName
 set DoneImgName = $IsoDir/$ImageName.iso
 set command = "mkisofs -V $VolId -iso-level 2 -quiet -o $WorkImgName $MyStageDir"
-logger -t $mysubname"[$$]" -p user.info "$command"
+logger -t $mysubname"[$$]" -p local0.info "$command"
 $command >& /dev/null
 if ($status != 0) then
-    logger -t $mysubname"[$$]" -p user.info "FAILED"
+    logger -t $mysubname"[$$]" -p local0.info "FAILED"
     goto failure
 endif
 
@@ -58,20 +58,20 @@ endif
 if (-e $isiIsoNotify) $isiIsoNotify $DoneImgName
 
 set command = "mv $WorkImgName $DoneImgName"
-if ($debug) logger -t $mysubname"[$$]" -p user.info "$command"
+if ($debug) logger -t $mysubname"[$$]" -p local0.info "$command"
 $command
 if ($status != 0) then
-    logger -t $mysubname"[$$]" -p user.info "FAILED"
+    logger -t $mysubname"[$$]" -p local0.info "FAILED"
     goto failure
 endif
 
 # Move the data files to pre-delete area
 
 set command = "mv $MyStageDir/*.gz $DoneZips"
-if ($debug) logger -t $mysubname"[$$]" -p user.info "$command"
+if ($debug) logger -t $mysubname"[$$]" -p local0.info "$command"
 $command
 if ($status != 0) then
-    logger -t $mysubname"[$$]" -p user.info "FAILED"
+    logger -t $mysubname"[$$]" -p local0.info "FAILED"
     goto failure
 endif
 
@@ -81,29 +81,20 @@ cleanup:
 
 cd $InitialDirectory
 set command = "rm -rf $MyStageDir"
-if ($debug) logger -t $mysubname"[$$]" -p user.info "$command"
+if ($debug) logger -t $mysubname"[$$]" -p local0.info "$command"
 $command
 if ($status != 0) then
-    logger -t $mysubname"[$$]" -p user.info "FAILED"
+    logger -t $mysubname"[$$]" -p local0.info "FAILED"
     goto failure
 endif
 
 # Normal exit
 
 success:
-if ($debug) logger -t $mysubname"[$$]" -p user.info "success, exit 0"
+if ($debug) logger -t $mysubname"[$$]" -p local0.info "success, exit 0"
 exit 0
 
 failure:
-logger -t $mysubname"[$$]" -p user.info "failure, exit 1"
+logger -t $mysubname"[$$]" -p local0.info "failure, exit 1"
 exit 1
 
-# Revision History
-# 
-# $Log: isiCreateIsoImage,v $
-# Revision 1.2  2005/10/20 20:07:08  dechavez
-# eliminated use of dummies when counting files
-#
-# Revision 1.1  2005/08/17 21:06:56  dechavez
-# initial release
-#
