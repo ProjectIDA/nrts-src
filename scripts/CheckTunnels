@@ -6,17 +6,6 @@ set myname = CheckTunnels
 set lock   = /var/tmp/$myname.lock
 set match  = /var/tmp/$myname.matches.$$
 
-# Check for debug flag
-
-if (-e $DebugDir/$myname) then
-    set debug = 1
-else
-    set debug = 0
-endif
-
-
-if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
-
 # General setup
 
 set setup  = ~nrts/scripts/ScriptSetup
@@ -27,6 +16,17 @@ if (! -e $setup ) then
     exit 1
 endif
 source $setup
+
+# Check for debug flag
+
+if (-e $DebugDir/$myname) then
+    set debug = 1
+else
+    set debug = 0
+endif
+
+
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # These are not expected to need to be changed, so we hardcode them here
 
