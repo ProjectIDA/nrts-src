@@ -1,0 +1,28 @@
+#!/bin/tcsh -f
+
+set myname = DeleteSpuriousJTSroute
+set lock   = /var/tmp/$myname.lock
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p local0.info "$message"
+    echo "${myname}: $message"
+    exit 1
+endif
+source $setup
+
+
+# Check for running instance
+
+/usr/nrts/bin/filelock $lock $$
+if ($status != 0) then
+    logger -t $myname"[$$]" -p local0.info "another instance already active"
+    exit 0
+endif
+
+/usr/nrts/scripts/tssh jts-gw delroute >& /dev/null
+
+exit 0
