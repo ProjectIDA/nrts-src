@@ -162,13 +162,17 @@ static int Getnsegfg(UINT32 test)
     return ColorMapNseg[2].fg;
 }
 
-static void UcaseStationName(ISI_SOH_REPORT *soh, ISI_CNF_REPORT *cnf)
+static void UcaseStationAndLoc(ISI_SOH_REPORT *soh, ISI_CNF_REPORT *cnf)
 {
 int i;
 
     for (i = 0; i < soh->nentry; i++) {
         util_ucase(soh->entry[i].name.sta);
         util_ucase(cnf->entry[i].name.sta);
+        util_ucase(soh->entry[i].name.loc);
+        util_ucase(cnf->entry[i].name.loc);
+        if (soh->entry[i].name.loc[0] == ' ') { printf("blank loc: %s\n", soh->entry[i].name.loc); sprintf(soh->entry[i].name.loc, "%s", "--"); }
+        if (strlen(cnf->entry[i].name.loc) == 0) sprintf(cnf->entry[i].name.loc, "%s", "--");
     }
 }
 
@@ -179,10 +183,11 @@ int result;
     result = strcmp(((ISI_STREAM_SOH *) a)->name.sta, ((ISI_STREAM_SOH *) b)->name.sta);
     if (result != 0) return result;
 
-    result = strcmp(((ISI_STREAM_SOH *) a)->name.chn, ((ISI_STREAM_SOH *) b)->name.chn);
+    result = strcmp(((ISI_STREAM_SOH *) a)->name.loc, ((ISI_STREAM_SOH *) b)->name.loc);
     if (result != 0) return result;
 
-    return strcmp(((ISI_STREAM_SOH *) a)->name.loc, ((ISI_STREAM_SOH *) b)->name.loc);
+    return strcmp(((ISI_STREAM_SOH *) a)->name.chn, ((ISI_STREAM_SOH *) b)->name.chn);
+    /* return strcmp(((ISI_STREAM_SOH *) a)->name.loc, ((ISI_STREAM_SOH *) b)->name.loc); */
 }
 
 static VOID SortSoh(ISI_SOH_REPORT *soh)
@@ -197,10 +202,11 @@ int result;
     result = strcmp(((ISI_STREAM_CNF *) a)->name.sta, ((ISI_STREAM_CNF *) b)->name.sta);
     if (result != 0) return result;
 
-    result = strcmp(((ISI_STREAM_CNF *) a)->name.chn, ((ISI_STREAM_CNF *) b)->name.chn);
+    result = strcmp(((ISI_STREAM_CNF *) a)->name.loc, ((ISI_STREAM_CNF *) b)->name.loc);
     if (result != 0) return result;
 
-    return strcmp(((ISI_STREAM_CNF *) a)->name.loc, ((ISI_STREAM_CNF *) b)->name.loc);
+    return strcmp(((ISI_STREAM_CNF *) a)->name.chn, ((ISI_STREAM_CNF *) b)->name.chn);
+    /* return strcmp(((ISI_STREAM_CNF *) a)->name.loc, ((ISI_STREAM_CNF *) b)->name.loc); */
 }
 
 static VOID SortCnf(ISI_CNF_REPORT *cnf)
@@ -416,7 +422,7 @@ parchvar[0]=0;
     fprintf(fp, "<div class=\'col-10 offset-1\'>\n");
     fprintf(fp, "\n<TABLE class=\'resultstbl sortable table table-sm\'>");
     fprintf(fp, "\n<thead class=\'thead-dark\'><tr>\n");
-    fprintf(fp, "<th>STA</th><th>%% CHN</th><th>NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH>\n");
+    fprintf(fp, "<th>STA-LOC</th><th>%% CHN</th><th>NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH>\n");
     fprintf(fp, "</tr></thead>\n");
     fprintf(fp, "<tbody>\n");
 }
@@ -424,7 +430,7 @@ parchvar[0]=0;
 static void PrintStatusTrailer(FILE *fp)
 {
     fprintf(fp, "</tbody>\n");
-    fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA</th><th>%% CHN</th><th>NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH></tr></thead>\n");
+    fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA-LOC</th><th>%% CHN</th><th>NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH></tr></thead>\n");
     fprintf(fp, "</table>\n");
 
     fprintf(fp, "</div> <!-- col -->\n");
@@ -440,12 +446,11 @@ static void PrintStatusTrailer(FILE *fp)
     fprintf(fp, "</BODY>");
 }
 
-static void PrintStatusResult(FILE *fp, char *sta, char *isiserver, char *webserver, char *webpath, char *stationdir, REAL64 tols, REAL64 tslw, UINT32 livechn, UINT32 nseg)
+static void PrintStatusResult(FILE *fp, char *sta, char *loc, char *isiserver, char *webserver, char *webpath, char *stationdir, REAL64 tols, REAL64 tslw, UINT32 livechn, UINT32 nseg)
 {
 UINT32 latency;
 char tbuf[1024];
 
-char *str1 = "index.html";
 char *str2 = "chan.html";
 char stahomelink[MAXPATHLEN+1];
 char chanlink[MAXPATHLEN+1];
@@ -454,19 +459,18 @@ stahomelink[0]=0;
 chanlink[0]=0;
 
     sprintf(stahomelink, "https://%s/?q=station/%s", webserver, util_lcase(sta));
-    sprintf(chanlink, "https://%s/%s/%s/%s%s", webserver, webpath, isiserver, util_ucase(sta), str2);
+    sprintf(chanlink, "https://%s/%s/%s/%s-%s-%s", webserver, webpath, isiserver, util_ucase(sta), util_ucase(loc), str2);
 
     fprintf(fp, "<tr  class=\'text-monospace\'>");
     if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
         latency = time(NULL) - (UINT32) tols;
         fprintf(fp, "<td bgcolor=\"%06x\">",GetBg(latency));
         if (GetBg(latency)) {
-            /* fprintf(fp, "<font size=\"+0\" color=\"%06x\"><B>*</B></font>", GetBg(tslw)); */
             fprintf(fp, "<font color=\"%06x\"><B>*</B></font>", GetBg(tslw));
             if (stationdir != NULL) {
                 fprintf(fp, "\n<a href=\"%s\">", stahomelink);
             }
-            fprintf(fp, "<font color=\"%06x\"><b>%s</b></font>", GetFg(tslw), util_ucase(sta));
+            fprintf(fp, "<font color=\"%06x\"><b>%s-%s</b></font>", GetFg(tslw), util_ucase(sta), util_ucase(loc));
             if (stationdir != NULL) {
                 fprintf(fp, "</a>\n");
             }
@@ -478,9 +482,10 @@ chanlink[0]=0;
                 fprintf(fp,"\n%s",sta);
             }
             fprintf(fp, "<font color=\"%06x\"><B>*</B></font>", GetBg(tslw));
-            fprintf(fp, "<font color=\"%06x\">%s</font></A>", WHITE,util_ucase(sta));
+            fprintf(fp, "<font color=\"%06x\">%s-%s</font></A>", WHITE, util_ucase(sta), util_ucase(loc));
         }
-        fprintf(fp, "\n</td>\n", GetFg(tslw),util_ucase(sta));
+        /* fprintf(fp, "</td>\n", GetFg(tslw),util_ucase(sta)); */
+        fprintf(fp, "</td>\n");
         fprintf(fp, "<td bgcolor=\"%06x\">",GetPercentbg(livechn));
         fprintf(fp, "<A HREF=\"%s\">",chanlink);
         fprintf(fp, "<font color=\"%06x\">%i</A></td>\n",GetPercentfg(livechn),livechn);
@@ -493,7 +498,7 @@ chanlink[0]=0;
         fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">",DKGRAY,WHITE);
         if (stationdir != NULL) {
             fprintf(fp, "\n<A HREF=\"%s\" class=\"broken\">",stahomelink);
-            fprintf(fp, "%s</A></td>\n",util_ucase(sta));        }
+            fprintf(fp, "%s-%s</A></td>\n",util_ucase(sta), util_ucase(loc));        }
         else {
             fprintf(fp,"\n%s",sta);
         }
@@ -518,6 +523,7 @@ REAL64 tslw;
 UINT32 nseg;
 //ISI_NSEG dest;
 char *sta;
+char *loc;
 static char *Blank = "    ";
 static BOOL First = TRUE;
 char webstuff[MAXPATHLEN+1];
@@ -526,8 +532,9 @@ webstuff[0]=0;
     sprintf(webstuff,"%s/%s",webserver,webpath);
     PrintStatusHeader(fp, isiserver, htdocpath, webstuff);
     sta = Blank;
+    loc =  Blank;
     for (i = 0; i < soh->nentry; i++) {
-        if (strcmp(sta, soh->entry[i].name.sta) != 0) {                     //  new station
+        if ((strcmp(sta, soh->entry[i].name.sta) != 0) || (strcmp(loc, soh->entry[i].name.loc) != 0)) {                     //  new station
             if (!First) {
                 if (totchn > 0) {
                     livechn = (livechn * 100) / totchn;
@@ -539,9 +546,10 @@ webstuff[0]=0;
                 } else {
                     nsegval = 0;
                 }
-                PrintStatusResult(fp, sta, isiserver, webserver, webpath, stationdir, tols, tslw, livechn, nsegval);
+                PrintStatusResult(fp, sta, loc, isiserver, webserver, webpath, stationdir, tols, tslw, livechn, nsegval);
             }
             sta = soh->entry[i].name.sta;
+            loc = soh->entry[i].name.loc;
             tols = (REAL64) ISI_UNDEFINED_TIMESTAMP;
             tslw = (REAL64) ISI_UNDEFINED_TIMESTAMP;
             nseg = 0;
@@ -580,69 +588,67 @@ webstuff[0]=0;
          nsegval = 0;
     }
 
-    PrintStatusResult(fp, sta, isiserver, webserver, webpath, stationdir, tols, tslw, livechn, nsegval);
+    PrintStatusResult(fp, sta, loc, isiserver, webserver, webpath, stationdir, tols, tslw, livechn, nsegval);
     PrintStatusTrailer(fp);
 }
 
-static int FindStaIndex(LNKLST *slist, char *sta)
+static int FindStaIndex(LNKLST *slist, char *sta, char *loc)
 {
 int i;
 char *name;
+char staloc[MAXPATHLEN];
 
+    sprintf(staloc, "%s-%s", sta, loc);
     for (i = 0; i < slist->count; i++) {
         name = (char *) slist->array[i];
-        if (!strcmp(name,sta)) return i;
+        if (!strcmp(name, staloc)) return i;
     }
     return -1;
 }
 
-static void MakeNextButtons(FILE *fp, LNKLST *slist, char *sta, char *isiserver, char *webstuff)
+static void MakeNextButtons(FILE *fp, LNKLST *slist, char *sta, char *loc, char *isiserver, char *webstuff)
 {
 int idx=0;
 char *str2 = "chan.html";
-char stachanfn[MAXPATHLEN+1];
-char *prevsta, *nextsta;
-stachanfn[0]=0;
+char stalocchanfn[MAXPATHLEN+1];
+char *prevstaloc, *nextstaloc;
+stalocchanfn[0]=0;
 
-    if ((idx = FindStaIndex(slist,sta)) < 0) {
+    if ((idx = FindStaIndex(slist, sta, loc)) < 0) {
          perror("MakeNextButtons");
          exit(0);
     }
     if (idx == 0) {
-        prevsta = (char *) slist->array[slist->count-1];
+        prevstaloc = (char *) slist->array[slist->count-1];
     } else {
-        prevsta = (char *) slist->array[idx-1];
+        prevstaloc = (char *) slist->array[idx-1];
     }
-    sprintf(stachanfn,"https://%s/%s/%s%s",webstuff,isiserver,prevsta,str2);
-    fprintf(fp,"<p  class=\"text-center font-weight-bold\"><A HREF=\"%s\" class=\"working\"><== %s </A> | \n",stachanfn, prevsta);
+    sprintf(stalocchanfn,"https://%s/%s/%s-%s",webstuff,isiserver,prevstaloc,str2);
+    fprintf(fp,"<p  class=\"text-center font-weight-bold\"><A HREF=\"%s\" class=\"working\"><== %s </A> | \n",stalocchanfn, prevstaloc);
     if (idx == ((slist->count)-1)) {
-        nextsta = (char *) slist->array[0];
+        nextstaloc = (char *) slist->array[0];
     } else {
-        nextsta = (char *) slist->array[idx+1];
+        nextstaloc = (char *) slist->array[idx+1];
     }
-    stachanfn[0] = 0;
-    sprintf(stachanfn,"https://%s/%s/%s%s",webstuff,isiserver,nextsta,str2);
-    fprintf(fp,"<A HREF=\"%s\" class=\"working\"> %s ==></A></p>\n",stachanfn, nextsta);
+    stalocchanfn[0] = 0;
+    sprintf(stalocchanfn,"https://%s/%s/%s-%s",webstuff,isiserver,nextstaloc,str2);
+    fprintf(fp,"<A HREF=\"%s\" class=\"working\"> %s ==></A></p>\n",stalocchanfn, nextstaloc);
 }
 
-static void MakeChanPageHeader(FILE *fp, LNKLST *slist, char *isiserver, char *htdocpath, char *webpath, char *webstuff, char *sta)
+static void MakeChanPageHeader(FILE *fp, LNKLST *slist, char *isiserver, char *htdocpath, char *webpath, char *webstuff, char *sta, char *loc)
 {
 char *name;
 int i;
 char *parchstr="parchment.jpg";
 char parchvar[MAXPATHLEN+1];
 parchvar[0]=0;
-char *str1 = "ack.html";
 char *str2 = "chan.html";
-char stachanfn[MAXPATHLEN+1];
+char stalocchanfn[MAXPATHLEN+1];
 char weblink[MAXPATHLEN+1];
 weblink[0]=0;
-stachanfn[0]=0;
-char ackpage[MAXPATHLEN+1];
-ackpage[0]=0;
+stalocchanfn[0]=0;
 
     sprintf(weblink, "%s/%s",webstuff,isiserver);
-    sprintf(ackpage, "%s/%s/%s",webstuff,isiserver,str1);
     fprintf(fp, "<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
     fprintf(fp, "<title>\nIDA/NRTS (%s)\n</title>\n",isiserver);
     fprintf(fp, "<!-- Bootstrap core CSS -->");
@@ -654,10 +660,10 @@ ackpage[0]=0;
     fprintf(fp, "<DIV class=\'container\'> <!-- container -->");
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col\'>\n");
-    fprintf(fp, "<h3 class=\"text-center\">IDA/NRTS Status for Station %s at %s</h3>\n", sta,isiserver);
+    fprintf(fp, "<h3 class=\"text-center\">IDA/NRTS Status for %s-%s at %s</h3>\n", sta, loc, isiserver);
     PrintTimeStamp(fp);
     fprintf(fp, "<p class=\"text-center\"><A HREF=\"https://%s/index.html \" class=\"working\">Network Summary Page</A></p>\n", weblink);
-    MakeNextButtons(fp, slist, sta, isiserver, webstuff);
+    MakeNextButtons(fp, slist, sta, loc, isiserver, webstuff);
     fprintf(fp, "</div> <!-- end column-->");
     fprintf(fp, "</div> <!-- end upper row -->");
 
@@ -665,12 +671,32 @@ ackpage[0]=0;
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col-10 offset-1\'>");
     fprintf(fp, "<TABLE class=\'stalisttbl table table-sm\'>");
-    for (i=0;  i < slist->count; i++) {
-        name = (char *) slist->array[i];
-        if (!(i % 10)) fprintf(fp,"<TR>");
-        sprintf(stachanfn,"https://%s/%s%s",weblink,name,str2);
-        fprintf(fp, "<TD><A HREF=\"%s\">%s</A></TD>\n",stachanfn,name);
+    int col;
+    int colcnt = 10;
+    int row;
+    int rowcnt = ceil(slist->count / 10.);
+    for (row=0; row < rowcnt; row++) {
+        fprintf(fp, "\n<TR>\n");
+
+        for (col=0; col < colcnt; col++) {
+            int ndx = col * rowcnt + row;
+            if (ndx < slist->count) {
+                name = (char *) slist->array[ndx];
+                sprintf(stalocchanfn,"https://%s/%s-%s",weblink,name,str2);
+                fprintf(fp, "<TD><A HREF=\"%s\">%s</A></TD>\n",stalocchanfn,name);
+            } else {
+                fprintf(fp, "<td></td>");
+            }
+        }
+
+        fprintf(fp, "\n</TR>\n");
     }
+    /* for (i=0;  i < slist->count; i++) { */
+    /*     name = (char *) slist->array[i]; */
+    /*    if (!(i % 10)) fprintf(fp,"</TR><TR>"); */
+    /*     sprintf(stalocchanfn,"https://%s/%s-%s",weblink,name,str2); */
+    /*     fprintf(fp, "<TD><A HREF=\"%s\">%s</A></TD>\n",stalocchanfn,name); */
+    /* } */
     fprintf(fp, "</TABLE>");
     fprintf(fp, "</div> <!-- end column-->");
     fprintf(fp, "</div> <!-- end station index table row -->");
@@ -690,7 +716,7 @@ ackpage[0]=0;
     fprintf(fp, "<tbody>");
 }
 
-static void MakeChanPageTrailer(FILE *fp, LNKLST *slist, char *sta, char *isiserver, char *webstuff)
+static void MakeChanPageTrailer(FILE *fp, LNKLST *slist, char *sta, char *loc, char *isiserver, char *webstuff)
 {
     fprintf(fp, "</tbody>");
     fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA</th><th>CHAN</th><th>RATE</th><th>NSEG</th><th>LAST DATUM</th><th>DATA LATENCY</TH><TH>LINK LATENCY</B></th></tr></thead>\n");
@@ -699,7 +725,7 @@ static void MakeChanPageTrailer(FILE *fp, LNKLST *slist, char *sta, char *isiser
     /* fprintf(fp,"<BR>\n"); */
     PrintChnPgLegend(fp);
     /* fprintf(fp,"<BR>\n"); */
-    MakeNextButtons(fp, slist, sta, isiserver, webstuff);
+    MakeNextButtons(fp, slist, sta, loc, isiserver, webstuff);
     fprintf(fp, "<p class=\"text-center\"><A HREF=\"https://%s/%s/index.html \" class=\"working\">Network Summary Page</A></p>\n", webstuff, isiserver);
     PrintTimeStamp(fp);
     fprintf(fp, "</div> <!-- end column-->");
@@ -807,25 +833,30 @@ UINT32 samprate=0;
 }
 
 
-static void AppendUniquePublicStation(LNKLST *slist, char *name)
+static void AppendUniquePublicStationLoc(LNKLST *slist, char *sta, char *loc)
 {
 LNKLST_NODE *crnt;
+static char prevstaloc[255] = "";
+char newstaloc[255];
 char *sname;
 
-    crnt = listFirstNode(slist);
-    while (crnt != NULL) {
-        sname = (char *) crnt->payload;
-        if (strcasecmp(name, sname) == 0) return;
-        crnt = listNextNode(crnt);
-    }
-
-    if (!listAppend(slist, name, strlen(name)+1)) {
-        perror("listAppend");
-        exit(1);
+    /* crnt = listFirstNode(slist); */
+    /* while (crnt != NULL) { */
+    /*     sname = (char *) crnt->payload; */
+    /*     if (strcasecmp(name, sname) == 0) return; */
+    /*     crnt = listNextNode(crnt); */
+    /* } */
+    sprintf(newstaloc, "%s-%s", sta, loc);
+    if (strcmp(newstaloc, prevstaloc) != 0) {
+        if (!listAppend(slist, newstaloc, strlen(newstaloc)+1)) {
+            perror("listAppend");
+            exit(1);
+        }
+        sprintf(prevstaloc, "%s", newstaloc);
     }
 }
 
-static LNKLST *CreateStationList(ISI_SOH_REPORT *soh)
+static LNKLST *CreateStationLocList(ISI_SOH_REPORT *soh)
 {
 int i;
 LNKLST *slist;
@@ -834,7 +865,7 @@ LNKLST *slist;
         perror("listCreate");
         exit(1);
     }
-    for (i = 0; i < soh->nentry; i++) AppendUniquePublicStation(slist, soh->entry[i].name.sta);
+    for (i = 0; i < soh->nentry; i++) AppendUniquePublicStationLoc(slist, soh->entry[i].name.sta, soh->entry[i].name.loc);
     if (!listSetArrayView(slist)) {
         perror("listSetArrayView");
         exit(1);
@@ -845,23 +876,23 @@ LNKLST *slist;
     return slist;
 }
 
-static FILE *OpenChanPageOutput(char *isiserver, char *sta, char *htdocpath, char *webpath)
+static FILE *OpenChanPageOutput(char *isiserver, char *sta, char *loc, char *htdocpath, char *webpath)
 {
 char *str2 = "chan.html";
 char ofname[MAXPATHLEN+1];
 char odirname[MAXPATHLEN+1];
 FILE *ofp;
 
-            sprintf(odirname,"%s/%s/%s", htdocpath, webpath, isiserver);
-            if (!utilDirectoryExists(odirname)) {
-               fprintf(stdout, "FATAL ERROR:   No output directory exists \n");
-               exit(1);
-            }
-            sprintf(ofname, "%s/%s/%s/%s%s", htdocpath, webpath, isiserver, sta, str2);
-            if ((ofp = fopen(ofname, "w")) == NULL) {
-                perror("OpenChanPageOutput");
-            }
-            return ofp;
+    sprintf(odirname,"%s/%s/%s", htdocpath, webpath, isiserver);
+    if (!utilDirectoryExists(odirname)) {
+        fprintf(stdout, "FATAL ERROR:   No output directory exists \n");
+        exit(1);
+    }
+    sprintf(ofname, "%s/%s/%s/%s-%s-%s", htdocpath, webpath, isiserver, sta, loc, str2);
+    if ((ofp = fopen(ofname, "w")) == NULL) {
+        perror("OpenChanPageOutput");
+    }
+    return ofp;
 }
 
 static void MakeChanPage(FILE *fp, ISI_SOH_REPORT *soh, ISI_CNF_REPORT *cnf, char *isiserver, char *webserver, char *htdocpath, char *webpath)
@@ -874,24 +905,27 @@ char ofname[MAXPATHLEN+1];
 char webstuff[MAXPATHLEN+1];
 webstuff[0]=0;
 FILE *ofp;
-static char *PrevSta, *Blank = "    ";
+static char *PrevSta, *PrevLoc, *Blank = "    ";
 PrevSta = Blank;
+PrevLoc = Blank;
 ofname[0] = 0;
 LNKLST *slist;
 
-    slist = CreateStationList(soh);  // this is a list of upper case public stations
+    slist = CreateStationLocList(soh);  // this is a list of upper case public stations
 
     sprintf(webstuff, "%s/%s", webserver,webpath);
     for (i = 0; i <= soh->nentry; i++) {
-        if (strcmp(PrevSta, soh->entry[i].name.sta) != 0) {                     //  new station
+        if ((strcmp(PrevSta, soh->entry[i].name.sta) != 0) || (strcmp(PrevLoc, soh->entry[i].name.loc) != 0)) {                     //  new station or loc
             if (i > 0) {
-                MakeChanPageTrailer(ofp, slist, PrevSta, isiserver, webstuff);
+                MakeChanPageTrailer(ofp, slist, PrevSta, PrevLoc, isiserver, webstuff);
                 fclose(ofp);
                 if (i == soh->nentry) continue;
             }
-            ofp = OpenChanPageOutput(isiserver, soh->entry[i].name.sta, htdocpath, webpath);
-            MakeChanPageHeader(ofp, slist, isiserver, htdocpath, webpath, webstuff, soh->entry[i].name.sta);
+            ofp = OpenChanPageOutput(isiserver, soh->entry[i].name.sta, soh->entry[i].name.loc, htdocpath, webpath);
+            MakeChanPageHeader(ofp, slist, isiserver, htdocpath, webpath, webstuff,
+                               soh->entry[i].name.sta, soh->entry[i].name.loc);
             PrevSta = util_ucase(soh->entry[i].name.sta);
+            PrevLoc = util_ucase(soh->entry[i].name.loc);
         }
         tols = (REAL64) ISI_UNDEFINED_TIMESTAMP;
         tslw = (REAL64) ISI_UNDEFINED_TIMESTAMP;
@@ -951,7 +985,7 @@ char *mainpage="index.html";
 
     utilNetworkInit();
     isiInitDefaultPar(&par);
-	now = time(NULL);
+    now = time(NULL);
     gmtime_r(&now, &gm.tm);
     asctime_r(&gm.tm, gm.buf);
     gm.buf[strlen(gm.buf)-1] = 0;
@@ -1003,7 +1037,7 @@ char *mainpage="index.html";
         perror("Main");
         exit(1);
     }
-    UcaseStationName(soh, cnf);
+    UcaseStationAndLoc(soh, cnf);
     SortSoh(soh);
     SortCnf(cnf);
 
