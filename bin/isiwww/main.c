@@ -171,8 +171,8 @@ int i;
         util_ucase(cnf->entry[i].name.sta);
         util_ucase(soh->entry[i].name.loc);
         util_ucase(cnf->entry[i].name.loc);
-        if (soh->entry[i].name.loc[0] == ' ') { printf("blank loc: %s\n", soh->entry[i].name.loc); sprintf(soh->entry[i].name.loc, "%s", "--"); }
-        if (strlen(cnf->entry[i].name.loc) == 0) sprintf(cnf->entry[i].name.loc, "%s", "--");
+        if (soh->entry[i].name.loc[0] == ' ') sprintf(soh->entry[i].name.loc, "%s", "--");
+        if (cnf->entry[i].name.loc[0] == ' ') sprintf(cnf->entry[i].name.loc, "%s", "--");
     }
 }
 
