@@ -48,15 +48,17 @@ typedef struct {
     int fg;
 } COLOR_MAP;
 
-#define NumColors 10
+#define NumColors 5
 #define NumColorsNseg 3
 
 #define PURPLE 0xCC99FF
+#define HAPPY  PURPLE
 #define BLUE   0x3399FF
 #define GREEN  0x00FF00
-#define YELLOW 0xFFFF00
+#define AQUMAR 0x7FFFA5
+#define YELLOW 0xEDE73B
 #define TAN    0xFF9966
-#define RED    0xFF3333
+#define RED    0xEE4900
 #define PINK   0xFFCCCC
 #define LTGRAY 0xCCCCCC
 #define MDGRAY 0x999999
@@ -65,21 +67,20 @@ typedef struct {
 #define WHITE  0xffffff
 
 static COLOR_MAP ColorMap[] = {
-    { 432000, 0,  DKGRAY, WHITE },   //  5 days
-    { 345600, 10, MDGRAY, WHITE },   //  4 days
-    { 259200, 25, LTGRAY, BLACK },   //  3 days
-    { 172800, 37, PINK,   BLACK },   //  2 day
-    {  86499, 50, RED,    BLACK },   //  1 day
-    {  21600, 66, TAN,    BLACK },   //  6 hrs
-    {   7200, 75, YELLOW, BLACK },   //  2 hr
-    {   3600, 87, GREEN,  BLACK },   //  1 hr
-    {   1800, 100, BLUE,   BLACK },   // 30 min
-    {      0, 100, PURPLE, BLACK},
+    /* { 432000, 0,  DKGRAY, WHITE },   //  5 days */
+    /* { 345600, 10, MDGRAY, WHITE },   //  4 days */
+    /* { 259200, 25, LTGRAY, BLACK },   //  3 days */
+    /* { 172800, 37, PINK,   BLACK },   //  2 day */
+    {  86499, 50,  RED,    BLACK },   //  1 day
+    {  21600, 66,  TAN,    BLACK },   //  6 hrs
+    {   7200, 75,  YELLOW, BLACK },   //  2 hr
+    {   3600, 87,  AQUMAR, BLACK },   //  1 hr
+    {      0, 100, BLUE,   BLACK},
     {     -1, 0, 0, 0}
 };
 
 static COLOR_MAP ColorMapNseg[] = {
-    {     10, 10,  GREEN,  BLACK},    //  lt 10
+    {     10, 10,  AQUMAR, BLACK},    //  lt 10
     {     50, 50,  YELLOW, BLACK},    //  lt 50
     {     51, 51,  RED,    BLACK}     //  gt 50
 };
@@ -171,6 +172,8 @@ int i;
         util_ucase(cnf->entry[i].name.sta);
         util_ucase(soh->entry[i].name.loc);
         util_ucase(cnf->entry[i].name.loc);
+        util_ucase(soh->entry[i].name.chn);
+        util_ucase(cnf->entry[i].name.chn);
         if (soh->entry[i].name.loc[0] == ' ') sprintf(soh->entry[i].name.loc, "%s", "--");
         if (cnf->entry[i].name.loc[0] == ' ') sprintf(cnf->entry[i].name.loc, "%s", "--");
     }
@@ -238,6 +241,7 @@ static void MakeLinkColorSS(FILE *fp)
 
     fprintf(fp, ".stalisttbl td a { \n");
     fprintf(fp, "font-weight: bolder; \n");
+    fprintf(fp, "font-size: 80%; \n");
     fprintf(fp, "} \n");
 
     fprintf(fp, ".resultstbl td, .resultstbl th { \n");
@@ -257,6 +261,7 @@ static void MakeLinkColorSS(FILE *fp)
     fprintf(fp, ".resultstbl a { \n");
     fprintf(fp, "color: #000; \n");
     fprintf(fp, "} \n");
+
     fprintf(fp, "</style>\n");
 }
 
@@ -270,27 +275,27 @@ int  i=0;
 int  j=0;
 
     fprintf(fp, "<TABLE class=\'legendtbl table table-sm\'>\n");
-    fprintf(fp, "<thead><tr><TH COLSPAN=\"11\">Latency Indicators (* denotes link latency)</TH></tr></thead>\n");
+    fprintf(fp, "<thead><tr><TH COLSPAN=\"6\">Latency Indicators</TH></tr></thead>\n");
     fprintf(fp, "<tr>");
     for (i = 0; ColorMap[i].value >= 0; i++) {
       if (GetBg(i) > 0) {
-        if (ColorMap[i].value / 432000) { phrase[i] = "gt;5 days";
-        } else if (ColorMap[i].value / 345600) { phrase[i] = "gt;4 days";
-        } else if (ColorMap[i].value / 259200) { phrase[i] = "gt;3 days";
-        } else if (ColorMap[i].value / 172800) { phrase[i] = "gt;2 days";
-        } else if (ColorMap[i].value / 86400)  { phrase[i] = "gt;1 day";
+        /* if (ColorMap[i].value / 432000) { phrase[i] = "gt;5 days"; */
+        /* } else if (ColorMap[i].value / 345600) { phrase[i] = "gt;4 days"; */
+        /* } else if (ColorMap[i].value / 259200) { phrase[i] = "gt;3 days"; */
+        /* } else if (ColorMap[i].value / 172800) { phrase[i] = "gt;2 days"; */
+        if (ColorMap[i].value / 86400)  { phrase[i] = "gt;1 day";
         } else if (ColorMap[i].value / 21600)  { phrase[i] = "gt;6 hrs";
         } else if (ColorMap[i].value / 7200)   { phrase[i] = "gt;2 hrs";
-        } else if (ColorMap[i].value / 3600)   { phrase[i] = "gt;1 hr";
-        } else if (ColorMap[i].value / 1800)   { phrase[i] = "gt;30 min";
+        } else if (ColorMap[i].value / 3600)   { phrase[i] = "gt;=1 hr";
         } else {
-            phrase[i] = "lt;30 min";
+            phrase[i] = "lt;=1 hr";
         }
         bgcolor[i] = GetBg(ColorMap[i].value);
         fgcolor[i] = GetFg(ColorMap[i].value);
         percent[i] = GetPercent(ColorMap[i].value);
       }
     }
+    fprintf(fp, "<td bgcolor=\"%06x\"><b>%s</b></td>", HAPPY, "not latent");
     for (j = (NumColors-1); j >= 0; j--) {
         fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\"><B>&%s</B></TD>\n",
              bgcolor[j],fgcolor[j],phrase[j]);
@@ -310,19 +315,11 @@ int  i=0;
 int  j=0;
 
     fprintf(fp, "<TABLE class=\'legendtbl table table-sm\'>\n");
-    fprintf(fp, "<thead><tr><TH COLSPAN=\"11\">Latency Indicators (* denotes link latency)</TH></tr></thead>\n");
+    fprintf(fp, "<thead><tr><TH COLSPAN=\"6\">Latency Indicators</TH></tr></thead>\n");
     fprintf(fp, "<tbody><tr>");
     for (i = 0; ColorMap[i].value >= 0; i++) {
       if (GetBg(i) > 0) {
-        if (ColorMap[i].value / 432000) {
-            phrase[i] = "gt;5 days";
-        } else if (ColorMap[i].value / 345600) {
-            phrase[i] = "gt;4 days";
-        } else if (ColorMap[i].value / 259200) {
-            phrase[i] = "gt;3 days";
-        } else if (ColorMap[i].value / 172800) {
-            phrase[i] = "gt;2 days";
-        } else if (ColorMap[i].value / 86400)  {
+        if (ColorMap[i].value / 86400)  {
             phrase[i] = "gt;1 day";
         } else if (ColorMap[i].value / 21600)  {
             phrase[i] = "gt;6 hrs";
@@ -330,31 +327,20 @@ int  j=0;
             phrase[i] = "gt;2 hrs";
         } else if (ColorMap[i].value / 3600)   {
             phrase[i] = "gt;1 hr";
-        } else if (ColorMap[i].value / 1800)   {
-            phrase[i] = "gt;30 min";
         } else {
-            phrase[i] = "lt;30 min";
+            phrase[i] = "lt;=1 hr";
         }
         bgcolor[i] = GetBg(ColorMap[i].value);
         fgcolor[i] = GetFg(ColorMap[i].value);
         percent[i] = GetPercent(ColorMap[i].value);
       }
     }
+    fprintf(fp, "<td style=\"width:%f%%\" bgcolor=\"%06x\"><b>&%s</b></td>", round(100/(NumColors+1)), HAPPY, "not latent");
     for (j = (NumColors-1); j >= 0; j--) {
-        fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\"><b>&%s</b></TD>\n",
-             bgcolor[j],fgcolor[j],phrase[j]);
+        fprintf(fp, "<td style=\"width:%f%%\" bgcolor=\"%06x\"><FONT COLOR=\"%06x\"><b>&%s</b></TD>\n",
+             round(100/(NumColors+1)), bgcolor[j],fgcolor[j],phrase[j]);
     }
     fprintf(fp, "</tr>\n");
-
-    fprintf(fp, "<tr><TH colspan=\"11\">Channel Completeness Indicators</th></tr>\n");
-    fprintf(fp, "<tr>");
-    for (j = (NumColors-1); j >= 0; j--) {
-        if ((j == (NumColors-1)) || (j == 0)) {
-            fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\"><b>%i%%</b></TD>\n",bgcolor[j],fgcolor[j],percent[j]);
-        } else {
-            fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\"><b>%i%%</b></TD>\n",bgcolor[j],fgcolor[j],percent[j]);
-        }
-    }
 
     for (i = 0; (i < NumColorsNseg); i++) {
          if (ColorMapNseg[i].value <= 10) {
@@ -373,14 +359,13 @@ int  j=0;
     }
 
 
-    fprintf(fp, "</tr>\n");
-    fprintf(fp, "<tr><TH COLSPAN=\"11\">Segment Indicators</TH></tr>\n");
+    fprintf(fp, "<tr><TH COLSPAN=\"6\">Segment Indicators</TH></tr>\n");
     fprintf(fp, "<tr>");
     for (j = 0; (j < NumColorsNseg-1); j++) {
-         fprintf(fp, "<td COLSPAN=\"3\" bgcolor=\"%06x\"><FONT COLOR=\"%06x\"><B>&%s</B></TD>\n",
+         fprintf(fp, "<td COLSPAN=\"2\" bgcolor=\"%06x\"><FONT COLOR=\"%06x\"><B>&%s</B></TD>\n",
               bgcolor[j],fgcolor[j],nsegphrase[j]);
     }
-    fprintf(fp, "<td COLSPAN=\"4\" bgcolor=\"%06x\"><FONT COLOR=\"%06x\"><B>&%s</B></TD>\n", bgcolor[NumColorsNseg-1],fgcolor[NumColorsNseg-1],nsegphrase[NumColorsNseg-1]);
+    fprintf(fp, "<td COLSPAN=\"2\" bgcolor=\"%06x\"><FONT COLOR=\"%06x\"><B>&%s</B></TD>\n", bgcolor[NumColorsNseg-1],fgcolor[NumColorsNseg-1],nsegphrase[NumColorsNseg-1]);
     fprintf(fp, "</tr>");
     fprintf(fp, "</tbody>");
     fprintf(fp, "</table>\n");
@@ -392,7 +377,7 @@ char *parchstr="parchment.jpg";
 char parchvar[MAXPATHLEN+1];
 parchvar[0]=0;
 
-    fprintf(fp, "<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
+    fprintf(fp, "<!DOCTYPE html>\n<html>\n<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
     fprintf(fp, "<title>IDA/NRTS (%s)</title>\n",isiserver);
 
     fprintf(fp, "<!-- Bootstrap core CSS -->");
@@ -422,7 +407,7 @@ parchvar[0]=0;
     fprintf(fp, "<div class=\'col-10 offset-1\'>\n");
     fprintf(fp, "\n<TABLE class=\'resultstbl sortable table table-sm\'>");
     fprintf(fp, "\n<thead class=\'thead-dark\'><tr>\n");
-    fprintf(fp, "<th>STA-LOC</th><th>%% CHN</th><th>NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH>\n");
+    fprintf(fp, "<th>STA-LOC</th><th>%% CHN</th><th>AVG NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH>\n");
     fprintf(fp, "</tr></thead>\n");
     fprintf(fp, "<tbody>\n");
 }
@@ -430,7 +415,7 @@ parchvar[0]=0;
 static void PrintStatusTrailer(FILE *fp)
 {
     fprintf(fp, "</tbody>\n");
-    fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA-LOC</th><th>%% CHN</th><th>NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH></tr></thead>\n");
+    fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA-LOC</th><th>%% CHN</th><th>AVG NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH></tr></thead>\n");
     fprintf(fp, "</table>\n");
 
     fprintf(fp, "</div> <!-- col -->\n");
@@ -443,12 +428,20 @@ static void PrintStatusTrailer(FILE *fp)
     fprintf(fp, "</div> <!-- col -->\n");
     fprintf(fp, "</div> <!-- row -->\n");
 
-    fprintf(fp, "</BODY>");
+    fprintf(fp, "</BODY>\n");
+    fprintf(fp, "</html>\n");
 }
 
-static void PrintStatusResult(FILE *fp, char *sta, char *loc, char *isiserver, char *webserver, char *webpath, char *stationdir, REAL64 tols, REAL64 tslw, UINT32 livechn, UINT32 nseg)
+static void PrintStatusResult(FILE *fp,
+        char *sta, char *loc, char *isiserver, char *webserver, char *webpath, char *stationdir,
+        REAL64 tols, REAL64 tslw, REAL64 max_live_latency, UINT32 livechn, UINT32 totchn, UINT32 nseg)
 {
-UINT32 latency;
+UINT32 data_latency;
+UINT32 data_bg;
+/* UINT32 data_fg = BLACK; */
+/* UINT32 link_latency; */
+UINT32 link_bg;
+/* UINT32 link_fg = BLACK; */
 char tbuf[1024];
 
 char *str2 = "chan.html";
@@ -463,48 +456,39 @@ chanlink[0]=0;
 
     fprintf(fp, "<tr  class=\'text-monospace\'>");
     if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
-        latency = time(NULL) - (UINT32) tols;
-        fprintf(fp, "<td bgcolor=\"%06x\">",GetBg(latency));
-        if (GetBg(latency)) {
-            fprintf(fp, "<font color=\"%06x\"><B>*</B></font>", GetBg(tslw));
-            if (stationdir != NULL) {
-                fprintf(fp, "\n<a href=\"%s\">", stahomelink);
-            }
-            fprintf(fp, "<font color=\"%06x\"><b>%s-%s</b></font>", GetFg(tslw), util_ucase(sta), util_ucase(loc));
-            if (stationdir != NULL) {
-                fprintf(fp, "</a>\n");
-            }
+        data_latency = time(NULL) - (UINT32) tols;
+        data_bg = (data_latency <= max_live_latency) ? HAPPY : GetBg(data_latency);
+        link_bg = (tslw <= max_live_latency) ? HAPPY : GetBg(tslw);
+
+        fprintf(fp, "<td bgcolor=\"%06x\">", data_bg);
+        if (stationdir != NULL) {
+            fprintf(fp, "\n<a href=\"%s\"><b>%s-%s</b></a>\n", stahomelink, sta, loc);
         } else {
-            if (stationdir != NULL) {
-                fprintf(fp, "\n<A HREF=\"%s\" class=\"working visited\">",stahomelink);
-            }
-            else {
-                fprintf(fp,"\n%s",sta);
-            }
-            fprintf(fp, "<font color=\"%06x\"><B>*</B></font>", GetBg(tslw));
-            fprintf(fp, "<font color=\"%06x\">%s-%s</font></A>", WHITE, util_ucase(sta), util_ucase(loc));
+            fprintf(fp, "<b>%s-%s</b>", sta, loc);
         }
-        /* fprintf(fp, "</td>\n", GetFg(tslw),util_ucase(sta)); */
         fprintf(fp, "</td>\n");
-        fprintf(fp, "<td bgcolor=\"%06x\">",GetPercentbg(livechn));
-        fprintf(fp, "<A HREF=\"%s\">",chanlink);
-        fprintf(fp, "<font color=\"%06x\">%i</A></td>\n",GetPercentfg(livechn),livechn);
+        if (livechn == totchn) {
+            fprintf(fp, "<td bgcolor=\"%06x\"><a href=\"%s\">%i/%i</a></td>", HAPPY, chanlink, livechn, totchn);
+        } else {
+            fprintf(fp, "<td bgcolor=\"%06x\"><a href=\"%s\"><font color=\"%06x\"><b>%i/%i</b></a></td>",
+                    RED, chanlink, WHITE, livechn, totchn);
+        }
         fprintf(fp, "<td style=\"width:5px\" bgcolor=\"%06x\">\n",GetNsegbg(nseg));
         fprintf(fp, "<font color=\"%06x\">%i</td>\n",Getnsegfg(nseg),nseg);
         fprintf(fp, "<td>%s</td>\n",utilLttostr((INT32)tols,0,tbuf));
-        fprintf(fp, "<td>%s</td>\n",utilLttostr((INT32)latency,8,tbuf));
-        fprintf(fp, "<td>%s</td>\n",utilLttostr((INT32)tslw,8,tbuf));
+        fprintf(fp, "<td bgcolor=\"%06x\"><b>%s</b></td>\n", data_bg, utilLttostr((INT32)data_latency,8,tbuf));
+        fprintf(fp, "<td bgcolor=\"%06x\"><b>%s</b></td>\n", link_bg, utilLttostr((INT32)tslw,8,tbuf));
     } else {
         fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">",DKGRAY,WHITE);
         if (stationdir != NULL) {
             fprintf(fp, "\n<A HREF=\"%s\" class=\"broken\">",stahomelink);
-            fprintf(fp, "%s-%s</A></td>\n",util_ucase(sta), util_ucase(loc));        }
+            fprintf(fp, "%s-%s</A></font></td>\n", sta, loc);        }
         else {
-            fprintf(fp,"\n%s",sta);
+            fprintf(fp,"\n%s</font></td>",sta);
         }
         fprintf(fp, "<td bgcolor=\"%06x\">\n",DKGRAY);
         fprintf(fp, "<A HREF=\"%s\">",chanlink);
-        fprintf(fp, "<font color=\"%06x\">%i</td></A>\n",WHITE,livechn);
+        fprintf(fp, "<font color=\"%06x\">%i</font></a></td>\n",WHITE,livechn);
         fprintf(fp, "<td>n/a</td>\n");
         fprintf(fp, "<td>n/a</td>\n");
         fprintf(fp, "<td>n/a</td>\n");
@@ -513,6 +497,38 @@ chanlink[0]=0;
     fprintf(fp, "</tr>\n");
 }
 
+static REAL32 CalcPacketLatencyThreshold(ISI_STREAM_SOH *chn_soh, ISI_STREAM_CNF *chn_cnf, UINT16 samples_per_packet)
+{
+    REAL32 packet_live_threshold;
+    REAL32 packet_delay; // max time required to fill a packet
+    REAL32 delay_factor = 1.1; // after this many packet_delay's (with a minimum of delay_ok seconds) we'll consider channel late
+
+    packet_delay = samples_per_packet * isiSrateToSint(&chn_cnf->srate); // use util func to pull sample rate out of ISI_SRATE struct
+
+    // crude hack to deal with triggered EN? channels
+    if (chn_soh->name.chn[0] == 'E') {
+        packet_live_threshold = 24 * 60 * 60.0;
+    } else {
+        // after this many packet_delay's (with a minimum of 5.0 seconds) we'll consider channel late
+        // OR maybe just try flat buffer of 10 seconds
+        packet_live_threshold = packet_delay + 10.0; // fmaxf(5.0, packet_delay * (delay_factor - 1.0));
+    }
+
+    return packet_live_threshold;
+}
+
+/* static BOOL ChanIsLive(ISI_STREAM_SOH *chn_soh, ISI_STREAM_CNF *chn_cnf, UINT16 samples_per_packet) */
+/* { */
+/*     REAL32 packet_live_threshold; */
+/*     BOOL isLive; */
+
+/*     packet_live_threshold = CalcPacketLatencyThreshold(chn_soh, chn_cnf, samples_per_packet); */
+
+/*     isLive = (chn_soh->nrec != 0) && ((UINT32) chn_soh->tslw <= packet_live_threshold); */
+
+/*     return isLive; */
+/* } */
+
 static void PrintStatus(FILE *fp, ISI_SOH_REPORT *soh, ISI_CNF_REPORT *cnf, char *isiserver, char *webserver, char *htdocpath, char *webpath, char *stationdir)
 {
 int i;
@@ -520,10 +536,13 @@ int livechn,totchn;
 int sumnseg,totnseg, nsegval;
 REAL64 tols;
 REAL64 tslw;
+REAL64 pktlat;
+REAL64 max_live_latency; // this is the maximum 'live' latency for each sta-loc group overall based on IDA10 packets and channel srates
 UINT32 nseg;
-//ISI_NSEG dest;
 char *sta;
 char *loc;
+BOOL new_sta = TRUE;
+BOOL new_loc = TRUE;
 static char *Blank = "    ";
 static BOOL First = TRUE;
 char webstuff[MAXPATHLEN+1];
@@ -534,19 +553,14 @@ webstuff[0]=0;
     sta = Blank;
     loc =  Blank;
     for (i = 0; i < soh->nentry; i++) {
-        if ((strcmp(sta, soh->entry[i].name.sta) != 0) || (strcmp(loc, soh->entry[i].name.loc) != 0)) {                     //  new station
+        new_sta = strcmp(sta, soh->entry[i].name.sta) != 0;
+        new_loc = strcmp(loc, soh->entry[i].name.loc) != 0;
+        if (new_sta || new_loc) {
             if (!First) {
-                if (totchn > 0) {
-                    livechn = (livechn * 100) / totchn;
-                } else {
-                    livechn = 0;
-                }
-                if (totnseg > 0) {
-                    nsegval = sumnseg / totnseg;
-                } else {
-                    nsegval = 0;
-                }
-                PrintStatusResult(fp, sta, loc, isiserver, webserver, webpath, stationdir, tols, tslw, livechn, nsegval);
+                nsegval = (totnseg > 0) ? (sumnseg / totnseg) : 0;
+                PrintStatusResult(fp,
+                        sta, loc, isiserver, webserver, webpath,
+                        stationdir, tols, tslw, max_live_latency, livechn, totchn, nsegval);
             }
             sta = soh->entry[i].name.sta;
             loc = soh->entry[i].name.loc;
@@ -557,6 +571,7 @@ webstuff[0]=0;
             totchn = 0;
             totnseg = 0;
             sumnseg = 0;
+            max_live_latency = INFINITY;
         }
         if (soh->entry[i].tols.value != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
             if (tols == (REAL64) ISI_UNDEFINED_TIMESTAMP || soh->entry[i].tols.value > tols) {
@@ -572,23 +587,18 @@ webstuff[0]=0;
             }
         }
         First = FALSE;
-        if ((soh->entry[i].nrec != 0) && (UINT32) tslw <= LIVE_LATENCY_THRESHOLD) livechn++; // if channel is reporting, count it
+
+        if ((pktlat = CalcPacketLatencyThreshold(&soh->entry[i], &cnf->entry[i], SAMP_PER_PACKET)) < max_live_latency) max_live_latency = pktlat;
+
+        if ((soh->entry[i].nrec != 0) && ((UINT32) soh->entry[i].tslw <= pktlat)) livechn++; // if channel is reporting, count it
         totchn++;    // count total channels
+
         if (nseg > 0) totnseg++;    // count total nseg if value > 0
     }
 
-    if (totchn > 0) {
-         livechn = (livechn * 100) / totchn;
-    } else {
-         livechn = 0;
-    }
-    if (totnseg > 0) {
-          nsegval = sumnseg / totnseg;
-    } else {
-         nsegval = 0;
-    }
+    nsegval = (totnseg > 0) ? (sumnseg / totnseg) : 0;
 
-    PrintStatusResult(fp, sta, loc, isiserver, webserver, webpath, stationdir, tols, tslw, livechn, nsegval);
+    PrintStatusResult(fp, sta, loc, isiserver, webserver, webpath, stationdir, tols, tslw, max_live_latency, livechn, totchn, nsegval);
     PrintStatusTrailer(fp);
 }
 
@@ -649,7 +659,7 @@ weblink[0]=0;
 stalocchanfn[0]=0;
 
     sprintf(weblink, "%s/%s",webstuff,isiserver);
-    fprintf(fp, "<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
+    fprintf(fp, "<!DOCTYPE html><html><HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
     fprintf(fp, "<title>\nIDA/NRTS (%s)\n</title>\n",isiserver);
     fprintf(fp, "<!-- Bootstrap core CSS -->");
     fprintf(fp, "   <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css\" integrity=\"sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4\" crossorigin=\"anonymous\">\n");
@@ -669,14 +679,16 @@ stalocchanfn[0]=0;
 
 //    Print links to the other stations' pages here
     fprintf(fp, "<div class=\'row\'>\n");
-    fprintf(fp, "<div class=\'col-10 offset-1\'>");
+    fprintf(fp, "<div class=\'col-12\'>");
     fprintf(fp, "<TABLE class=\'stalisttbl table table-sm\'>");
     int col;
-    int colcnt = 10;
+    int colcnt = 9;
     int row;
-    int rowcnt = ceil(slist->count / 10.);
+    int rowcnt = ceil(slist->count / (float)colcnt);
     for (row=0; row < rowcnt; row++) {
-        fprintf(fp, "\n<TR>\n");
+        /* name = (char *) slist->array[ndx]; */
+        /* sprintf(stalocchanfn,"https://%s/%s-%s",weblink,name,str2); */
+        /* fprintf(fp, "<tr><td><a href=\"%s\">%s</a></td></tr>\n",stalocchanfn,name); */
 
         for (col=0; col < colcnt; col++) {
             int ndx = col * rowcnt + row;
@@ -691,23 +703,17 @@ stalocchanfn[0]=0;
 
         fprintf(fp, "\n</TR>\n");
     }
-    /* for (i=0;  i < slist->count; i++) { */
-    /*     name = (char *) slist->array[i]; */
-    /*    if (!(i % 10)) fprintf(fp,"</TR><TR>"); */
-    /*     sprintf(stalocchanfn,"https://%s/%s-%s",weblink,name,str2); */
-    /*     fprintf(fp, "<TD><A HREF=\"%s\">%s</A></TD>\n",stalocchanfn,name); */
-    /* } */
     fprintf(fp, "</TABLE>");
     fprintf(fp, "</div> <!-- end column-->");
     fprintf(fp, "</div> <!-- end station index table row -->");
 
     fprintf(fp, "\n<br/>\n");
-    //
+
 //    Accommodate multiple color links
     MakeLinkColorSS(fp);
 
     fprintf(fp, "<div class=\'row\'>\n");
-    fprintf(fp, "<div class=\'col\'>\n");
+    fprintf(fp, "<div class=\'col-12\'>\n");
 
     PrintChnPgLegend(fp);
 
@@ -731,103 +737,52 @@ static void MakeChanPageTrailer(FILE *fp, LNKLST *slist, char *sta, char *loc, c
     fprintf(fp, "</div> <!-- end column-->");
     fprintf(fp, "</div> <!-- main body and footer row -->");
     fprintf(fp, "</div> <!-- container -->");
-    fprintf(fp, "</BODY>");
+    fprintf(fp, "</BODY>\n</html>\n");
 }
 
 
-static void MakeChanPageResult(FILE *fp, char *sta, char *chn, char *loc, REAL64 srate, UINT32 nseg, REAL64 tols, REAL64 tslw)
+static void MakeChanPageResult(FILE *fp, char *sta, char *chn, char *loc, REAL64 srate, UINT32 nseg, REAL64 tols, REAL64 tslw, REAL64 pktlat_threshold)
 {
-UINT32 latency, tslw_latency;
+UINT32 latency, link_latency, data_latency;
 UINT32 colorlatency;
+UINT32 data_bg, link_bg;
 ISI_SITECHANFLAG dest;
 char tbuf[1024];
-static BOOL TimeStampsOK;
 char chanloc[ISI_CHNLOCLEN+1];
 chanloc[0]=0;
 UINT32 samprate=0;
 
 
-    TimeStampsOK = TRUE; /* maybe */
     samprate = SAMP_PER_PACKET / srate;
     fprintf(fp, "\n<tr class=\'text-monospace\'>");
     sprintf(chanloc,"%s%s",util_ucase(chn),loc);
     if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
-        latency = time(NULL) - (UINT32) tols;
-        tslw_latency = (UINT32) tslw;
-        if (latency <= samprate) {
-            colorlatency = 10;
+        link_latency = (UINT32) tslw;
+        data_latency = time(NULL) - (UINT32) tols;
+        data_bg = (data_latency <= pktlat_threshold) ? HAPPY : GetBg(data_latency);
+        link_bg = (tslw <= pktlat_threshold) ? HAPPY : GetBg(tslw);
+
+        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", data_bg, sta);
+        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", data_bg, chanloc);
+        fprintf(fp, "<td bgcolor=\"%06x\">%4.2f</td>\n", data_bg, srate);
+        fprintf(fp, "<td bgcolor=\"%06x\">%i</td>\n", GetNsegbg(nseg), nseg);
+
+        if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
+            fprintf(fp,"<td>%s</td>\n", utilLttostr((INT32)tols, 0, tbuf));
+            fprintf(fp,"<td bgcolor=\"%06x\">%s</td>\n", data_bg, utilLttostr((INT32)data_latency, 8, tbuf));
         } else {
-            colorlatency = latency;
+            fprintf(fp, "<td></td>");
+            fprintf(fp, "<td></td>");
         }
-        if (GetBg(colorlatency) != DKGRAY) {
-            fprintf(fp,"<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</td>\n",
-                GetBg(colorlatency),BLACK,sta);
-            fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</TD>\n",
-                GetBg(colorlatency),BLACK,chanloc);
-            fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%4.2f</td>\n",
-                GetBg(colorlatency),BLACK,srate);
-//  ADD CODE FOR NSEG COLOR
-/*            fprintf(fp,"<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%i</td>\n",
-                GetBg(colorlatency),BLACK,nseg);
-*/
-            fprintf(fp,"<td colspan=\"1\" bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%i</td>\n",
-                GetNsegbg(nseg),BLACK,nseg);
-            if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
-                fprintf(fp,"<td bgcolor=\"%06x\" <FONT COLOR=\"%06x\">%s</td>\n",
-                    GetBg(colorlatency),BLACK,utilLttostr((INT32)tols,0,tbuf));
-            } else {
-                fprintf(fp, "                   ");
-                TimeStampsOK = FALSE;
-            }
-            if (TimeStampsOK) {
-                fprintf(fp,"<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</td>\n",
-                     GetBg(colorlatency),BLACK,utilLttostr((INT32)latency,8,tbuf));
-            } else {
-                fprintf(fp, "                   ");
-            }
-            fprintf(fp,"<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</td>\n",
-                 GetBg(tslw_latency),BLACK,utilLttostr((INT32)tslw,8,tbuf));
-        } else {
-            if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
-                fprintf(fp,"<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</td>\n",
-                    GetBg(colorlatency),WHITE,sta);
-                fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</TD>\n",
-                    GetBg(colorlatency),WHITE,chanloc);
-                fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%4.2f</td>\n",
-                    GetBg(colorlatency),WHITE,srate);
-//  ADD CODE FOR NSEG COLOR
-                fprintf(fp,"<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%i</td>\n",
-                    GetBg(colorlatency),WHITE,nseg);
-                fprintf(fp, "<td bgcolor=\"%06x\" <FONT COLOR=\"%06x\">%s</td>\n",
-                   GetBg(colorlatency),WHITE,utilLttostr((INT32)tols,0,tbuf));
-            } else {
-                fprintf(fp, "                   ");
-                TimeStampsOK = FALSE;
-            }
-            if (TimeStampsOK) {
-                fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</td>\n",
-                    GetBg(colorlatency),WHITE,utilLttostr((INT32)latency,8,tbuf));
-            } else {
-                fprintf(fp, "                   ");
-            }
-            fprintf(fp, "<td bgcolor=\"%06x\"><FONT COLOR=\"%06x\">%s</td>\n",
-                    GetBg(tslw_latency),WHITE,utilLttostr((INT32)tslw,8,tbuf));
-        }
+        fprintf(fp,"<td bgcolor=\"%06x\">%s</td>\n", link_bg, utilLttostr((INT32)tslw, 8, tbuf));
     } else {
-        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%s</TD>",
-            DKGRAY,WHITE,sta);
-        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%s</TD>",
-            DKGRAY,WHITE,chanloc);
-        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%4.2f</td>\n",
-            DKGRAY,WHITE,srate);
-        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%i</td>\n",
-            DKGRAY,WHITE,nseg);
-        fprintf(fp, "<td bgcolor=\"%06x\" <font color=\"%06x\">n/a</td>\n",
-                 DKGRAY,WHITE);
-        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">n/a</td>\n",
-                 DKGRAY,WHITE);
-        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">n/a</td>\n",
-                 DKGRAY,WHITE);
+        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%s</font></TD>", DKGRAY,WHITE,sta);
+        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%s</font></TD>", DKGRAY,WHITE,chanloc);
+        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%4.2f</font></td>\n", DKGRAY,WHITE,srate);
+        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%i</font></td>\n", DKGRAY,WHITE,nseg);
+        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">n/a</font></td>\n", DKGRAY,WHITE);
+        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">n/a</font></td>\n", DKGRAY,WHITE);
+        fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">n/a</font></td>\n", DKGRAY,WHITE);
     }
     fprintf(fp, "</tr>\n");
 }
@@ -901,6 +856,7 @@ int i;
 REAL64 tols;
 REAL64 tslw;
 REAL64 ssrate;
+REAL64 pktlat;
 char ofname[MAXPATHLEN+1];
 char webstuff[MAXPATHLEN+1];
 webstuff[0]=0;
@@ -927,20 +883,10 @@ LNKLST *slist;
             PrevSta = util_ucase(soh->entry[i].name.sta);
             PrevLoc = util_ucase(soh->entry[i].name.loc);
         }
-        tols = (REAL64) ISI_UNDEFINED_TIMESTAMP;
-        tslw = (REAL64) ISI_UNDEFINED_TIMESTAMP;
-        if (soh->entry[i].tols.value != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
-            if (tols == (REAL64) ISI_UNDEFINED_TIMESTAMP || soh->entry[i].tols.value > tols) {
-                tols = soh->entry[i].tols.value;
-            }
-        }
-        if (soh->entry[i].tslw != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
-            if (tslw == (REAL64) ISI_UNDEFINED_TIMESTAMP || soh->entry[i].tslw < tslw) {
-                tslw = soh->entry[i].tslw;
-            }
-        }
         ssrate = 1.0 / isiSrateToSint(&cnf->entry[i].srate);
-        MakeChanPageResult(ofp, soh->entry[i].name.sta, soh->entry[i].name.chn, soh->entry[i].name.loc, ssrate, soh->entry[i].nseg, soh->entry[i].tols.value, tslw);
+        pktlat = CalcPacketLatencyThreshold(&soh->entry[i], &cnf->entry[i], SAMP_PER_PACKET);
+        MakeChanPageResult(ofp, soh->entry[i].name.sta, soh->entry[i].name.chn, soh->entry[i].name.loc, ssrate,
+            soh->entry[i].nseg, soh->entry[i].tols.value, soh->entry[i].tslw, pktlat);
     }
     listDestroy(slist);
 
