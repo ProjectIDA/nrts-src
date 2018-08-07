@@ -1,0 +1,65 @@
+#!/bin/csh -f
+# $Id$
+#
+# Script to launch one-shot data pulls from remote locations
+
+set debug       = 0
+set myname      = PullData
+
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p local0.info "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+source $setup
+if ($debug) logger -t $myname"[$$]" -p local0.info "$setup OK"
+
+set DefaultSite = ale
+if ($#argv == 0) then
+    set site = $DefaultSite
+else if ($#argv == 1) then
+    set site = $argv[1]
+else
+    echo "usage: $myname [ site ]"
+    logger -t $myname"[$$]" -p local0.info "ERROR: bad command line: $argv"
+    goto failure
+endif
+
+if ($site == ale) then
+    if (-e $TunnelKeepAliveFlag) then
+        set command = "tssh ale tunnel keep"
+        logger -t $myname"[$$]" -p local0.info "$command"
+        $command
+        rm -f $TunnelKeepAliveFlag
+    endif
+    set command = "isidl isi=localhost:59189 scl=nrts end=newest maxdur=600 ale log=syslogd:local0 seedlink=rtserve.ida.ucsd.edu:16000:512:500:II"
+else
+    echo "${myname}: site '$site' is not supported"
+    logger -t $myname"[$$]" -p local0.info "ERROR: site '$site' is not supported"
+    goto failure
+endif
+
+logger -t $myname"[$$]" -p local0.info "$command"
+$command
+
+if ($status != 0) then
+    logger -t $myname"[$$]" -p local0.info "ERROR: command failed"
+    goto failure
+endif
+
+logger -t $myname"[$$]" -p local0.info "exit 0"
+exit 0
+
+failure:
+logger -t $myname"[$$]" -p local0.info "exit 1"
+exit 1
+
+# Revision History
+#
+# $Log$
