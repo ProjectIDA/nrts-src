@@ -8,23 +8,23 @@
 set debug  = 1
 set myname = isiRequestOnce
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # General setup
 
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
 source $setup
-if ($debug) logger -t $myname"[$$]" -p user.info "$setup OK"
+if ($debug) logger -t $myname"[$$]" -p local0.info "$setup OK"
 
-if ($#argv != 3) then
+if ($#argv != 4) then
     set message = "bad command line"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     echo "usage: $myname server sta"
     goto failure
@@ -33,17 +33,18 @@ endif
 set server = $argv[1]
 set sta    = $argv[2]
 set maxdur = $argv[3]
+set slsrvr = $argv[4]
 set timeout = 60
 
-set command = "isidl isi=${server} $sta end=newest log=syslogd:user to=$timeout maxdur=$maxdur -nosync"
-if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+set command = "isidl isi=${server} $sta end=newest log=syslogd:local0 to=$timeout maxdur=$maxdur seedlink=${slsrvr}:16000:512:500:II -nosync"
+if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 $command
 
-if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
 exit 0
 
 failure:
-logger -t $myname"[$$]" -p user.info "exit 1"
+logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 
 # Revision History
