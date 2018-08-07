@@ -1,0 +1,50 @@
+.TH migcmp L " 13 August 1992" "IRIS Data \(em IGPP"
+.SH NAME
+migcmp - copies/compresses/decompresses data files
+.SH SYNOPSIS
+.PP
+\fBmigcmp base= inwfd= outwfd= [+/-v +/-c +/-d +a +/-rename mode=0xxx]\fP 
+.PP
+.SH DESCRIPTION
+.PP
+This program copies the data files pointed to in the input wfdisc to
+the directory specified by base and outputs the new wfdisc and remark entries
+to the specified prefix.  If the output wfdisc or remark files exist, the
+new entries are appended to the existing files.  Unique commids are assigned
+to the remarks to be output.
+.SH OPTIONS
+.IP
+base= Specified directory to write data to
+.IP
+inwfd= Prefix of input wfdisc and remark files
+.IP
+outwfd= Prefix of output wfdisc and remark files
+.IP
++/-v Turns on/off verbose mode (default is off)
+.IP
++/-c Turns on/off data compression (default is off)
+.IP
++/-d Turns on/off data decompression (default is off)
+.IP
++a Turns on append mode for ouputed compressed files (default is off)
+.IP
++/-rename Turns on/off file renaming.  Output files are named sta-chan-hhmm.w
+.IP
+mode= Mode to set output data files to after writing (default is off)
+.sp
+.SH NOTES
+.PP
+Only one of the options +c or +d may be selected.  If more than one is 
+selected, an error message will be output and the program will exit.
+.sp
+.SH BUGS
+.PP
+If the user has selected the decompress option, "+d", the input wfdisc
+must not contain any references to uncompressed data.  Uncompressed data
+fed through the decompression scheme of migcmp will not produce an error
+but the resulting binary waveform data will be garbage.
+.SH EXAMPLE
+.IP
+.B migcmp base=. inwfd=junk outwfd=outjunk +v +c +rename mode=0444
+.SH AUTHOR
+A. Reynolds

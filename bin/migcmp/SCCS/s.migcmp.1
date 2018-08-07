@@ -1,0 +1,79 @@
+h42864
+s 00006/00000/00044
+d D 1.3 96/02/20 09:55:06 dap 3 2
+c added note about decompression bug
+e
+s 00003/00001/00041
+d D 1.2 95/03/17 12:53:44 dap 2 1
+c added new option to append to outputed files
+e
+s 00042/00000/00000
+d D 1.1 94/03/11 08:59:05 iris 1 0
+c date and time created 94/03/11 08:59:05 by iris
+e
+u
+U
+f e 0
+t
+T
+I 1
+.TH migcmp L " 13 August 1992" "IRIS Data \(em IGPP"
+.SH NAME
+migcmp - copies/compresses/decompresses data files
+.SH SYNOPSIS
+.PP
+D 2
+\fBmigcmp base= inwfd= outwfd= [+/-v +/-c +/-d +/-rename mode=0xxx]\fP 
+E 2
+I 2
+\fBmigcmp base= inwfd= outwfd= [+/-v +/-c +/-d +a +/-rename mode=0xxx]\fP 
+E 2
+.PP
+.SH DESCRIPTION
+.PP
+This program copies the data files pointed to in the input wfdisc to
+the directory specified by base and outputs the new wfdisc and remark entries
+to the specified prefix.  If the output wfdisc or remark files exist, the
+new entries are appended to the existing files.  Unique commids are assigned
+to the remarks to be output.
+.SH OPTIONS
+.IP
+base= Specified directory to write data to
+.IP
+inwfd= Prefix of input wfdisc and remark files
+.IP
+outwfd= Prefix of output wfdisc and remark files
+.IP
++/-v Turns on/off verbose mode (default is off)
+.IP
++/-c Turns on/off data compression (default is off)
+.IP
++/-d Turns on/off data decompression (default is off)
+I 2
+.IP
++a Turns on append mode for ouputed compressed files (default is off)
+E 2
+.IP
++/-rename Turns on/off file renaming.  Output files are named sta-chan-hhmm.w
+.IP
+mode= Mode to set output data files to after writing (default is off)
+.sp
+.SH NOTES
+.PP
+Only one of the options +c or +d may be selected.  If more than one is 
+selected, an error message will be output and the program will exit.
+.sp
+I 3
+.SH BUGS
+.PP
+If the user has selected the decompress option, "+d", the input wfdisc
+must not contain any references to uncompressed data.  Uncompressed data
+fed through the decompression scheme of migcmp will not produce an error
+but the resulting binary waveform data will be garbage.
+E 3
+.SH EXAMPLE
+.IP
+.B migcmp base=. inwfd=junk outwfd=outjunk +v +c +rename mode=0444
+.SH AUTHOR
+A. Reynolds
+E 1
