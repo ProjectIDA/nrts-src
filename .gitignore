@@ -4,6 +4,7 @@ QDP_Toolkit
 windows
 .DS*
 **/CVS
+**/SCCS
 **/._.*
 **/OBJS
 **/*.swp
