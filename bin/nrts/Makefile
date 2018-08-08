@@ -13,7 +13,7 @@ solaris.sun4: FORCE
 	cd edes;      $(MAKE)
 	cd mon;       $(MAKE)
 	cd utils;     $(MAKE)
-	cd wrtdl;     $(MAKE)
+#	cd wrtdl;     $(MAKE)
 
 freebsd.i86pc: FORCE
 	cd edes;      $(MAKE)
@@ -29,7 +29,7 @@ linux.i86pc: FORCE
 	cd edes;      $(MAKE)
 	cd mon;       $(MAKE)
 	cd utils;     $(MAKE)
-	cd wrtdl;     $(MAKE)
+#	cd wrtdl;     $(MAKE)
 
 linux.x86_64: FORCE
 	cd edes;      $(MAKE)
@@ -51,30 +51,30 @@ install: libs $(TARGET)
 #	cd wrtdl;     $(MAKE) $@
 
 clean:
-	cd alpha;     $(MAKE) $@
+#	cd alpha;     $(MAKE) $@
 	cd edes;      $(MAKE) $@
 	cd mon;       $(MAKE) $@
-	cd push;      $(MAKE) $@
+#	cd push;      $(MAKE) $@
 	cd utils;     $(MAKE) $@
-	cd wrtdl;     $(MAKE) $@
-	cd xfer;      $(MAKE) $@
+#	cd wrtdl;     $(MAKE) $@
+#	cd xfer;      $(MAKE) $@
 
 REMOVE:
-	cd alpha;     $(MAKE) $@
+#	cd alpha;     $(MAKE) $@
 	cd edes;      $(MAKE) $@
 	cd mon;       $(MAKE) $@
-	cd push;      $(MAKE) $@
+#	cd push;      $(MAKE) $@
 	cd utils;     $(MAKE) $@
-	cd wrtdl;     $(MAKE) $@
-	cd xfer;      $(MAKE) $@
+#	cd wrtdl;     $(MAKE) $@
+#	cd xfer;      $(MAKE) $@
 
 remove:
-	cd alpha;     $(MAKE) $@
+#	cd alpha;     $(MAKE) $@
 	cd edes;      $(MAKE) $@
 	cd mon;       $(MAKE) $@
-	cd push;      $(MAKE) $@
+#	cd push;      $(MAKE) $@
 	cd utils;     $(MAKE) $@
-	cd wrtdl;     $(MAKE) $@
-	cd xfer;      $(MAKE) $@
+#	cd wrtdl;     $(MAKE) $@
+#	cd xfer;      $(MAKE) $@
 
 FORCE:
