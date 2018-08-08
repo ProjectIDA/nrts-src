@@ -1,5 +1,5 @@
 #!/bin/csh -f
-# $Id: isiGetIsoStats,v 1.5 2015/12/10 00:00:15 dechavez Exp $
+# $Id: isiGetIsoStats,v 1.3 2005/10/11 18:17:58 dechavez Exp $
 #
 # Generate cdrom stats for use by ispd
 
@@ -96,13 +96,6 @@ exit 1
 # Revision History
 #
 # $Log: isiGetIsoStats,v $
-# Revision 1.5  2015/12/10 00:00:15  dechavez
-# undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
-# (didn't work in cron, duh)
-#
-# Revision 1.4  2015/12/07 22:18:43  dechavez
-# don't assume user nrts (use NRTS_HOME environment varible instead)
-#
 # Revision 1.3  2005/10/11 18:17:58  dechavez
 # removed requirement on location of starting directory
 #

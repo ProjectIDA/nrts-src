@@ -14,7 +14,7 @@ endif
 set autorun = $dest/autorun
 set unpack  = $dest/unpack.exe
        
-set setup  = $NRTS_HOME/scripts/ScriptSetup
+set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     echo "${myname}: missing $setup"
     goto failure

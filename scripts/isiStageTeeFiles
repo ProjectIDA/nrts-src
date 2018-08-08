@@ -1,5 +1,5 @@
 #!/bin/csh -f
-# $Id: isiStageTeeFiles,v 1.20 2015/12/10 00:00:16 dechavez Exp $
+# $Id: isiStageTeeFiles,v 1.17 2013/09/20 17:03:08 dechavez Exp $
 #
 # Compress and move ISI tee files into ISO staging area
 
@@ -31,7 +31,13 @@ if ($#argv == 0) then
 else if ($#argv == 1) then
     if ($argv[1] == "FORCE") then
         set Force = 1
-        set site = $DefaultSite
+        if ($#SystemsList == 1) then
+            set site = $DefaultSite
+        else
+            set error = 1
+            echo "Multi-site systems require explict name of site to process"
+            exit 1
+        endif
     else
         set Force = 0
         set site = $argv[1]

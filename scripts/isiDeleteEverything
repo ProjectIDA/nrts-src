@@ -1,5 +1,5 @@
 #!/bin/csh -f
-# $Id: isiDeleteEverything,v 1.8 2015/12/10 00:00:15 dechavez Exp $
+# $Id: isiDeleteEverything,v 1.6 2015/08/26 15:30:59 dechavez Exp $
 #
 # Delete all ISI and NRTS data files (eg, prior to backup)
 
@@ -118,13 +118,6 @@ exit 1
 # Revision History
 #
 # $Log: isiDeleteEverything,v $
-# Revision 1.8  2015/12/10 00:00:15  dechavez
-# undid the previous change, now use ~nrts instead of NRTS_HOME to load the setup script
-# (didn't work in cron, duh)
-#
-# Revision 1.7  2015/12/07 22:18:43  dechavez
-# don't assume user nrts (use NRTS_HOME environment varible instead)
-#
 # Revision 1.6  2015/08/26 15:30:59  dechavez
 # create the done/gziped and done/images iso subdirs
 #

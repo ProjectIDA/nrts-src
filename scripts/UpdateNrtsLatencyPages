@@ -1,0 +1,22 @@
+#!/bin/csh -f
+
+set LockFile = /var/tmp/isiwww.lock
+set filelock = /usr/nrts/bin/filelock
+if (-e $filelock) then
+    $filelock $LockFile $$
+    if ($status != 0) exit 0
+endif
+
+set webserver = ida.ucsd.edu
+
+set list = ""
+set list = "$list idahub.ucsd.edu"
+#set list = "$list xidahub.ucsd.edu"
+#set list = "$list gci.ida.ucsd.edu"
+set list = "$list femto.ucsd.edu"
+set list = "$list ida.iris.washington.edu"
+set list = "$list ida.adc1.iris.edu"
+
+foreach isiserver ($list)
+    /usr/nrts/scripts/UpdateNrtsLatencyPage $isiserver $webserver
+end
