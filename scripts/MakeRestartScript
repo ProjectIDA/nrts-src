@@ -1,0 +1,18 @@
+#!/bin/csh -f
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p user.info "$message"
+    echo "${myname}: $message"
+    exit 1
+endif
+source $setup
+set envrc  = ~nrts/.envrc
+
+foreach sta ($SystemsList)
+	echo -n "isidl isi=$sta $sta beg="
+	isildl $sta | grep "seqno = " | awk '{print $3$4$5}'
+end
