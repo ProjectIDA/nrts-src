@@ -1,7 +1,7 @@
 #!/bin/csh -f
 #
 # Install /etc/init.d files
-# $Id: nrtsInstallInit,v 1.5 2015/12/07 22:18:43 dechavez Exp $
+# $Id: nrtsInstallInit,v 1.4 2005/10/13 20:01:48 dechavez Exp $
 
 # Root only script
 
@@ -19,7 +19,7 @@ endif
 
 # General setup
 
-set setup  = $NRTS_HOME/scripts/ScriptSetup
+set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
     logger -t $myname"[$$]" -p user.info "$message"
