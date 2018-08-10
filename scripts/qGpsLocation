@@ -26,11 +26,15 @@ foreach site ($SiteList)
 
     foreach loc (00 10)
 
-        echo GPS Lat/Lon from: ${site}${loc}:
-        tssh ${site} q330 ${site}${loc} status | egrep "(Latitude|Longitude)"
+        echo "${site}${loc}:   X" | awk '{print substr($0, 1, 7)}' | tr '\n' ' '
+        tssh ${site} q330 ${site}${loc} status | egrep "(Latitude|Longitude)" | tr '\n' ' ' | awk '{print $3, $6}'
         if ($status != 0) then
-            echo Error communicating with ${site}${loc}
+            echo ""
+            echo "   Error communicating with ${site}${loc}"
+        else
+            # echo ""
         endif
+
 
     end
 end
