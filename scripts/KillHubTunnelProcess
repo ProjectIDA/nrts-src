@@ -1,0 +1,71 @@
+#!/bin/tcsh -f
+#
+# Kill SSH Tunnels by killing sshd process on Hub for ports used by specified host
+#
+set myname = `basename $0`
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p local0.info "$message"
+    echo "${myname}: $message"
+    exit 1
+endif
+source $setup
+
+# check args
+if ($#argv < 1) then
+    echo "usage: $myname hostname"
+    exit 1
+endif
+
+# Check for debug flag
+if (-e $DebugDir/$myname) then
+    set debug = 1
+else
+    set debug = 0
+endif
+
+# set CTRL-C jumo in case I get cold feet
+onintr interrupt
+
+# find tunnel ports
+set TunnelPorts  = $NRTS_HOME/etc/Tunnels
+set hostports = `grep $argv[1] $TunnelPorts`
+
+if ($status != 0) then
+    set msg = "ERROR: host $argv[1] not found in $TunnelPorts"
+    
+endif
+
+# echo Hostports: $hostports
+
+set hostname = `echo $hostports | awk '{print $1}'`
+set dataport = `echo $hostports | awk '{print $2}'`
+set sshport = `echo $hostports | awk '{print $3}'`
+
+if ($debug) logger -t $myname"[$$]" -p local0.info "Tunnel Info: $hostname $dataport $sshport"
+
+foreach port ($dataport $sshport)
+
+    set sshdprocess = `sudo lsof -i tcp -u tunnel | egrep "^sshd.*idahub.ucsd.edu:$port \(L" | awk '{print $9,$1,"pid:",$2}' | sort | rev | column -t | rev`
+    if ("$sshdprocess" != "") then
+        set sshdpid = $sshdprocess[4]
+        if ($debug) logger -t $myname"[$$]" -p local0.info "killing sshd process $sshdpid for: ${hostname}:${port}"
+        set cmd = "kill -TERM $sshdpid"
+        logger -t $myname"[$$]" -p local0.info "$cmd"
+        sudo -- tcsh -c "$cmd"
+    else
+        logger -t $myname"[$$]" -p local0.info "NO sshd process found for: ${hostname}:${port}"
+    endif
+
+end
+
+exit 0
+
+interrupt:
+    logger -t $myname"[$$]" -p local0.info "User aborted $0 $argv[1]"
+    exit 1
+
