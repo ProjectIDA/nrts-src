@@ -10,7 +10,9 @@ jobs:
       - run:
           name: Go to src_root
           command: cd src_root
-      - checkout
+      - run:
+          name: Checkout repo
+          command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
       - run:
           name: Make NRTS
           command: make
