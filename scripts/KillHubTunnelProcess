@@ -21,6 +21,8 @@ if ($#argv < 1) then
     exit 1
 endif
 
+set hostname = `echo $argv[1] | ucase`
+
 # Check for debug flag
 if (-e $DebugDir/$myname) then
     set debug = 1
@@ -33,16 +35,15 @@ onintr interrupt
 
 # find tunnel ports
 set TunnelPorts  = $NRTS_HOME/etc/Tunnels
-set hostports = `grep $argv[1] $TunnelPorts`
+set hostports = `grep $hostname $TunnelPorts`
 
 if ($status != 0) then
-    set msg = "ERROR: host $argv[1] not found in $TunnelPorts"
+    set msg = "ERROR: host $hostname not found in $TunnelPorts"
     
 endif
 
 # echo Hostports: $hostports
 
-set hostname = `echo $hostports | awk '{print $1}'`
 set dataport = `echo $hostports | awk '{print $2}'`
 set sshport = `echo $hostports | awk '{print $3}'`
 
