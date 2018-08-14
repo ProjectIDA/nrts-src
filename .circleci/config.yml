@@ -15,4 +15,4 @@ jobs:
           command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
       - run:
           name: Make NRTS
-          command: make
+          command: cd src && make
