@@ -4,7 +4,13 @@ jobs:
     docker:
       - image: projectida/nrts-builder:0.2
     steps:
+      - run:
+          name: Create dirs
+          command: mkdir src_root && mkdir bin && mkdir lib
+      - run:
+          name: Go to src_root
+          command: cd src_root
       - checkout
       - run:
-          name: Build world
+          name: Make NRTS
           command: make
