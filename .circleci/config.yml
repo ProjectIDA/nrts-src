@@ -1,7 +1,6 @@
 version: 2
 jobs:
   build:
-    environment:
     docker:
       image: projectida/nrts-builder
     steps:
