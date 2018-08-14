@@ -11,8 +11,11 @@ jobs:
           name: Go to src_root
           command: cd src_root
       - run:
-          name: Checkout repo
+          name: Checkout NRTS src repo
           command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
       - run:
+          name: Checkout lib330 repo
+          command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/lib330.git lib330
+      - run:
           name: Make NRTS
-          command: cd src && make
+          command: cd lib330 && make
