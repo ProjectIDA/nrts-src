@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    environment:
+    docker:
+      image: projectida/nrts-builder
+    steps:
+      - checkout
+      - run:
+          name: Build world
+          command: make
