@@ -18,7 +18,7 @@ jobs:
           command: cd src
       - run:
           name: Run build script
-          command: ./build.csh
+          command: tcsh build.csh
       # - run:
       #     name: Checkout lib330 repo
       #     command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/lib330.git lib330
