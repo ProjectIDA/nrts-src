@@ -15,7 +15,6 @@ all: \
      idatomseed \
      imseed \
      isi \
-     isi330 \
      isid \
      i10dld \
      isidl \
@@ -45,6 +44,7 @@ all: \
      uniqpath \
      vhfilt \
      xfer
+     #isi330 \
      #tristar \
      #tristar10
 
