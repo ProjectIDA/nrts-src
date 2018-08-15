@@ -14,8 +14,21 @@ jobs:
           name: Checkout NRTS src repo
           command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
       - run:
-          name: Checkout lib330 repo
-          command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/lib330.git lib330
+          name: Enter src repo
+          command: cd src
       - run:
-          name: Make NRTS
-          command: cd lib330 && make
+          name: Run build script
+          command: ./build.csh
+      # - run:
+      #     name: Checkout lib330 repo
+      #     command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/lib330.git lib330
+      # - run:
+      #     name: Setup NRTS build env
+      #     command: |
+      #       source env/platform
+      #       source env/envrc
+      #       source env/pathrc
+      #       source env/aliases
+      # - run:
+      #     name: Make NRTS
+      #     command: cd src && make
