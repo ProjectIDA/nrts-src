@@ -5,20 +5,29 @@ jobs:
       - image: projectida/nrts-builder:0.2
     steps:
       - run:
-          name: Create dirs
-          command: mkdir src_root && mkdir bin && mkdir lib
-      - run:
-          name: Go to src_root
-          command: cd src_root
-      - run:
-          name: Checkout NRTS src repo
-          command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
-      - run:
-          name: Enter src repo
-          command: cd src
-      - run:
-          name: Run build script
-          command: pwd && tcsh build.csh
+          name: Do Build
+          command: |
+            mkdir src_root
+            cd src_root
+            mkdir bin && mkdir lib
+            git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
+            cd src
+            tcsh build.csh
+      # - run:
+      #     name: Create dirs
+      #     command: mkdir src_root && mkdir bin && mkdir lib
+      # - run:
+      #     name: Go to src_root
+      #     command: cd src_root
+      # - run:
+      #     name: Checkout NRTS src repo
+      #     command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
+      # - run:
+      #     name: Enter src repo
+      #     command: cd src
+      # - run:
+      #     name: Run build script
+      #     command: pwd && tcsh build.csh
       # - run:
       #     name: Checkout lib330 repo
       #     command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/lib330.git lib330
