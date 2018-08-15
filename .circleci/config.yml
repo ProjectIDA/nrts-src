@@ -21,7 +21,7 @@ jobs:
       #     command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/lib330.git lib330
       - run:
           name: open tcsh
-          command: /bin/tcsh
+          command: /usr/bin/tcsh
       - run:
           name: Setup NRTS build env
           command: |
