@@ -1,0 +1,17 @@
+
+set MyPath = (.)
+set MyPath = ($MyPath ~/scripts)
+set MyPath = ($MyPath ./OBJS/$platform)
+set MyPath = ($MyPath ~/$SRC_ROOT/bin/$platform)
+set MyPath = ($MyPath ~/$SRC_ROOT/src/scripts)
+set MyPath = ($MyPath /usr/local/bin)
+
+set path = ($MyPath $path)
+
+set cdpath = (~)
+set cdpath = ($cdpath ~/$SRC_ROOT)
+set cdpath = ($cdpath ~/$SRC_ROOT/src)
+set cdpath = ($cdpath ~/$SRC_ROOT/src/bin)
+set cdpath = ($cdpath ~/$SRC_ROOT/src/lib)
+set cdpath = ($cdpath ~/$SRC_ROOT/src/bin/nrts)
+set cdpath = ($cdpath /usr/nrts)

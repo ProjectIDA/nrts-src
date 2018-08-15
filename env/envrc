@@ -1,0 +1,33 @@
+setenv HOME $home
+
+setenv PLATFORM "$platform"
+setenv MACHINE  "$machine"
+setenv SOCKLIBS "$socklibs"
+setenv RANLIB   "$ranlib"
+setenv CURSELIB "$curselib"
+setenv INSTALL  "$install"
+setenv OSNAME   `echo $osname | tr "[a-z]" "[A-Z]"`
+setenv OSTYPE   "$ostype"
+setenv OSVER     $osver
+setenv NATIVE_ORDER "$order"
+setenv DBIO_DATABASE /usr/nrts
+
+setenv SRC_ROOT src_root
+setenv SRC_INCLUDE /usr/home/ida/src_root/src/include
+
+setenv CC "gcc"
+
+if (-e /opt/local) then
+    setenv OPTDIR /opt/local
+else
+    setenv OPTDIR /usr/local
+endif
+
+# locale stuff
+
+setenv LC_CTYPE "C"
+setenv LC_NUMERIC "C"
+setenv LC_TIME "C"
+setenv LC_COLLATE "C"
+setenv LC_MONETARY "C"
+setenv LC_MESSAGES "C"

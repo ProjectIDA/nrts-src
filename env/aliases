@@ -1,0 +1,28 @@
+alias cls clear
+alias cp '/bin/cp -i'
+alias dbpick iwv
+alias del /bin/rm
+alias df 'df -h'
+alias e300 telnet e300 2001
+alias ga 'git add'
+alias gcm 'git commit -m'
+alias gs 'git status'
+alias gl 'git log'
+alias gln 'git log --name-only'
+alias gll 'git log --graph --pretty=oneline --abbrev-commit'
+alias glln 'git log --graph --pretty=oneline --abbrev-commit --name-only'
+alias grep 'egrep'
+alias h history
+alias iso isiReportIsoStats
+alias la 'ls -Fla'
+alias ll 'ls -Fl'
+alias lo 'logout'
+alias ls 'ls -F'
+alias mon 'nrts_mon'
+alias mv '/bin/mv -i'
+alias pib 'ps -ax -o user,pid,%cpu,%mem,state,start,command | grep "\!*" | egrep -v "(grep| ps -)" | sort -k 7'
+alias pid 'ps -aux | egrep "(\!*|USER)" | egrep -v "(grep| ps -)"'
+alias rmdir '/bin/rm -r'
+alias ssh ssh -X
+alias today 'date -u +%Y%j'
+alias vi vim
