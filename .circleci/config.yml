@@ -5,9 +5,6 @@ jobs:
       - image: projectida/nrts-builder:0.2
     steps:
       - run:
-          name: open tcsh
-          command: /usr/bin/tcsh
-      - run:
           name: Create dirs
           command: mkdir src_root && mkdir bin && mkdir lib
       - run:
@@ -19,16 +16,19 @@ jobs:
       - run:
           name: Enter src repo
           command: cd src
+      - run:
+          name: Run build script
+          command: ./build.csh
       # - run:
       #     name: Checkout lib330 repo
       #     command: git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/lib330.git lib330
-      - run:
-          name: Setup NRTS build env
-          command: |
-            source env/platform
-            source env/envrc
-            source env/pathrc
-            source env/aliases
-      - run:
-          name: Make NRTS
-          command: cd src && make
+      # - run:
+      #     name: Setup NRTS build env
+      #     command: |
+      #       source env/platform
+      #       source env/envrc
+      #       source env/pathrc
+      #       source env/aliases
+      # - run:
+      #     name: Make NRTS
+      #     command: cd src && make
