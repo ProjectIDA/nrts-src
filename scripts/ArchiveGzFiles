@@ -162,7 +162,7 @@ foreach day ($msdays)
     if ($debug) logger -t $myname"[$$]" -p user.info "Moving previous run files into TEMP dir..."
     # first lets move existing files to TEMP dir
     mkdir -p ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP
-    mv -f ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/*.${year}.${jday} ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP/ > /dev/null
+    mv -f ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/*.${year}.${jday} ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP/ >& /dev/null
     # TODO: SOme error checking perhaps...
 
     if ($debug) logger -t $myname"[$$]" -p user.info "Prepping whole-day ms file for run through dataselect..."

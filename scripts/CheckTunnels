@@ -25,11 +25,14 @@ else
     set debug = 0
 endif
 
-
-if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
+# Make sure no other instance of this script is running
+filelock $lock $$
+if ($status != 0) then
+    if ($debug) logger -t $myname"[$$]" -p local0.info "Another instance already active"
+    exit 0
+endif
 
 # These are not expected to need to be changed, so we hardcode them here
-
 set LocalData    = 39136
 set LocalShell   = 22
 set TunnelUser   = tunnel
@@ -104,15 +107,6 @@ endif
 set PortStrings = ( "`cat $match`" )
 rm -rf $match
 
-# Make sure no other instance of this script is running
-
-filelock $lock $$
-if ($status != 0) then
-    if ($debug) logger -t $myname"[$$]" -p local0.info "another instance already active"
-    rm -rf $match
-    exit 0
-endif
-
 # Loop for all tunnels
 
 foreach RemoteHost ($RemoteHostList)
@@ -170,24 +164,27 @@ foreach RemoteHost ($RemoteHostList)
         if ($debug) logger -t $myname"[$$]" -p local0.info "TunnelUser = $TunnelUser"
         if ($debug) logger -t $myname"[$$]" -p local0.info "TunnelHost = $TunnelHost"
 
-        logger -t $myname"[$$]" -p user.notice "Starting SSH tunnels into $RemoteHost"
         # NOTE: Do not change the order of the ssh parameters without consider BounceTunnels
         set command = "ssh -f -N -R ${RemoteData}:localhost:${LocalData} -R ${RemoteShell}:localhost:${LocalShell} ${TunnelUser}@${TunnelHost}"
-        logger -t $myname"[$$]" -p user.notice "$command"
 
         # Create tunnel only if not already running
 
         pgrep -f "$command" >& /dev/null
         if ($status == 0) then
-            if ($debug) logger -t $myname"[$$]" -p local0.info "tunnel already present"
+            if ($debug) logger -t $myname"[$$]" -p local0.info "Tunnel already present: $command"
         else
             # Launch the tunnel
             $command
+            if ($status == 0) then
+                logger -t $myname"[$$]" -p local0.info "Tunnel established: $command"
+            else
+                logger -t $myname"[$$]" -p local0.info "Unable to establish tunnel: $command"
+            endif
         endif
     end
 
 end
 
-if ($debug) logger -t $myname"[$$]" -p local0.info "end (success)"
+rm -rf $lock
 exit 0
 
