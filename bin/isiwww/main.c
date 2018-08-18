@@ -247,6 +247,7 @@ static void MakeLinkColorSS(FILE *fp)
     fprintf(fp, ".resultstbl td, .resultstbl th { \n");
     fprintf(fp, "text-align: right; \n");
     fprintf(fp, "font-size: smaller;\n");
+    fprintf(fp, "padding: 3px;\n");
     fprintf(fp, "} \n");
 
     fprintf(fp, ".resultstbl tr:hover { \n");
@@ -388,9 +389,9 @@ parchvar[0]=0;
     sprintf(parchvar,"https://%s/%s",webstuff,parchstr);
     fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
     fprintf(fp, "<script src=/web/js/sorttable.js></script>");
-    fprintf(fp, "<DIV class=\'container\'> <!-- container -->");
+    fprintf(fp, "<DIV class=\'container-fluid\'> <!-- container -->");
     fprintf(fp, "<div class=\'row\'>\n");
-    fprintf(fp, "<div class=\'col-10 offset-1\'>\n");
+    fprintf(fp, "<div class=\'col-12 \'>\n");
     fprintf(fp, "<h3 class=\"text-center\">IDA/NRTS Status at %s</h3>\n", isiserver);
 
     PrintTimeStamp(fp);
@@ -404,10 +405,10 @@ parchvar[0]=0;
     fprintf(fp, "\n<br/>\n");
 
     fprintf(fp, "<div class=\'row\'>\n");
-    fprintf(fp, "<div class=\'col-10 offset-1\'>\n");
+    fprintf(fp, "<div class=\'col-6 offset-0\'>\n");
     fprintf(fp, "\n<TABLE class=\'resultstbl sortable table table-sm\'>");
     fprintf(fp, "\n<thead class=\'thead-dark\'><tr>\n");
-    fprintf(fp, "<th>STA-LOC</th><th>%% CHN</th><th>AVG NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH>\n");
+    fprintf(fp, "<th style=\"width:18%\">STA-LOC</th><th style=\"width:15%\">LIVE CHN</th><th style=\"width:13%\">AVG NSEG</th><th style=\"width:27%\"> DATA LATENCY </th><th style=\"width:27%\"> LINK LATENCY </TH>\n");
     fprintf(fp, "</tr></thead>\n");
     fprintf(fp, "<tbody>\n");
 }
@@ -415,7 +416,7 @@ parchvar[0]=0;
 static void PrintStatusTrailer(FILE *fp)
 {
     fprintf(fp, "</tbody>\n");
-    fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA-LOC</th><th>%% CHN</th><th>AVG NSEG</th><th>LAST DATUM</th><th> DATA LATENCY </th><th> LINK LATENCY </TH></tr></thead>\n");
+    fprintf(fp, "<thead class=\'thead-dark\'><tr><th>STA-LOC</th><th>LIVE CHN</th><th>AVG NSEG</th><th> DATA LATENCY </th><th> LINK LATENCY </TH></tr></thead>\n");
     fprintf(fp, "</table>\n");
 
     fprintf(fp, "</div> <!-- col -->\n");
@@ -434,7 +435,7 @@ static void PrintStatusTrailer(FILE *fp)
 
 static void PrintStatusResult(FILE *fp,
         char *sta, char *loc, char *isiserver, char *webserver, char *webpath, char *stationdir,
-        REAL64 tols, REAL64 tslw, REAL64 max_live_latency, UINT32 livechn, UINT32 totchn, UINT32 nseg)
+        REAL64 tols, REAL64 tslw, REAL64 allowed_latency, UINT32 livechn, UINT32 totchn, UINT32 nseg)
 {
 UINT32 data_latency;
 UINT32 data_bg;
@@ -457,8 +458,8 @@ chanlink[0]=0;
     fprintf(fp, "<tr  class=\'text-monospace\'>");
     if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
         data_latency = time(NULL) - (UINT32) tols;
-        data_bg = (data_latency <= max_live_latency) ? HAPPY : GetBg(data_latency);
-        link_bg = (tslw <= max_live_latency) ? HAPPY : GetBg(tslw);
+        data_bg = (data_latency <= allowed_latency) ? HAPPY : GetBg(data_latency);
+        link_bg = (tslw <= allowed_latency) ? HAPPY : GetBg(tslw);
 
         fprintf(fp, "<td bgcolor=\"%06x\">", data_bg);
         if (stationdir != NULL) {
@@ -473,11 +474,11 @@ chanlink[0]=0;
             fprintf(fp, "<td bgcolor=\"%06x\"><a href=\"%s\"><font color=\"%06x\"><b>%i/%i</b></a></td>",
                     RED, chanlink, WHITE, livechn, totchn);
         }
-        fprintf(fp, "<td style=\"width:5px\" bgcolor=\"%06x\">\n",GetNsegbg(nseg));
+        fprintf(fp, "<td bgcolor=\"%06x\">\n",GetNsegbg(nseg));
         fprintf(fp, "<font color=\"%06x\">%i</td>\n",Getnsegfg(nseg),nseg);
-        fprintf(fp, "<td>%s</td>\n",utilLttostr((INT32)tols,0,tbuf));
-        fprintf(fp, "<td bgcolor=\"%06x\"><b>%s</b></td>\n", data_bg, utilLttostr((INT32)data_latency,8,tbuf));
-        fprintf(fp, "<td bgcolor=\"%06x\"><b>%s</b></td>\n", link_bg, utilLttostr((INT32)tslw,8,tbuf));
+        /* fprintf(fp, "<td>%s</td>\n",utilLttostr((INT32)tols,0,tbuf)); */
+        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", data_bg, utilLttostr((INT32)data_latency,8,tbuf));
+        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", link_bg, utilLttostr((INT32)tslw,8,tbuf));
     } else {
         fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">",DKGRAY,WHITE);
         if (stationdir != NULL) {
@@ -490,7 +491,7 @@ chanlink[0]=0;
         fprintf(fp, "<A HREF=\"%s\">",chanlink);
         fprintf(fp, "<font color=\"%06x\">%i</font></a></td>\n",WHITE,livechn);
         fprintf(fp, "<td>n/a</td>\n");
-        fprintf(fp, "<td>n/a</td>\n");
+        /* fprintf(fp, "<td>n/a</td>\n"); */
         fprintf(fp, "<td>n/a</td>\n");
         fprintf(fp, "<td>n/a</td>\n");
     }
@@ -499,19 +500,22 @@ chanlink[0]=0;
 
 static REAL32 CalcPacketLatencyThreshold(ISI_STREAM_SOH *chn_soh, ISI_STREAM_CNF *chn_cnf, UINT16 samples_per_packet)
 {
-    REAL32 packet_live_threshold;
-    REAL32 packet_delay; // max time required to fill a packet
-    REAL32 delay_factor = 1.1; // after this many packet_delay's (with a minimum of delay_ok seconds) we'll consider channel late
+    /* Calculate and return the number of seconds after which a packet is considered late */
 
+    REAL32 packet_live_threshold;
+    REAL32 packet_delay; // time required to fill a packet at a given sample rate
+    REAL32 delay_constant = 10.0; // minimum acceptable delay in seconds for any packet */
+    REAL32 delay_factor = 1.01;   // Additional latency 'allowance' as a multiplier of the time it takes to fill a packet channel late */
+
+    // how long does it taek to fill this packet...
     packet_delay = samples_per_packet * isiSrateToSint(&chn_cnf->srate); // use util func to pull sample rate out of ISI_SRATE struct
 
     // crude hack to deal with triggered EN? channels
     if (chn_soh->name.chn[0] == 'E') {
+        // E?? channels should have a short pulse once a day, so should never be more than 24 hours latent
         packet_live_threshold = 24 * 60 * 60.0;
     } else {
-        // after this many packet_delay's (with a minimum of 5.0 seconds) we'll consider channel late
-        // OR maybe just try flat buffer of 10 seconds
-        packet_live_threshold = packet_delay + 10.0; // fmaxf(5.0, packet_delay * (delay_factor - 1.0));
+        packet_live_threshold = packet_delay * delay_factor + delay_constant;
     }
 
     return packet_live_threshold;
@@ -537,7 +541,9 @@ int sumnseg,totnseg, nsegval;
 REAL64 tols;
 REAL64 tslw;
 REAL64 pktlat;
-REAL64 max_live_latency; // this is the maximum 'live' latency for each sta-loc group overall based on IDA10 packets and channel srates
+REAL64 allowed_latency; // this is the maximum 'live' latency for each sta-loc group
+                        //overall based on IDA10 packets and channel srates
+                        // this goes down with higher sample rate
 UINT32 nseg;
 char *sta;
 char *loc;
@@ -560,7 +566,7 @@ webstuff[0]=0;
                 nsegval = (totnseg > 0) ? (sumnseg / totnseg) : 0;
                 PrintStatusResult(fp,
                         sta, loc, isiserver, webserver, webpath,
-                        stationdir, tols, tslw, max_live_latency, livechn, totchn, nsegval);
+                        stationdir, tols, tslw, allowed_latency, livechn, totchn, nsegval);
             }
             sta = soh->entry[i].name.sta;
             loc = soh->entry[i].name.loc;
@@ -571,7 +577,7 @@ webstuff[0]=0;
             totchn = 0;
             totnseg = 0;
             sumnseg = 0;
-            max_live_latency = INFINITY;
+            allowed_latency = INFINITY;
         }
         if (soh->entry[i].tols.value != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
             if (tols == (REAL64) ISI_UNDEFINED_TIMESTAMP || soh->entry[i].tols.value > tols) {
@@ -588,7 +594,7 @@ webstuff[0]=0;
         }
         First = FALSE;
 
-        if ((pktlat = CalcPacketLatencyThreshold(&soh->entry[i], &cnf->entry[i], SAMP_PER_PACKET)) < max_live_latency) max_live_latency = pktlat;
+        if ((pktlat = CalcPacketLatencyThreshold(&soh->entry[i], &cnf->entry[i], SAMP_PER_PACKET)) < allowed_latency) allowed_latency = pktlat;
 
         if ((soh->entry[i].nrec != 0) && ((UINT32) soh->entry[i].tslw <= pktlat)) livechn++; // if channel is reporting, count it
         totchn++;    // count total channels
@@ -598,7 +604,7 @@ webstuff[0]=0;
 
     nsegval = (totnseg > 0) ? (sumnseg / totnseg) : 0;
 
-    PrintStatusResult(fp, sta, loc, isiserver, webserver, webpath, stationdir, tols, tslw, max_live_latency, livechn, totchn, nsegval);
+    PrintStatusResult(fp, sta, loc, isiserver, webserver, webpath, stationdir, tols, tslw, allowed_latency, livechn, totchn, nsegval);
     PrintStatusTrailer(fp);
 }
 
@@ -745,7 +751,7 @@ static void MakeChanPageResult(FILE *fp, char *sta, char *chn, char *loc, REAL64
 {
 UINT32 latency, link_latency, data_latency;
 UINT32 colorlatency;
-UINT32 data_bg, link_bg;
+UINT32 late_bg;
 ISI_SITECHANFLAG dest;
 char tbuf[1024];
 char chanloc[ISI_CHNLOCLEN+1];
@@ -759,22 +765,22 @@ UINT32 samprate=0;
     if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
         link_latency = (UINT32) tslw;
         data_latency = time(NULL) - (UINT32) tols;
-        data_bg = (data_latency <= pktlat_threshold) ? HAPPY : GetBg(data_latency);
-        link_bg = (tslw <= pktlat_threshold) ? HAPPY : GetBg(tslw);
+        latency = (link_latency > data_latency) ? link_latency : data_latency;
+        late_bg = (latency <= pktlat_threshold) ? HAPPY : GetBg(latency);
 
-        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", data_bg, sta);
-        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", data_bg, chanloc);
-        fprintf(fp, "<td bgcolor=\"%06x\">%4.2f</td>\n", data_bg, srate);
+        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", late_bg, sta);
+        fprintf(fp, "<td bgcolor=\"%06x\">%s</td>\n", late_bg, chanloc);
+        fprintf(fp, "<td bgcolor=\"%06x\">%4.2f</td>\n", late_bg, srate);
         fprintf(fp, "<td bgcolor=\"%06x\">%i</td>\n", GetNsegbg(nseg), nseg);
 
         if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
             fprintf(fp,"<td>%s</td>\n", utilLttostr((INT32)tols, 0, tbuf));
-            fprintf(fp,"<td bgcolor=\"%06x\">%s</td>\n", data_bg, utilLttostr((INT32)data_latency, 8, tbuf));
+            fprintf(fp,"<td bgcolor=\"%06x\">%s</td>\n", late_bg, utilLttostr((INT32)data_latency, 8, tbuf));
         } else {
             fprintf(fp, "<td></td>");
             fprintf(fp, "<td></td>");
         }
-        fprintf(fp,"<td bgcolor=\"%06x\">%s</td>\n", link_bg, utilLttostr((INT32)tslw, 8, tbuf));
+        fprintf(fp,"<td bgcolor=\"%06x\">%s</td>\n", late_bg, utilLttostr((INT32)tslw, 8, tbuf));
     } else {
         fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%s</font></TD>", DKGRAY,WHITE,sta);
         fprintf(fp, "<td bgcolor=\"%06x\"><font color=\"%06x\">%s</font></TD>", DKGRAY,WHITE,chanloc);
