@@ -480,9 +480,9 @@ chanlink[0]=0;
         }
         fprintf(fp, "</td>\n");
         if (livechn == totchn) {
-            fprintf(fp, "<td bgcolor=\"%06x\"><a href=\"%s\">%i of %i</a></td>", HAPPY, chanlink, livechn, totchn);
+            fprintf(fp, "<td bgcolor=\"%06x\"><a href=\"%s\">%i/%i</a></td>", HAPPY, chanlink, livechn, totchn);
         } else {
-            fprintf(fp, "<td bgcolor=\"%06x\"><a href=\"%s\"><font color=\"%06x\"><b>%i of %i</b></a></td>",
+            fprintf(fp, "<td bgcolor=\"%06x\"><a href=\"%s\"><font color=\"%06x\"><b>%i/%i</b></a></td>",
                     RED, chanlink, WHITE, livechn, totchn);
         }
         fprintf(fp, "<td bgcolor=\"%06x\">\n",GetNsegbg(nseg));
