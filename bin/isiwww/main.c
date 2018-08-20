@@ -417,14 +417,13 @@ parchvar[0]=0;
     fprintf(fp, "<title>IDA/NRTS (%s)</title>\n",isiserver);
 
     fprintf(fp, "<!-- Bootstrap core CSS -->");
-    fprintf(fp, "<meta http-equiv=\"Cache-control\" content=\"no-cache\">");
     fprintf(fp, "   <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css\" integrity=\"sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4\" crossorigin=\"anonymous\">\n");
     fprintf(fp, "</HEAD>\n");
 
 
     sprintf(parchvar,"https://%s/%s",webstuff,parchstr);
     fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
-    fprintf(fp, "<script src=/web/js/sorttable.js></script>");
+    fprintf(fp, "<script src=/web/js/sorttable.js></script>\n");
     fprintf(fp, "<DIV class=\'container-fluid\'> <!-- container -->");
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col-12 \'>\n");
@@ -616,12 +615,15 @@ webstuff[0]=0;
             if (tslw == (REAL64) ISI_UNDEFINED_TIMESTAMP || soh->entry[i].tslw < tslw) {
                 tslw = soh->entry[i].tslw;
             }
+        } else {
+            printf("Channel tslw undefind:%s-%s: %s\n", soh->entry[i].name.sta, soh->entry[i].name.loc, soh->entry[i].name.chn);
         }
         First = FALSE;
 
         if ((pktlat = CalcPacketLatencyThreshold(&soh->entry[i], &cnf->entry[i], SAMP_PER_PACKET)) < allowed_latency) allowed_latency = pktlat;
 
-        if ((soh->entry[i].nrec != 0) && ((UINT32) soh->entry[i].tslw <= pktlat)) livechn++; // if channel is reporting, count it
+        /* if ((soh->entry[i].nrec != 0) && ((UINT32) soh->entry[i].tslw <= pktlat)) { */
+        if ((UINT32) soh->entry[i].tslw <= pktlat) livechn++; // if channel is reporting, count it
         totchn++;    // count total channels
 
         if (nseg > 0) totnseg++;    // count total nseg if value > 0
@@ -695,8 +697,8 @@ stalocchanfn[0]=0;
     fprintf(fp, "<title>\nIDA/NRTS (%s)\n</title>\n",isiserver);
     fprintf(fp, "<!-- Bootstrap core CSS -->");
     fprintf(fp, "   <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css\" integrity=\"sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4\" crossorigin=\"anonymous\">\n");
-    fprintf(fp, "<meta http-equiv=\"Cache-control\" content=\"no-cache\">");
-    fprintf(fp, "</HEAD>\n");
+
+    fprintf(fp, "\n</HEAD>\n");
     sprintf(parchvar,"https://%s/%s",webstuff,parchstr);
     fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
     fprintf(fp, "<script src=/web/js/sorttable.js></script>\n");
