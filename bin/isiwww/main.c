@@ -175,7 +175,7 @@ int i;
         util_ucase(soh->entry[i].name.chn);
         util_ucase(cnf->entry[i].name.chn);
         if (soh->entry[i].name.loc[0] == ' ') sprintf(soh->entry[i].name.loc, "%s", "--");
-        if (cnf->entry[ie.name.loc[0] == ' ') sprintf(cnf->entry[i].name.loc, "%s", "--");
+        if (cnf->entry[i].name.loc[0] == ' ') sprintf(cnf->entry[i].name.loc, "%s", "--");
     }
 }
 
