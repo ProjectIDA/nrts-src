@@ -9,7 +9,7 @@ set myname = ArchiveTeeFiles
 set setup = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
@@ -26,13 +26,13 @@ endif
 set lock   = /var/tmp/$myname.lock
 filelock $lock $$
 if ($status != 0) then
-    if ($debug) logger -t $myname"[$$]" -p user.info "another instance already active"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "another instance already active"
     exit 0
 endif
 
 
 if ($#argv != 1) then
-    logger -t $myname"[$$]" -p user.info "bad command line"
+    logger -t $myname"[$$]" -p local0.info "bad command line"
     echo "usage: $myname archive_dir"
     goto failure
 endif
@@ -40,24 +40,24 @@ endif
 set ArchiveDir = $argv[1]
 if (! -d $ArchiveDir) then
     set message = "missing $ArchiveDir"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # Process each site listed in the Systems file
 
 set systems = /usr/nrts/etc/Systems
 if (! -e $systems) then
-    logger -t $myname"[$$]" -p user.info "missing $systems file"
+    logger -t $myname"[$$]" -p local0.info "missing $systems file"
     goto failure
 endif
 
 set SiteList = `stripcat $systems`
 if ($status != 0) then
-    logger -t $myname"[$$]" -p user.info "stripcat $systems FAILED"
+    logger -t $myname"[$$]" -p local0.info "stripcat $systems FAILED"
     goto failure
 endif
 
@@ -67,29 +67,29 @@ foreach site ($SiteList)
     set archive = $ArchiveDir/$site
     if (! -d $archive) then
         set command = "mkdir $archive"
-        if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
         if ($status != 0) then
             set message = "can't $command"
-            logger -t $myname"[$$]" -p user.info "$message"
+            logger -t $myname"[$$]" -p local0.info "$message"
             echo "${myname}: $message"
             goto failure
         endif
     endif
 
     set command = "GzipTeeFiles $tee"
-    if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
     $command
 
     set stage = /ida/stage/$site
     if (-d $stage) then
         set command = "StageGzFiles $tee $stage"
-        if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
     endif
 
     set command = "ArchiveGzFiles $tee $archive"
-    if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
     $command
 
 end
@@ -97,11 +97,11 @@ end
 # Normal exit
 
 success:
-if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
 exit 0
 
 failure:
-logger -t $myname"[$$]" -p user.info "exit 1"
+logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 
 # Revision History

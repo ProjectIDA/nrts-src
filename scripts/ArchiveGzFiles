@@ -12,7 +12,7 @@ set myname = ArchiveGzFiles
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
@@ -26,7 +26,7 @@ else
     set debug = 0
 endif
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # Command line setup
 
@@ -42,7 +42,7 @@ endif
 
 if ($error) then
     set message = "bad command line, error $error"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     echo "usage: $myname srcdir dstdir"
     goto failure
@@ -52,13 +52,13 @@ endif
 
 foreach dir ($srcdir $dstroot)
     if (! -d $dir) then
-        logger -t $myname"[$$]" -p user.info "ERROR: no such dir $dir"
+        logger -t $myname"[$$]" -p local0.info "ERROR: no such dir $dir"
         set error = 1
     endif
 end
 
 if ($error) then
-    logger -t $myname"[$$]" -p user.info "ERROR: required directories are missing"
+    logger -t $myname"[$$]" -p local0.info "ERROR: required directories are missing"
     goto failure
 endif
 
@@ -66,7 +66,7 @@ endif
 
 cd $srcdir
 if ($status != 0) then
-    logger -t $myname"[$$]" -p user.info "ERROR: can't chdir $srcdir"
+    logger -t $myname"[$$]" -p local0.info "ERROR: can't chdir $srcdir"
     goto failure
 endif
 
@@ -91,20 +91,20 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
             set destdir = $dstroot/$date
             if (! -d $destdir) then
                 set command = "mkdir -p $destdir"
-                if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+                if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
                 $command
             endif
             if (! -d $destdir) then
-                logger -t $myname"[$$]" -p user.info "ERROR: missing $destdir"
+                logger -t $myname"[$$]" -p local0.info "ERROR: missing $destdir"
                 rm $dummy
                 goto failure
             endif
             set destpath = `uniqpath suflen=3 $file $destdir`
             set command = "cp -p $file $destpath"
-            if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
             $command
             if ($status != 0) then
-                logger -t $myname"[$$]" -p user.info "FAILED: $command"
+                logger -t $myname"[$$]" -p local0.info "FAILED: $command"
                 rm $dummy
                 goto failure
             endif
@@ -121,12 +121,12 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
             set command  = "$cmd < $filepath >>! $msfile"
             echo $command >>! ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
 
-            if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 
             # send stderr output to log file.
             ($cmd < $filepath >>! $msfile) >>& ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
             if ($status != 0) then 
-                logger -t $myname"[$$]" -p user.info "FAILED: $command"
+                logger -t $myname"[$$]" -p local0.info "FAILED: $command"
                 rm $dummy
                 rm -rf $msfile
                 goto failure
@@ -134,15 +134,15 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
             #echo $msout >>! ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
 
             set command = "chmod 444 $destpath"
-            if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
             $command
             set command = "dupchk $destpath"
-            if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
             $command
-            if ($status != 0) logger -t $myname"[$$]" -p user.info "WARNING: $command FAILED (ignored)"
+            if ($status != 0) logger -t $myname"[$$]" -p local0.info "WARNING: $command FAILED (ignored)"
         end
         set command = "rm -f $file"
-        if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
     endif
 end
@@ -159,34 +159,34 @@ foreach day ($msdays)
 	set sitedayms = ${site}-${year}-${jday}.ms
 	set dayms = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/${sitedayms}
 
-    if ($debug) logger -t $myname"[$$]" -p user.info "Moving previous run files into TEMP dir..."
+    if ($debug) logger -t $myname"[$$]" -p local0.info "Moving previous run files into TEMP dir..."
     # first lets move existing files to TEMP dir
     mkdir -p ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP
     mv -f ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/*.${year}.${jday} ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP/ >& /dev/null
     # TODO: SOme error checking perhaps...
 
-    if ($debug) logger -t $myname"[$$]" -p user.info "Prepping whole-day ms file for run through dataselect..."
+    if ($debug) logger -t $myname"[$$]" -p local0.info "Prepping whole-day ms file for run through dataselect..."
 	# now run through dataselect
 	# -Sd - split data on day boundaries
 	# -Ps - prune data at the sample level and collapse overlaps
 	# -ts - start time
 	# -te - end time
 	set command = "dataselect -Sd -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
-	if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+	if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 	$command
 	if ($status != 0) then
-		logger -t $myname"[$$]" -p user.info "FAILED: $command"
+		logger -t $myname"[$$]" -p local0.info "FAILED: $command"
 		goto failure
 	endif
 	echo $command >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
 	
     set command = "msi -S ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/II.${site}.*.*.${year}.${jday}"
     set invfn   = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/inventory
-	if ($debug) logger -t $myname"[$$]" -p user.info "$command '>!' $invfn"
+	if ($debug) logger -t $myname"[$$]" -p local0.info "$command '>!' $invfn"
 	$command >! $invfn
     set savestat = $status
 	if ($savestat != 0) then
-		logger -t $myname"[$$]" -p user.info "FAILED: [retcode: $savestat] $command '>!' $invfn"
+		logger -t $myname"[$$]" -p local0.info "FAILED: [retcode: $savestat] $command '>!' $invfn"
 		goto failure
 	endif
 	echo "$command '>!' $invfn" >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
@@ -197,10 +197,10 @@ end
 # Normal exit
 
 success:
-if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
 exit 0
 
 failure:
-logger -t $myname"[$$]" -p user.info "exit 1"
+logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 

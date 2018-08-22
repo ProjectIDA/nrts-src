@@ -6,7 +6,7 @@
 set debug  = 0
 set myname = isiStageZipFiles
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # This only works if there is a "iso" subdir and we are
 # sitting right above it.  Special check for runs from
@@ -26,7 +26,7 @@ if (! -e $IsoDir) exit 0
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
@@ -43,7 +43,7 @@ set errors = 0
 foreach dir ($ZipDir $StageDir $DoneZips $DoneIsos)
     if (! -d $dir) then
         set message = "Missing $dir"
-        logger -t $myname"[$$]" -p user.info "$message"
+        logger -t $myname"[$$]" -p local0.info "$message"
         echo "${myname}: $message"
         set errors = 1
     endif
@@ -58,7 +58,7 @@ set isiIsoParameters = $IsoDir/config
 foreach script ($isiCreateIsoImage $isiGenerateIsoLabel $isiIsoParameters)
     if (! -e $script) then
         set message = "Missing $script"
-        logger -t $myname"[$$]" -p user.info "$message"
+        logger -t $myname"[$$]" -p local0.info "$message"
         echo "${myname}: $message"
         set errors = 1
     endif
@@ -99,7 +99,7 @@ endif
 # If forcing an ISO image, then do it now
 
 if ($Force == TRUE) then
-    logger -t $myname"[$$]" -p user.info "begin (FORCE $StaName $PktRev $PktLen)"
+    logger -t $myname"[$$]" -p local0.info "begin (FORCE $StaName $PktRev $PktLen)"
     source $isiCreateIsoImage
     if ($status != 0) goto failure
     set count = `CountIsoImages iso`
@@ -109,7 +109,7 @@ else
     if ($MaxMBytesPerArchive == 0) set MaxMBytesPerArchive = $DefaultMaxMbytes
     @ MaxBytesPerArchive = $MaxMBytesPerArchive * 1024 * 1024
     set Force = FALSE
-    if ($debug) logger -t $myname"[$$]" -p user.info "begin ($MaxMBytesPerArchive $StaName $PktRev $PktLen)"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "begin ($MaxMBytesPerArchive $StaName $PktRev $PktLen)"
 endif
 
 # Move zipped files into the staging area, building ISO images as needed
@@ -119,7 +119,7 @@ StartOfLoop:
     @ BytesUsed  = `du -sk $StageDir | awk '{print $1}'`
     @ BytesUsed *= 1024 # convert from K-bytes to bytes
     if ($BytesUsed > $MaxBytesPerArchive) then
-        logger -t $myname"[$$]" -p user.info "WARNING: $StageDir is too full"
+        logger -t $myname"[$$]" -p local0.info "WARNING: $StageDir is too full"
         source $isiCreateIsoImage
         goto StartOfLoop
     endif
@@ -127,7 +127,7 @@ StartOfLoop:
 
     # Move files from the zip directory to the staging directory
 
-    if ($debug) logger -t $myname"[$$]" -p user.info "staging files from $ZipDir to $StageDir"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "staging files from $ZipDir to $StageDir"
     set dummy = $ZipDir/Dummy.gz
     touch $dummy
     chmod 777 $dummy
@@ -138,22 +138,22 @@ StartOfLoop:
             if ($file == $dummy) continue
             @ FileSize = `wc -c $file | awk '{print $1}'`
             if ($FileSize > $AvailSpace) then
-                logger -t $myname"[$$]" -p user.info "$StageDir is full"
+                logger -t $myname"[$$]" -p local0.info "$StageDir is full"
                 source $isiCreateIsoImage
                 goto StartOfLoop
             else
                 set command = "mv $file $StageDir"
-                if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+                if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
                 $command
                 if ($status == 0) then
                     @ AvailSpace -= $FileSize
                     if ($AvailSpace <= 0) then
-                        logger -t $myname"[$$]" -p user.info "$StageDir is full"
+                        logger -t $myname"[$$]" -p local0.info "$StageDir is full"
                         source $isiCreateIsoImage
                         goto StartOfLoop
                     endif
                 else
-                    logger -t $myname"[$$]" -p user.info "FAILED: $command"
+                    logger -t $myname"[$$]" -p local0.info "FAILED: $command"
                     goto failure
                 endif
             endif
@@ -164,12 +164,12 @@ StartOfLoop:
 
 success:
 pkill -HUP -x ispd
-if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
 exit 0
 
 failure:
 pkill -HUP -x ispd
-logger -t $myname"[$$]" -p user.info "exit 1"
+logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 
 # Revision History

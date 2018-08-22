@@ -10,7 +10,7 @@ set myname = GzipTeeFiles
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
@@ -24,7 +24,7 @@ else
     set debug = 0
 endif
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # Command line setup
 
@@ -37,7 +37,7 @@ endif
 
 if ($error) then
     set message = "bad command line, error $error"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     echo "usage: $myname teedir"
     goto failure
@@ -51,7 +51,7 @@ set LockFile = $TeeDir/lock
 # Nothing to do if there isn't a tee directory
 
 if (! -d $TeeDir) then
-    if ($debug) logger -t $myname"[$$]" -p user.info "no such tee dir $TeeDir"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "no such tee dir $TeeDir"
     goto success
 endif
 
@@ -60,14 +60,14 @@ endif
 filelock $LockFile $$
 if ($status != 0) then
     set active = `cat $LockFile`
-    if ($debug) logger -t $myname"[$$]" -p user.info "$TeeDir locked by process $active"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "$TeeDir locked by process $active"
     goto success
 endif
 
 # Nothing to do if the STOP flag is set in the tee directory
 
 if (-e $StopFlag) then
-    if ($debug) logger -t $myname"[$$]" -p user.info "quit: $TeeDir STOP flag set"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "quit: $TeeDir STOP flag set"
     goto success
 endif
 
@@ -78,14 +78,14 @@ set tmp = /tmp/$myname.$$
 /bin/ls [4-9]??????????????????????? >& $tmp
 if ($status != 0) then
     rm $tmp
-    if ($debug) logger -t $myname"[$$]" -p user.info "no uncompressed files found in $TeeDir"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "no uncompressed files found in $TeeDir"
     goto success
 endif
 
 set NumFiles = `cat $tmp | wc -l`
 if ($NumFiles <= 1) then
     rm $tmp
-    if ($debug) logger -t $myname"[$$]" -p user.info "no uncompressed files found in $TeeDir"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "no uncompressed files found in $TeeDir"
     goto success
 endif
 
@@ -96,32 +96,32 @@ rm $tmp
 # Compress each file in the list
 
 @ count = 0
-if ($debug) logger -t $myname"[$$]" -p user.info "compressing files in $TeeDir"
+if ($debug) logger -t $myname"[$$]" -p local0.info "compressing files in $TeeDir"
 if ($status == 0) then
     foreach file ($UncompressedFileList)
         set output = $file.gz
         rm -f $output
         set command = "gzip $file"
-        if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
         if (-e $file && -e $output) then
-            logger -t $myname"[$$]" -p user.info "$command failed"
+            logger -t $myname"[$$]" -p local0.info "$command failed"
             rm -f $output
             goto failure
         endif
         @ count++
     end
 endif
-if ($debug) logger -t $myname"[$$]" -p user.info "$count files compressed in $TeeDir"
+if ($debug) logger -t $myname"[$$]" -p local0.info "$count files compressed in $TeeDir"
 
 # Normal exit
 
 success:
-if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
 exit 0
 
 failure:
-logger -t $myname"[$$]" -p user.info "exit 1"
+logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 
 # Revision History

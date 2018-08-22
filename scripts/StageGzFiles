@@ -12,7 +12,7 @@ set myname = StageGzFiles
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
@@ -26,7 +26,7 @@ else
     set debug = 0
 endif
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # Command line setup
 
@@ -40,25 +40,25 @@ endif
 
 if ($error) then
     set message = "bad command line, error $error"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     echo "usage: $myname srcdir dstdir"
     goto failure
 endif
 
-if ($debug) logger -t $myname"[$$]" -p user.info "srcdir=$srcdir dstdir=$dstdir"
+if ($debug) logger -t $myname"[$$]" -p local0.info "srcdir=$srcdir dstdir=$dstdir"
 
 # Nothing to do if the directories don't exist
 
 foreach dir ($srcdir $dstdir)
     if (! -d $dir) then
-        logger -t $myname"[$$]" -p user.info "ERROR: no such dir $dir"
+        logger -t $myname"[$$]" -p local0.info "ERROR: no such dir $dir"
         set error = 1
     endif
 end
 
 if ($error) then
-    logger -t $myname"[$$]" -p user.info "ERROR: required directories are missing"
+    logger -t $myname"[$$]" -p local0.info "ERROR: required directories are missing"
     goto failure
 endif
 
@@ -66,7 +66,7 @@ endif
 
 cd $srcdir
 if ($status != 0) then
-    logger -t $myname"[$$]" -p user.info "ERROR: can't chdir $srcdir"
+    logger -t $myname"[$$]" -p local0.info "ERROR: can't chdir $srcdir"
     goto failure
 endif
 
@@ -76,10 +76,10 @@ touch $dummy
 foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
     if ($file != $dummy) then
         set command = "cp -p $file $dstdir"
-        if ($debug) logger -t $myname"[$$]" -p user.info "$command"
+        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
         if ($status != 0) then
-            logger -t $myname"[$$]" -p user.info "FAILED: $command"
+            logger -t $myname"[$$]" -p local0.info "FAILED: $command"
             rm $dummy
             goto failure
         endif
@@ -91,11 +91,11 @@ rm -f $dummy
 # Normal exit
 
 success:
-if ($debug) logger -t $myname"[$$]" -p user.info "completed OK"
+if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
 exit 0
 
 failure:
-logger -t $myname"[$$]" -p user.info "exit 1"
+logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 
 # Revision History

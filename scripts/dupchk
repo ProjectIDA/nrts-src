@@ -35,12 +35,12 @@ if ($fname == $UNAME) then
         set PVdir = $dname/PreviousVersion
         if (! -d $PVdir) mkdir -p $PVdir
         if ($status != 0) then
-            logger -t $myname"[$$]" -p user.info "FAILED: mkdir -p $PVdir"
+            logger -t $myname"[$$]" -p local0.info "FAILED: mkdir -p $PVdir"
             exit 1
         endif
         mv $dname/$lname $PVdir
         if ($status != 0) then
-            logger -t $myname"[$$]" -p user.info "Error in moving $dname/$lname to $PVdir"
+            logger -t $myname"[$$]" -p local0.info "Error in moving $dname/$lname to $PVdir"
             exit 2
         endif
     endif

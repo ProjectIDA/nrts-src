@@ -14,14 +14,14 @@ set debug  = 1
 set myname = RestartNRTS
 set lock   = /var/tmp/$myname.lock
 
-if ($debug) logger -t $myname"[$$]" -p user.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 
 # General setup
 
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p user.info "$message"
+    logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     exit 1
 endif
@@ -37,7 +37,7 @@ else if ($#argv == 1) then
 else
     set message = "${myname}: unrecognized argument(s): $argv"
     echo $message
-    if ($debug) logger -t $myname"[$$]" -p user.info "unrecognized argument(s): $argv"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "unrecognized argument(s): $argv"
     exit 1
 endif
 
@@ -45,19 +45,19 @@ endif
 
 filelock $lock $$
 if ($status != 0) then
-    if ($debug) logger -t $myname"[$$]" -p user.info "another instance already active"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "another instance already active"
     exit 0
 endif
 
 # Bounce NRTS
 
-if ($debug) logger -t $myname"[$$]" -p user.info "Stopping NRTS"
+if ($debug) logger -t $myname"[$$]" -p local0.info "Stopping NRTS"
 $NRTS_HOME/etc/init.d/nrts stop >& /dev/null
 
-if ($debug) logger -t $myname"[$$]" -p user.info "sleep($delay)"
+if ($debug) logger -t $myname"[$$]" -p local0.info "sleep($delay)"
 sleep $delay
 
-if ($debug) logger -t $myname"[$$]" -p user.info "Starting NRTS"
+if ($debug) logger -t $myname"[$$]" -p local0.info "Starting NRTS"
 $NRTS_HOME/etc/init.d/nrts start >& /dev/null
 
 exit 0
