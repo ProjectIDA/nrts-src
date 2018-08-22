@@ -45,6 +45,8 @@ switch ($os)
     set candidate = "etc/rc.conf"
     set candidate = "$candidate etc/rc.local"
     set candidate = "$candidate etc/resolv.conf"
+    set candidate = "$candidate etc/rc.d/inetd.conf"
+    set candidate = "$candidate etc/syslog.conf"
     set candidate = "$candidate etc/ntp.conf"
     set candidate = "$candidate etc/hosts"
     set candidate = "$candidate etc/motd"
