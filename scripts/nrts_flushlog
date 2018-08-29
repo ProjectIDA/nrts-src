@@ -1,5 +1,4 @@
 #!/bin/csh
-# $Id: nrts_flushlog,v 1.5 2005/10/26 23:44:50 dechavez Exp $
 #
 #  Roll the NRTS log file(s). 
 
@@ -16,7 +15,6 @@ source $setup
 
 set mode      = 644
 set adm       = nrtsmgr
-set mail      = /usr/ucb/Mail
 set tmp       = /tmp/$myname.$$
 set nrtslog   = $NRTS_HOME/log/nrtslog
 set yyyyddd   = `gmt yyyyddd`
@@ -25,7 +23,7 @@ set Processes = $NRTS_HOME/etc/Processes
 
 # Save existing log file and make an empty new one
 
-set facility = user
+set facility = local0
 
 logger -t $myname -p $facility.info -i "flushing log"
 mv $nrtslog  $tmp
@@ -34,8 +32,15 @@ chmod $mode  $nrtslog
 
 # Let syslogd know about the new log file
 
+# FreeBSD 7 (???)
 if (-e /usr/bin/syslogd) set syslogd = syslogd
+
+# FreeBSD 10.1
+if (-e /usr/sbin/syslogd) set syslogd = syslogd
+
+# RHEL 6
 if (-e /sbin/rsyslogd) set syslogd = rsyslogd
+
 sudo /usr/bin/pkill -HUP $syslogd
 
 logger -t $myname -p $facility.info -i "log flushed"
@@ -49,7 +54,7 @@ if (-e $tempname) set Processes = $tempname
 if (-e $Processes) then
     set list = `cat $Processes | stripcat`
     if ($status != 0) then
-        echo "stripcat $Processes failed" | $mail -s "$myname failed" $adm
+        logger -t $myname -p $facility.info -i "stripcat $Processes failed"
         exit 0
     endif
 else
@@ -75,7 +80,7 @@ if (-e $tempname) set Systems = $tempname
 if (-e $Systems) then
     set list = `cat $Systems | stripcat`
     if ($status != 0) then
-        echo "stripcat $Systems failed" | $mail -s "$myname failed" $adm
+        logger -t $myname -p $facility.info -i "stripcat $Systems failed"
         exit 0
     endif
 else
@@ -99,35 +104,5 @@ end
 
 rm -f $tmp
 
-# Collect the saved email
-
-set mailbox = $NRTS_HOME/log/email/recent
-if (-e $mailbox) then
-    set logdir = $NRTS_HOME/log/email
-    if (! -e $logdir) mkdir -p $logdir
-    set log = $logdir/$yyyyddd
-    touch $log $mailbox
-    mv $mailbox $tmp
-    touch $mailbox
-    chmod $mode $mailbox
-    cat $tmp >> $log
-    chmod $mode $log
-    rm -f $tmp
-    find $logdir -mtime $FlushLogFindValue -a -exec rm -f {} \;
-endif
-
 exit 0
 
-# Revision History
-#
-# $Log: nrts_flushlog,v $
-# Revision 1.5  2005/10/26 23:44:50  dechavez
-# use ScriptSetup and FlushLogFindValue for purging old files
-#
-# Revision 1.4  2005/02/11 22:07:34  dechavez
-# remove all the cross platform crap and use sudo pkill to HUP syslogd so
-# that we don't have to run this as root
-#
-# Revision 1.1.1.1  2003/04/18 22:44:18  nrts
-# initial (imported) release
-#
