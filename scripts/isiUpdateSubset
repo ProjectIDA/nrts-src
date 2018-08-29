@@ -1,5 +1,4 @@
 #!/bin/csh -f
-# $Id: isiUpdateSubset,v 1.2 2014/05/09 18:14:27 dechavez Exp $
 #
 # Update disk loop from remote, using NRTS as stream control list
 # Breaks connection when current.  This is intended for use over
@@ -35,7 +34,7 @@ set     sta = $argv[2]
 set timeout = 60
 set  maxdur = 600
 
-set command = "isidl isi=${server} $sta end=newest scl=nrts log=syslogd:user to=$timeout maxdur=$maxdur"
+set command = "isidl isi=${server} $sta end=newest scl=nrts log=syslogd:local0 to=$timeout maxdur=$maxdur"
 if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 $command
 
@@ -46,12 +45,3 @@ failure:
 logger -t $myname"[$$]" -p local0.info "exit 1"
 exit 1
 
-# Revision History
-#
-# $Log: isiUpdateSubset,v $
-# Revision 1.2  2014/05/09 18:14:27  dechavez
-# added maxdur and timeout options
-#
-# Revision 1.1  2011/04/22 17:56:52  dechavez
-# initial release
-#
