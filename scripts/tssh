@@ -31,10 +31,10 @@ endif
 set PortString = `stripcat $TunnelInfo | grep -i " $site " `
 set exitstatus = $status
 if ($exitstatus != 0) then
-	set command = "ssh nrts@$site"
+	set command = "ssh -t nrts@$site"
 else
 	set port = `echo $PortString | awk '{print $3}'`
-	set command = "ssh -p $port nrts@localhost"
+	set command = "ssh -t -p $port nrts@localhost"
 endif
 
 if ($#argv != 0) set command = "$command $argv"
