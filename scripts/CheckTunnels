@@ -73,6 +73,10 @@ if ($#argv == 1) then
             endif
 
         end
+
+        # lets take a brief nap to make sure (hope?) that 'hub' ssh process dies before trying to recreate new tunnels below.
+        sleep 5
+
     else
         set message = "${myname}: unrecognized argument(s): $argv"
         echo $message
