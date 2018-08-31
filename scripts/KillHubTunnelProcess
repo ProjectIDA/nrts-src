@@ -1,6 +1,6 @@
 #!/bin/tcsh -f
 #
-# Kill SSH Tunnels by killing sshd process on Hub for ports used by specified host
+# Find and optionally Kill SSH Tunnels by killing sshd process on Hub for ports used by specified host
 #
 set myname = `basename $0`
 
@@ -15,20 +15,28 @@ if (! -e $setup ) then
 endif
 source $setup
 
-# check args
-if ($#argv < 1) then
-    echo "usage: $myname hostname"
-    exit 1
-endif
+# set defaults
+set killProcess = 0
+set debug = 0
 
-set hostname = `echo $argv[1] | ucase`
+# check args
+if (($#argv < 1) || ($#argv > 2)) then
+    echo "usage: $myname hostname [ --kill ]"
+    exit 1
+else
+    set hostname = `echo $argv[1] | ucase`
+    if ($#argv == 2) then
+        if ("$argv[2]" == "--kill") then
+            set killProcess = 1
+        else
+            echo "usage: $myname hostname [ --kill ]"
+            exit 1
+        endif
+    endif
+endif
 
 # Check for debug flag
-if (-e $DebugDir/$myname) then
-    set debug = 1
-else
-    set debug = 0
-endif
+if (-e $DebugDir/$myname) set debug = 1
 
 # set CTRL-C jumo in case I get cold feet
 onintr interrupt
@@ -54,10 +62,16 @@ foreach port ($dataport $sshport)
     set sshdprocess = `sudo lsof -i tcp -u tunnel | egrep "^sshd.*idahub.ucsd.edu:$port \(L" | awk '{print $9,$1,"pid:",$2}' | sort | rev | column -t | rev`
     if ("$sshdprocess" != "") then
         set sshdpid = $sshdprocess[4]
-        if ($debug) logger -t $myname"[$$]" -p local0.info "killing sshd process $sshdpid for: ${hostname}:${port}"
-        set cmd = "kill -TERM $sshdpid"
-        logger -t $myname"[$$]" -p local0.info "$cmd"
-        sudo -- tcsh -c "$cmd"
+        if ($debug) logger -t $myname"[$$]" -p local0.info "found sshd process $sshdpid for: ${hostname}:${port}"
+        if ($killProcess) then
+            set cmd = "kill -TERM $sshdpid"
+            logger -t $myname"[$$]" -p local0.info "$cmd"
+            sudo -- tcsh -c "$cmd"
+        else
+            set msg = "${hostname}:${port} $sshdpid"
+            echo $msg
+            logger -t $myname"[$$]" -p local0.info "$msg"
+        endif
     else
         logger -t $myname"[$$]" -p local0.info "NO sshd process found for: ${hostname}:${port}"
     endif
