@@ -65,8 +65,8 @@ if ($#argv == 1) then
             kill -TERM $pid  >& /dev/null
 
             # lets double check that it's gone.
-            kill -0 $pid
-            if ($status != 0) then
+            /bin/ps -p $pid >& /dev/null
+            if ($status == 0) then
                 if ($debug) logger -t $myname"[$$]" -p local0.debug "UH OH: NOT Bounced: [${pid}]"
             else
                 if ($debug) logger -t $myname"[$$]" -p local0.debug "Bounced: [${pid}]"
@@ -75,7 +75,7 @@ if ($#argv == 1) then
         end
 
         # lets take a brief nap to make sure (hope?) that 'hub' ssh process dies before trying to recreate new tunnels below.
-        sleep 5
+        sleep 3
 
     else
         set message = "${myname}: unrecognized argument(s): $argv"
