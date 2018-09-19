@@ -1,0 +1,22 @@
+#!/bin/csh -f
+
+set myname = `basename "$0"`
+
+if ($#argv != 2) then
+    echo "bad dog. You need 2 args"
+    exit 1
+endif
+
+set msg = "$argv[1]"
+set evt = "$argv[2]"
+
+echo msg: "${msg}" : evt: $evt
+
+if (("$evt" != "nrts-start") &&  \
+    ("$evt" != "nrts-stop")) then
+    echo "${myname}: invalid event-type"
+    exit 1
+endif
+
+curl -s -X POST -H 'Content-type: application/json' --data '{"text":"['${HOST}'] '"${msg}"', event: '"${evt}"'"}' https://hooks.slack.com/services/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 > /dev/null
+
