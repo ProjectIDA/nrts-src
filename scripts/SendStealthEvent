@@ -18,5 +18,5 @@ if (("$evt" != "nrts-start") &&  \
     exit 1
 endif
 
-curl -s -X POST -H 'Content-type: application/json' --data '{"text":"['${HOST}'] '"${msg}"', event: '"${evt}"'"}' https://hooks.slack.com/services/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 > /dev/null
+curl -m 10 -s -X POST -H 'Content-type: application/json' --data '{"text":"['${HOST}'] '"${msg}"', event: '"${evt}"'"}' https://hooks.slack.com/services/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 > /dev/null
 
