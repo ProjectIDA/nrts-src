@@ -13,10 +13,13 @@ set evt = "$argv[2]"
 echo msg: "${msg}" : evt: $evt
 
 if (("$evt" != "nrts-start") &&  \
-    ("$evt" != "nrts-stop")) then
-    echo "${myname}: invalid event-type"
+    ("$evt" != "nrts-stop")  &&  \
+    ("$evt" != "system-startup")) then
+    set message = "Invalid event-type: $evt"
+    logger -t $myname"[$$]" -p local0.info "$message"
     exit 1
 endif
 
 curl -m 10 -s -X POST -H 'Content-type: application/json' --data '{"text":"['${HOST}'] '"${msg}"', event: '"${evt}"'"}' https://hooks.slack.com/services/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 > /dev/null
 
+exit 0
