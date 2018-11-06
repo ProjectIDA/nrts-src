@@ -9,10 +9,11 @@ phases:
             - cd src_root
     pre_build:
         commands:
-            - mkdir bin && mkdir lib
+            - mkdir bin
+            - mkdir lib
     build:
         commands:
-            - cd ../bin
+            - cd bin
             - touch mybinary.bin
 artifacts:
     files:
