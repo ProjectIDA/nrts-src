@@ -10,9 +10,9 @@ phases:
             - mkdir lib
     build:
         commands:
-            - cd $(CODEBUILD_SRC_DIR)
+            - cd $CODEBUILD_SRC_DIR
             - tcsh ./build.csh
 artifacts:
     files:
-        - $(CODEBUILD_SRC_DIR)/../bin/*
+        - $CODEBUILD_SRC_DIR/../bin/*
     discard-paths: yes
