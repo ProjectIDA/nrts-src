@@ -1,0 +1,28 @@
+version: 0.2
+
+run-as: ec2-user
+
+env:
+    variables:
+        key: "value"
+        key: "value"
+        parameter-store:
+            key: "value"
+            key: "value"
+
+phases:
+    install:
+        commands:
+            - mkdir src_root
+            - cd src_root
+    pre_build:
+        commands:
+            - mkdir bin && mkdir lib
+    build:
+        commands:
+            - cd ../bin
+            - touch mybinary.bin
+artifacts:
+    files:
+        - src_root/bin/*
+    discard-paths: yes
