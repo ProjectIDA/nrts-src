@@ -3,19 +3,16 @@ version: 0.2
 
 
 phases:
-    install:
-        commands:
-            - mkdir src_root
-            - cd src_root
     pre_build:
         commands:
+            - cd ..
             - mkdir bin
             - mkdir lib
     build:
         commands:
-            - cd bin
-            - touch mybinary.bin
+            - cd $(CODEBUILD_SRC_DIR)
+            - tcsh ./build.csh
 artifacts:
     files:
-        - src_root/bin/*
+        - $(CODEBUILD_SRC_DIR)/../bin/*
     discard-paths: yes
