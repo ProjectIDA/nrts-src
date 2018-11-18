@@ -171,7 +171,7 @@ foreach day ($msdays)
 	# -Ps - prune data at the sample level and collapse overlaps
 	# -ts - start time
 	# -te - end time
-	set command = "dataselect -Sd -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
+	set command = "dataselect -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
 	if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 	$command
 	if ($status != 0) then
