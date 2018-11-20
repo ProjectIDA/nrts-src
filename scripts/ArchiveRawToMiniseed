@@ -1,0 +1,110 @@
+#!/bin/tcsh -f
+#
+# Convert all .gz (and .GZ) files in the named source dir to
+# site/year/day subdirectories in the named destination dir root
+# run through dataselect to generate a 'buddir' like dir & file structure
+
+
+# General setup
+set myname = `basename $0` #ArchiveRawToMiniseed
+set debug = 1
+
+if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
+
+# Command line setup
+
+set error = 0
+if ($#argv == 3) then
+    set site = `echo $argv[1] | ucase`
+    set lsite = `echo $argv[1] | lcase`
+    set year  = $argv[2]
+    set oday = $argv[3]
+else
+    set error = 1
+endif
+
+if ($error) then
+    set message = "Bad command line, error $error"
+    logger -t $myname"[$$]" -p local0.info "$message"
+    echo "${myname}: $message"
+    echo "usage: $myname site year oday"
+    goto failure
+endif
+
+# construct src and dst dirs
+set rawdir = $IDA_ARCHIVE_RAW_DIR/$lsite/$year/$oday
+set msdir = $IDA_ARCHIVE_MS_DIR/$lsite/$year/$oday
+# Nothing to do if src directory doesn't exist
+
+if (! -d $rawdir) then
+    logger -t $myname"[$$]" -p local0.info "ERROR: Source dir not found: $rawdir"
+    goto failure
+endif
+
+# Work in the source directory
+
+cd $rawdir
+
+if ($status != 0) then
+    logger -t $myname"[$$]" -p local0.info "ERROR: can't chdir $rawdir"
+    goto failure
+endif
+
+set gzfiles = (`ls *.{gz,GZ}`)
+if ($status != 0) then
+    logger =t $myname"[$$]" -p local0.info "No gz files found in $rawdir."
+    goto failure
+endif
+
+
+# keek a copy of days that have been added to and just process them into miniseed once
+set msdays =
+
+set tmpfn = /tmp/$myname.$lsite.$$.ms
+rm -rf $tmpfn > /dev/null
+
+set command = "cat $gzfiles | imseed sta=$lsite >>! $tmpfn"
+if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+
+(cat $gzfiles | imseed sta=$lsite >>! $tmpfn) >>& /dev/null
+
+if ($status != 0) then
+    echo "You FAILED AGAIN!"
+    exit 1
+endif
+
+mkdir -p $msdir   # make sure it exists
+
+rm -rf $msdir/*.${year}.${oday} > /dev/null
+
+# run through dataselect
+
+set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.23.59.59.999999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/${year}/${oday}/%n.%s.%l.%c.%Y.%j $tmpfn"
+if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+$command
+if ($status != 0) then
+    rm -rf $tmpfn
+    logger -t $myname"[$$]" -p local0.info "FAILED: $command"
+    goto failure
+endif
+echo $command >>! ${IDA_ARCHIVE_MS_DIR}/${myname}.log
+
+
+set command = "msi -S ${IDA_ARCHIVE_MS_DIR}/${lsite}/${year}/${oday}/II.*.*.*.*.*"
+set invfn   = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${year}/${oday}/inventory
+if ($debug) logger -t $myname"[$$]" -p local0.info "$command '>!' $invfn"
+$command >! $invfn
+set savestat = $status
+if ($savestat != 0) then
+    logger -t $myname"[$$]" -p local0.info "FAILED: [retcode: $savestat] $command '>!' $invfn"
+    goto failure
+endif
+
+success:
+if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
+exit 0
+
+failure:
+logger -t $myname"[$$]" -p local0.info "exit 1"
+exit 1
+

@@ -156,41 +156,42 @@ foreach day ($msdays)
 
 	set year      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
 	set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
-	set sitedayms = ${site}-${year}-${jday}.ms
-	set dayms = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/${sitedayms}
+	# set sitedayms = ${site}-${year}-${jday}.ms
+	# set dayms = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/${sitedayms}
 
-    if ($debug) logger -t $myname"[$$]" -p local0.info "Moving previous run files into TEMP dir..."
-    # first lets move existing files to TEMP dir
-    mkdir -p ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP
-    mv -f ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/*.${year}.${jday} ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP/ >& /dev/null
-    # TODO: SOme error checking perhaps...
+    # if ($debug) logger -t $myname"[$$]" -p local0.info "Moving previous run files into TEMP dir..."
+    # # first lets move existing files to TEMP dir
+    # mkdir -p ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP
+    # mv -f ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/*.${year}.${jday} ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP/ >& /dev/null
+    # # TODO: SOme error checking perhaps...
 
-    if ($debug) logger -t $myname"[$$]" -p local0.info "Prepping whole-day ms file for run through dataselect..."
-	# now run through dataselect
-	# -Sd - split data on day boundaries
-	# -Ps - prune data at the sample level and collapse overlaps
-	# -ts - start time
-	# -te - end time
-	set command = "dataselect -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
-	if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
-	$command
-	if ($status != 0) then
-		logger -t $myname"[$$]" -p local0.info "FAILED: $command"
-		goto failure
-	endif
-	echo $command >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
+    # if ($debug) logger -t $myname"[$$]" -p local0.info "Prepping whole-day ms file for run through dataselect..."
+	# # now run through dataselect
+	# # -Sd - split data on day boundaries
+	# # -Ps - prune data at the sample level and collapse overlaps
+	# # -ts - start time
+	# # -te - end time
+	# set command = "dataselect -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
+	# if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+	# $command
+	# if ($status != 0) then
+	# 	logger -t $myname"[$$]" -p local0.info "FAILED: $command"
+	# 	goto failure
+	# endif
+	# echo $command >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
 	
-    set command = "msi -S ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/II.${site}.*.*.${year}.${jday}"
-    set invfn   = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/inventory
-	if ($debug) logger -t $myname"[$$]" -p local0.info "$command '>!' $invfn"
-	$command >! $invfn
-    set savestat = $status
-	if ($savestat != 0) then
-		logger -t $myname"[$$]" -p local0.info "FAILED: [retcode: $savestat] $command '>!' $invfn"
-		goto failure
-	endif
-	echo "$command '>!' $invfn" >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
+    # set command = "msi -S ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/II.${site}.*.*.${year}.${jday}"
+    # set invfn   = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/inventory
+	# if ($debug) logger -t $myname"[$$]" -p local0.info "$command '>!' $invfn"
+	# $command >! $invfn
+    # set savestat = $status
+	# if ($savestat != 0) then
+	# 	logger -t $myname"[$$]" -p local0.info "FAILED: [retcode: $savestat] $command '>!' $invfn"
+	# 	goto failure
+	# endif
+	# echo "$command '>!' $invfn" >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
 	
+    echo "ArchiveRawToMiniseed ${lsite} ${year} ${jday}" | nc -w 3 idadcc.ucsd.edu 39236
 end
 
 
