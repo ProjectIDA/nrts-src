@@ -77,21 +77,21 @@ cd $TeeDir
 set tmp = /tmp/$myname.$$
 /bin/ls [4-9]??????????????????????? >& $tmp
 if ($status != 0) then
-    rm $tmp
+    rm $tmp >& /dev/null
     if ($debug) logger -t $myname"[$$]" -p local0.info "no uncompressed files found in $TeeDir"
     goto success
 endif
 
 set NumFiles = `cat $tmp | wc -l`
 if ($NumFiles <= 1) then
-    rm $tmp
+    rm $tmp >& /dev/null
     if ($debug) logger -t $myname"[$$]" -p local0.info "no uncompressed files found in $TeeDir"
     goto success
 endif
 
 @ NumFiles -= 1
 set UncompressedFileList = `head -$NumFiles $tmp`
-rm $tmp
+rm $tmp >& /dev/null
 
 # Compress each file in the list
 
@@ -100,13 +100,13 @@ if ($debug) logger -t $myname"[$$]" -p local0.info "compressing files in $TeeDir
 if ($status == 0) then
     foreach file ($UncompressedFileList)
         set output = $file.gz
-        rm -f $output
+        rm -f $output >& /dev/null
         set command = "gzip $file"
         if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
         if (-e $file && -e $output) then
             logger -t $myname"[$$]" -p local0.info "$command failed"
-            rm -f $output
+            rm -f $output >& /dev/null
             goto failure
         endif
         @ count++
