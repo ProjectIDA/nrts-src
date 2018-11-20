@@ -61,7 +61,7 @@ endif
 set msdays =
 
 set tmpfn = /tmp/$myname.$lsite.$$.ms
-rm -rf $tmpfn > /dev/null
+rm -rf $tmpfn >& /dev/null
 
 set command = "cat $gzfiles | imseed sta=$lsite >>! $tmpfn"
 if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
@@ -69,7 +69,8 @@ if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 (cat $gzfiles | imseed sta=$lsite >>! $tmpfn) >>& /dev/null
 
 if ($status != 0) then
-    echo "You FAILED AGAIN!"
+    logger -t $myname"[$$]" -p local0.info "ERROR: Could not convert gzfiles to miniseed: $lsite $year $oday"
+    rm -rf $tmpfn >& /dev/null
     exit 1
 endif
 
@@ -83,7 +84,7 @@ set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.2
 if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 $command
 if ($status != 0) then
-    rm -rf $tmpfn
+    rm -rf $tmpfn >& /dev/null
     logger -t $myname"[$$]" -p local0.info "FAILED: $command"
     goto failure
 endif
@@ -101,6 +102,7 @@ if ($savestat != 0) then
 endif
 
 success:
+rm -rf $tmpfn >& /dev/null
 if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
 exit 0
 

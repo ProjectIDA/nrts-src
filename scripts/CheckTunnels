@@ -11,9 +11,9 @@ set match  = /var/tmp/$myname.matches.$$
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.info "ERROR: $message"
     echo "${myname}: $message"
-    exit 1
+    goto failure
 endif
 source $setup
 
@@ -28,9 +28,10 @@ endif
 # Make sure no other instance of this script is running
 filelock $lock $$
 if ($status != 0) then
-    if ($debug) logger -t $myname"[$$]" -p local0.info "Another instance already active"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "WARNING: Well, this is awkward. Another instance is already active."
     exit 0
 endif
+
 
 # These are not expected to need to be changed, so we hardcode them here
 set LocalData    = 39136
@@ -43,16 +44,16 @@ set default_peer = idahub
 
 #More than one argument is not allowed
 if ($#argv > 1) then
-    set message = "${myname}: unrecognized argument(s): $argv"
+    set message = "${myname}: too many argument(s): $argv. Only optional argument is --bounce"
     echo $message
-    if ($debug) logger -t $myname"[$$]" -p local0.info "unrecognized argument(s): $argv"
-    exit 1
+    if ($debug) logger -t $myname"[$$]" -p local0.info "ERROR: unrecognized argument(s): $argv"
+    goto failure
 endif
 
 # Single argument is assumed option flag to force a tunnel bounce
 if ($#argv == 1) then
     if ($argv[1] == "--bounce") then
-        if ($debug) logger -t $myname"[$$]" -p local0.info "bounce option triggering kill of all ssh tunnels"
+        if ($debug) logger -t $myname"[$$]" -p local0.info "Bounce option triggering kill of all ssh tunnels"
 
         set list = `/bin/ps -ax -o pid,user,command | egrep "nrts +ssh -f -N" | awk '{print $1}'`
         foreach pid ($list)
@@ -62,16 +63,24 @@ if ($#argv == 1) then
                 logger -t $myname"[$$]" -p local0.debug "Bouncing tunnel:[${pid}] $cmd"
             endif
 
-            kill -TERM $pid  >& /dev/null
+            /bin/ps -p $pid >& /dev/null
+            if ($status == 0) kill -TERM $pid  >& /dev/null
 
-            # lets double check that it's gone.
+            # Give it a few seconds and then double check that it's gone
+            # and take out the big guns if not
+            sleep 3
+            /bin/ps -p $pid >& /dev/null
+            if ($status == 0) then
+               kill -9 $pid
+            endif
+
+            # final check that it's gone.
             /bin/ps -p $pid >& /dev/null
             if ($status == 0) then
                 if ($debug) logger -t $myname"[$$]" -p local0.debug "UH OH: NOT Bounced: [${pid}]"
             else
                 if ($debug) logger -t $myname"[$$]" -p local0.debug "Bounced: [${pid}]"
             endif
-
         end
 
         # lets take a brief nap to make sure (hope?) that 'hub' ssh process dies before trying to recreate new tunnels below.
@@ -80,8 +89,8 @@ if ($#argv == 1) then
     else
         set message = "${myname}: unrecognized argument(s): $argv"
         echo $message
-        if ($debug) logger -t $myname"[$$]" -p local0.info "unrecognized argument(s): $argv"
-        exit 1
+        if ($debug) logger -t $myname"[$$]" -p local0.info "ERROR: unrecognized argument(s): $argv"
+        goto failure
     endif
 endif
 
@@ -96,20 +105,18 @@ endif
 
 # Get the port numbers from the lookup table
 if (! -e $TunnelPorts) then
-    if ($debug) logger -t $myname"[$$]" -p local0.info "$TunnelPorts not present"
-    exit 1
+    if ($debug) logger -t $myname"[$$]" -p local0.info "ERROR: $TunnelPorts not present"
+    goto failure
 endif
 
 # Find host matches in Tunnels file
 stripcat $TunnelPorts | grep -i " $TunnelName " > $match
 set exitstatus = $status
 if ($exitstatus != 0) then
-    if ($debug) logger -t $myname"[$$]" -p local0.info "can't extract ports for $TunnelName from $TunnelPorts"
-    rm -rf $match
-    exit 1
+    if ($debug) logger -t $myname"[$$]" -p local0.info "ERROR: can't extract ports for $TunnelName from $TunnelPorts"
+    goto failure
 endif
 set PortStrings = ( "`cat $match`" )
-rm -rf $match
 
 # Loop for all tunnels
 
@@ -152,12 +159,12 @@ foreach RemoteHost ($RemoteHostList)
                 # this is a gateway record for a gateway host (e.g. cmla1 <dataport> <shellport> <gwuser> cmla-gw ...)
                 set LocalData = $PortString[6]
                 set LocalShell = $PortString[7]
-            else 
-                if ($debug) logger -t $myname"[$$]" -p local0.info "can't find $TunnelName in invalid record $PortString"
+            else
+                if ($debug) logger -t $myname"[$$]" -p local0.info "ERROR: can't find $TunnelName in invalid record $PortString"
             endif
 
         else
-            if ($debug) logger -t $myname"[$$]" -p local0.info "invalid record $PortString"
+            if ($debug) logger -t $myname"[$$]" -p local0.info "ERROR: invalid record $PortString"
             continue
         endif
 
@@ -168,11 +175,17 @@ foreach RemoteHost ($RemoteHostList)
         if ($debug) logger -t $myname"[$$]" -p local0.info "TunnelUser = $TunnelUser"
         if ($debug) logger -t $myname"[$$]" -p local0.info "TunnelHost = $TunnelHost"
 
+        # check that host is reachable via ping
+        /sbin/ping -c 1 $TunnelHost >& /dev/null
+        if ($status != 0) then
+            logger -t $myname"[$$]" -p local0.info "WARNING: RemoteHost $TunnelHost not reachable. Skipping tunnel creation."
+            continue
+        endif
+
         # NOTE: Do not change the order of the ssh parameters without consider BounceTunnels
         set command = "ssh -f -N -R ${RemoteData}:localhost:${LocalData} -R ${RemoteShell}:localhost:${LocalShell} ${TunnelUser}@${TunnelHost}"
 
         # Create tunnel only if not already running
-
         pgrep -f "$command" >& /dev/null
         if ($status == 0) then
             if ($debug) logger -t $myname"[$$]" -p local0.info "Tunnel already present: $command"
@@ -182,7 +195,7 @@ foreach RemoteHost ($RemoteHostList)
             if ($status == 0) then
                 logger -t $myname"[$$]" -p local0.info "Tunnel established: $command"
             else
-                logger -t $myname"[$$]" -p local0.info "Unable to establish tunnel: $command"
+                logger -t $myname"[$$]" -p local0.info "ERROR: Unable to establish tunnel: $command"
             endif
         endif
     end
@@ -190,5 +203,10 @@ foreach RemoteHost ($RemoteHostList)
 end
 
 rm -rf $lock
+rm -rf $match
 exit 0
 
+failure:
+rm -rf $lock
+rm -rf $match
+exit 1
