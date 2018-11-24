@@ -76,7 +76,7 @@ endif
 
 mkdir -p $msdir   # make sure it exists
 
-rm -rf $msdir/*.${year}.${oday} > /dev/null
+rm -rf $msdir/*.${year}.${oday} >& /dev/null
 
 # run through dataselect
 
