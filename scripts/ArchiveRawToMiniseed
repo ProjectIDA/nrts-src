@@ -57,9 +57,6 @@ if ($status != 0) then
 endif
 
 
-# keek a copy of days that have been added to and just process them into miniseed once
-set msdays =
-
 set tmpfn = /tmp/$myname.$lsite.$$.ms
 rm -rf $tmpfn >& /dev/null
 
