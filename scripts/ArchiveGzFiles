@@ -2,7 +2,7 @@
 #
 # Move all .gz (and .GZ) tee files from the named source dir to
 # year/day subdirectories in the named destination dir
-# and convert gz (ida10) files to miniseed, run through dataselect to 
+# and convert gz (ida10) files to miniseed, run through dataselect to
 # geenrate a 'buddir' like directory & file structure
 
 set myname = ArchiveGzFiles
@@ -74,20 +74,17 @@ set dummy = 4_______________________.gz
 touch $dummy
 
 # keek a copy of days that have been added to and just process them into miniseed once
-set msdays = 
+set msdays =
 
 foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
     if ($file != $dummy) then
         set datelist = `idaspan -yd rev=10 < $file | sort | uniq`
         foreach date ($datelist)
-            # build name of 'siteday' MS file for all day's data: <site>-<yyyy>-<jjj>.ms
-            # This will keep growing with each gz file, but  Dataselect with takw care of overlaps
+
+            # keep track of days processed so miniseed archive can be updated for each day
+            set msdays = ($msdays $date)
+
             # File will be put in $destdir (<sta>/<YYYY>/<jjj>)
-			set year      = `echo ${date} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
-			set jday      = `echo ${date} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
-			set sitedayms = ${site}-${year}-${jday}.ms
-            #set sitedayms = `echo "${site}-${date}.ms" | sed -e "s/\//-/g"`               # construct site-yyyy-jjj from yyyy/jjj
-            set msdays = ($msdays $date)                                                  # note day we're modifying
             set destdir = $dstroot/$date
             if (! -d $destdir) then
                 set command = "mkdir -p $destdir"
@@ -109,30 +106,6 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
                 goto failure
             endif
 
-
-            set msdir    = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${date}
-            mkdir -p $msdir   # TODO: Add error checking
-
-            # conversion to MS and append to whole-day ms filea
-            # TODO: See if a better/simpler way to construct and execute this command. Had trouble with '<' and '>' chars
-            set cmd      = "imseed sta=$site"
-            set filepath = `pwd`/$file
-            set msfile   = ${msdir}/${sitedayms}                   # append ms data to whole day ms file
-            set command  = "$cmd < $filepath >>! $msfile"
-            echo $command >>! ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
-
-            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
-
-            # send stderr output to log file.
-            ($cmd < $filepath >>! $msfile) >>& ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
-            if ($status != 0) then 
-                logger -t $myname"[$$]" -p local0.info "FAILED: $command"
-                rm $dummy
-                rm -rf $msfile
-                goto failure
-            endif
-            #echo $msout >>! ${IDA_ARCHIVE_MS_DIR}/converted-to-ms
-
             set command = "chmod 444 $destpath"
             if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
             $command
@@ -152,46 +125,12 @@ rm -f $dummy
 
 # first lets get unique days...
 set msdays = `echo $msdays | tr ' ' '\012' | sort | uniq`
-foreach day ($msdays) 
+foreach day ($msdays)
 
-	set year      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
-	set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
-	# set sitedayms = ${site}-${year}-${jday}.ms
-	# set dayms = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/${sitedayms}
+    set year      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
+    set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
 
-    # if ($debug) logger -t $myname"[$$]" -p local0.info "Moving previous run files into TEMP dir..."
-    # # first lets move existing files to TEMP dir
-    # mkdir -p ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP
-    # mv -f ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/*.${year}.${jday} ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/TEMP/ >& /dev/null
-    # # TODO: SOme error checking perhaps...
-
-    # if ($debug) logger -t $myname"[$$]" -p local0.info "Prepping whole-day ms file for run through dataselect..."
-	# # now run through dataselect
-	# # -Sd - split data on day boundaries
-	# # -Ps - prune data at the sample level and collapse overlaps
-	# # -ts - start time
-	# # -te - end time
-	# set command = "dataselect -Ps -ts ${year}.${jday}.00.00.00 -te ${year}.${jday}.23.59.59.999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/%Y/%j/%n.%s.%l.%c.%Y.%j $dayms"
-	# if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
-	# $command
-	# if ($status != 0) then
-	# 	logger -t $myname"[$$]" -p local0.info "FAILED: $command"
-	# 	goto failure
-	# endif
-	# echo $command >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
-	
-    # set command = "msi -S ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/II.${site}.*.*.${year}.${jday}"
-    # set invfn   = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${day}/inventory
-	# if ($debug) logger -t $myname"[$$]" -p local0.info "$command '>!' $invfn"
-	# $command >! $invfn
-    # set savestat = $status
-	# if ($savestat != 0) then
-	# 	logger -t $myname"[$$]" -p local0.info "FAILED: [retcode: $savestat] $command '>!' $invfn"
-	# 	goto failure
-	# endif
-	# echo "$command '>!' $invfn" >>! ${IDA_ARCHIVE_MS_DIR}/processed-by-dataselect
-	
-    echo "ArchiveRawToMiniseed ${lsite} ${year} ${jday}" | nc -w 3 idadcc.ucsd.edu 39236
+    ArchiveRawToMiniseed ${lsite} ${year} ${jday}
 end
 
 
