@@ -71,10 +71,21 @@ if ($status != 0) then
     exit 1
 endif
 
-mkdir -p $msdir   # make sure it exists
+if (! -d $msdir ) then
+    mkdir -p $msdir   # make sure it exists
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p local0.info "ERROR: can't mkdir $msdir"
+        goto failure
+    endif
 
-rm -rf $msdir/*.${year}.${oday} >& /dev/null
-
+    chmod g+w $msdir   # make sure it is group writable
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p local0.info "ERROR: error making $msdir group writable"
+        goto failure
+    endif
+else
+    rm -rf $msdir/*.${year}.${oday} >& /dev/null
+endif
 # run through dataselect
 
 set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.23.59.59.999999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/${year}/${oday}/%n.%s.%l.%c.%Y.%j $tmpfn"
