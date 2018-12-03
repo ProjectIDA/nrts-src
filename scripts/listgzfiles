@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import sys
+import os.path
+import glob
+
+
+def usage():
+    print(file=sys.stderr)
+    print('USAGE:', file=sys.stderr)
+    print('   ' + os.path.split(sys.argv[0])[1] + ' gzfiles-dir start-seq-num end-seq-num', file=sys.stderr)
+    print(file=sys.stderr)
+
+def gz_fn_val(fn):
+
+    fullname = os.path.split(fn)[1].strip()
+    name, ext = os.path.splitext(fullname)
+
+    if (ext not in ['.gz','.GZ']):
+        return None, fullname, True
+
+    if len(name) != 24:
+        return None, fullname, True
+
+    try:
+        name_val = int(name, 16)
+        name_val_ok = True
+    except:
+        name_val = None
+        name_val_ok = False
+        return None, fullname, True
+
+    return name_val, fullname, False
+
+
+def get_gap_start_end(start_seq, end_seq):
+
+    if (len(start_seq) != 24) or (len(end_seq) != 24): 
+        print('\nInvalid argument(s). Must be a valid 24 digit hex sequence number.', file=sys.stderr)
+        return None, None, True
+
+    try:
+        start_val = int(start_seq, 16)
+    except:
+        print('\nInvalid argument(s). Must be a valid 24 digit hex sequence number.', file=sys.stderr)
+        return None, None, True
+
+    try:
+        end_val = int(end_seq, 16)
+    except:
+        print('\nInvalid argument(s). Must be a valid 24 digit hex sequence number.', file=sys.stderr)
+        return None, None, True
+
+    return start_val, end_val, False
+
+
+if len(sys.argv) != 4:
+    print('\nWrong number of arguments', file=sys.stderr)
+    usage()
+    sys.exit(1)
+
+if sys.argv[1] == '-':
+    source = sys.stdin
+elif os.path.exists(sys.argv[1]):
+    source = glob.glob(os.path.join(os.path.normpath(sys.argv[1]), "????????????????????????.gz"))
+    source.sort()
+else:
+    print('\nDirectory not found:', sys.argv[1], file=sys.stderr)
+    usage()
+    sys.exit(1)
+
+start_gap_val, end_gap_val, err = get_gap_start_end(sys.argv[2], sys.argv[3])
+if err:
+    usage()
+    sys.exit(1)
+
+found_first = False
+
+prev_name = None 
+prev_val =  None
+
+for line in source:
+
+    flval, name, err = gz_fn_val(line)
+    if not err:
+        if (flval >= start_gap_val) and (flval < end_gap_val):
+            if not found_first and prev_name:
+                print(prev_name, prev_val, "IN GAP")
+                found_first = True
+            print(name, flval, "IN GAP")
+        else:
+            print(name, flval, "NOT IN GAP")
+        prev_name = name
+        prev_val = flval
+    else:
+        print('Skipping file:', line, file=sys.stderr)
+
+
