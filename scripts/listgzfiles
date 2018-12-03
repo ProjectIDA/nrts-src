@@ -5,7 +5,7 @@ import sys
 import os.path
 import glob
 
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 
 def version():
     print(os.path.split(sys.argv[0])[1], ': Version', VERSION, file=sys.stderr);
@@ -31,12 +31,13 @@ def gz_fn_val(fn):
 
     try:
         name_val = int(name, 16)
+        # print(name)
         name_val_ok = True
     except:
         name_val = None
         name_val_ok = False
 
-    return name_val, fullname, name_val_ok
+    return name_val, fullname, not name_val_ok
 
 
 def get_gap_start_end(start_seq, end_seq):
@@ -96,11 +97,12 @@ for line in source:
     if not err:
         if (flval >= start_gap_val) and (flval < end_gap_val):
             if not found_first and prev_name:
-                print(prev_name, prev_val, "IN GAP")
+                # print(prev_name, prev_val, "IN GAP")
                 found_first = True
-            print(name, flval, "IN GAP")
-        else:
-            print(name, flval, "NOT IN GAP")
+            print(name)
+            # print(name, flval, "IN GAP")
+        # else:
+        #     print(name, flval, "NOT IN GAP")
         prev_name = name
         prev_val = flval
     else:
