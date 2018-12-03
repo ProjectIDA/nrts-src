@@ -5,8 +5,14 @@ import sys
 import os.path
 import glob
 
+VERSION = '1.0.0'
+
+def version():
+    print(os.path.split(sys.argv[0])[1], ': Version', VERSION, file=sys.stderr);
 
 def usage():
+    print(file=sys.stderr)
+    version()
     print(file=sys.stderr)
     print('USAGE:', file=sys.stderr)
     print('   ' + os.path.split(sys.argv[0])[1] + ' gzfiles-dir start-seq-num end-seq-num', file=sys.stderr)
@@ -29,14 +35,13 @@ def gz_fn_val(fn):
     except:
         name_val = None
         name_val_ok = False
-        return None, fullname, True
 
-    return name_val, fullname, False
+    return name_val, fullname, name_val_ok
 
 
 def get_gap_start_end(start_seq, end_seq):
 
-    if (len(start_seq) != 24) or (len(end_seq) != 24): 
+    if (len(start_seq) != 24) or (len(end_seq) != 24):
         print('\nInvalid argument(s). Must be a valid 24 digit hex sequence number.', file=sys.stderr)
         return None, None, True
 
@@ -54,8 +59,13 @@ def get_gap_start_end(start_seq, end_seq):
 
     return start_val, end_val, False
 
-
-if len(sys.argv) != 4:
+if sys.argv[1] in ['-v', '--version']:
+    version()
+    sys.exit(0)
+elif sys.argv[1] in ['-h', '--help']:
+    usage()
+    sys.exit(0)
+elif len(sys.argv) != 4:
     print('\nWrong number of arguments', file=sys.stderr)
     usage()
     sys.exit(1)
@@ -77,7 +87,7 @@ if err:
 
 found_first = False
 
-prev_name = None 
+prev_name = None
 prev_val =  None
 
 for line in source:
