@@ -2,6 +2,7 @@ ISI_Toolkit
 php
 QDP_Toolkit
 windows
+*.pyc
 .DS*
 **/CVS
 **/SCCS
