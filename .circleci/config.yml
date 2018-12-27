@@ -2,10 +2,10 @@ version: 2
 jobs:
   build:
     docker:
-        - image: projectida/nrts-packer:latest
+        - image: projectida/nrts-builder-image
     steps:
       - run:
-          name: Do Build
+          name: Build NRTS Binaries
           command: |
             mkdir src_root
             cd src_root
