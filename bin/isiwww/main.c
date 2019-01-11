@@ -608,7 +608,12 @@ webstuff[0]=0;
                 tols = soh->entry[i].tols.value;
             }
         }
-        nseg = soh->entry[i].nseg;
+        // Do not count nsegs (gaps) for EN? triggered channels
+        if (soh->entry[i].name.chn[0] != 'E') {
+            nseg = soh->entry[i].nseg;
+        } else {
+            nseg = 0;
+        }
         sumnseg = sumnseg + nseg;
 
         if (soh->entry[i].tslw != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
