@@ -70,5 +70,5 @@ FORCE:
 
 $(OBJS): $(INCDIR)/isi.h $(INCDIR)/iacp.h $(INCDIR)/util.h
  
-$(OUTPUT): $(OBJS) $(LIBDIR)/libisi.a $(LIBDIR)/libisidl.a $(LIBDIR)/libiacp.a $(LIBDIR)/libutil.a
+$(OUTPUT): $(OBJS) $(LIBDIR)/libisi.a $(LIBDIR)/libisidl.a $(LIBDIR)/libiacp.a $(LIBDIR)/libutil.a $(LIBDIR)/libdbio.a
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
