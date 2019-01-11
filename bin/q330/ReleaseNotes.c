@@ -1,6 +1,10 @@
-char *VersionIdentString = "Release 2.11.4 beta";
+char *VersionIdentString = "Release 2.11.5";
 
 /* Release notes
+
+2.11.5  12/28/2018
+        Added -xmlsta option to CONFIG command to use <station> value from xml config file
+        instead of forcing station name with sta=
 
 2.11.4  05/25/2018
         link with libqdpxml 1.4.2 to fix bug in parsing optional token LCQ parameters

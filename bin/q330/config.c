@@ -50,6 +50,7 @@ int i;
 char *arg;
 BOOL console;
 char *sta = NULL;
+BOOL use_sta_from_xml = FALSE;
 
     q330->cmd.code = Q330_CMD_CONFIG;
     q330->cmd.config.sname = NULL;
@@ -87,6 +88,8 @@ char *sta = NULL;
             q330->cmd.config.boot = TRUE;
         } else if (strcmp(arg, "-q") == 0) {
             q330->cmd.config.verbose = FALSE;
+        } else if (strcmp(arg, "-xmlsta") == 0) {
+            use_sta_from_xml = TRUE;
         } else if (q330->cmd.config.xname == NULL) {
             q330->cmd.config.xname = arg;
         } else {
@@ -94,8 +97,8 @@ char *sta = NULL;
         }
     }
 
-    if (sta == NULL) {
-        printf("ERROR: station name must be specified with the sta=name argument\n");
+    if ((sta == NULL) && (!use_sta_from_xml)){
+        printf("ERROR: station name must be specified with the sta=name argument\nERROR: or you must use the -xmlsta option to use value in xml config file\n");
         return FALSE;
     }
 
