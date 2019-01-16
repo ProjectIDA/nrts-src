@@ -55,6 +55,9 @@ set DebugDir = $NRTS_HOME/etc/debug
 
 set LogFacility = local0
 
+set TunnelFlagDir       = $NRTS_HOME/etc/.tunnel
+set TunnelStopFlag      = $TunnelFlagDir/stop
+set TunnelKeepAliveFlag = $TunnelFlagDir/keepalive
 # Revision History
 #
 # $Log: ScriptSetup,v $
