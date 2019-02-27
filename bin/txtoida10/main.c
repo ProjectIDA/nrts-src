@@ -88,6 +88,7 @@ LOGIO *lp;
 
     switch (rev) {
       case 1: DecodeFunc = DecodeRev01; break;
+      case 2: DecodeFunc = DecodeRev02; break;  // TPDin2 / IDA MPS
       default:
         fprintf(stderr, "unsupported line format '%d'\n", rev);
         exit(1);
@@ -104,6 +105,7 @@ LOGIO *lp;
             LogMsg(LOG_ERR, "input tee suspended\n");
             tee = NULL;
         }
+        printf("line: %s\n", buf);
         (DecodeFunc)(list, buf, options);
     }
 

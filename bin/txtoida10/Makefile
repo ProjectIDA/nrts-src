@@ -35,6 +35,7 @@ OBJS += log.o
 OBJS += proto.o
 OBJS += util.o
 OBJS += rev01.o
+OBJS += rev02.o
 
 OUTPUT  = txtoida10
  
