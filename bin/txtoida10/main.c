@@ -105,7 +105,6 @@ LOGIO *lp;
             LogMsg(LOG_ERR, "input tee suspended\n");
             tee = NULL;
         }
-        printf("line: %s\n", buf);
         (DecodeFunc)(list, buf, options);
     }
 
