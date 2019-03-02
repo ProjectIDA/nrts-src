@@ -78,6 +78,9 @@ BOOL SetDlOutput(char *string, LOGIO *lp);
 /* rev01.c */
 void DecodeRev01(LNKLST *list, char *buf, UINT32 options);
 
+/* rev02.c - TPDin2 - IDA MPS */
+void DecodeRev02(LNKLST *list, char *buf, UINT32 options);
+
 /* util.c */
 void BuildIdentString(char *dest, char *nname, char *sname, char *cname);
 void BuildGentag(IDA10_GENTAG *dest, TIMESTAMP *tstamp);
@@ -86,7 +89,9 @@ void BuildGentag(IDA10_GENTAG *dest, TIMESTAMP *tstamp);
 
 /* Revision History
  *
- * $Log: txtoida10.h,v $
+ * Revision 1.3  2019/02/26 10:20;11  dauerbach
+ * Added rev02 support for IDA MPS TPDin2 power monitoring device
+ *
  * Revision 1.2  2011/10/12 17:52:04  dechavez
  * updated prototypes, added TXTOIDA10_DEFAULT_DEPTH
  *

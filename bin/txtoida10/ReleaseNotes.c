@@ -1,8 +1,11 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.4 2011/10/19 21:29:18 dechavez Exp $"
 
-char *VersionIdentString = "Release 1.2.1";
+char *VersionIdentString = "Release 1.3.0";
 
 /* Release notes
+
+1.3.0  02-26-2019
+       Added support for TPDin2 IDA MPS device as format #02
 
 1.2.1  10/19/2011
        fixed bug where x.00 floating values were not multiplied by 100 before int conversion
