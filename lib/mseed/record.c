@@ -1,6 +1,6 @@
 #pragma ident "$Id: record.c,v 1.10 2015/11/17 18:52:33 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * MSEED_RECORD stuff
  *
  *====================================================================*/
@@ -46,7 +46,7 @@ struct { INT64 nsec; REAL64 secs; REAL64 samp; char *type;} tear; static char *g
 
     expected = prev->hdr.endtime + prev->hdr.sint;
     if (crnt->hdr.tstamp != expected) {
-    
+
         if (crnt->hdr.tstamp > expected) {
             tear.nsec = crnt->hdr.tstamp - expected;
             tear.type = gap;
@@ -54,10 +54,10 @@ struct { INT64 nsec; REAL64 secs; REAL64 samp; char *type;} tear; static char *g
             tear.nsec = expected - crnt->hdr.tstamp;
             tear.type = overlap;
         }
-    
+
         tear.samp = (REAL64) tear.nsec / (REAL64) prev->hdr.sint;
         tear.secs = (REAL64) tear.nsec / (REAL64) NANOSEC_PER_SEC;
-    
+
         if (tear.samp > 0.5) {
             mseedLog(handle, 1, "flushing %s: %.3lf sec (%.3lf sample) %s\n", prev->hdr.ident, tear.secs, tear.samp, tear.type);
             mseedLog(handle, 1, "previous record: %s\n", mseedHdrString(&prev->hdr, tbuf));
@@ -100,7 +100,7 @@ static char *fid = "mseedAddRecordToHandle:AppendData";
     need = SampleSize * new->hdr.nsamp;
     used = SampleSize * old->hdr.nsamp;
 
-    if (MSEED_MAX_BUFLEN - used < need) { 
+    if (MSEED_MAX_BUFLEN - used < need) {
         mseedLog(handle, 1, "flushing %s: handle is full", old->hdr.ident);
         if (!mseedFlushRecord(handle, old)) {
             mseedLog(handle, -1, "%s: mseedFlushRecord failed", fid);
