@@ -6,9 +6,12 @@
  *====================================================================*/
 #include "mseed.h"
 
-static VERSION version = {2, 9, 0};
+static VERSION version = {2, 9, 1};
 
 /* mseed library release notes
+
+2.9.1  03/01/2019 dauerbach
+       mseed.h: Change bitwise AND to OR when defining MSEED_DEFAULT_HANDLE_OPTIONS
 
 2.9.0  01/18/2018
        mseed.h: updated mseed512ToIDA1012() prototype to include serial number
