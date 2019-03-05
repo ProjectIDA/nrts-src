@@ -1,11 +1,14 @@
 #pragma ident "$Id: ReleaseNotes.c,v 1.18 2018/01/18 23:34:20 dechavez Exp $"
 
-char *VersionIdentString = "Release 1.8.0";
+char *VersionIdentString = "Release 1.8.1";
 
 /* Release notes
 
+1.8.1  03/02/2019 dauerbach
+       Link with libmseed 2.9.1 with mseed.h fix. Records now flushed when clock qual changes
+
 1.8.0  01/18/2018
-      Link with libida10 2.25.0 for updated IDA10.12 definition
+       Link with libida10 2.25.0 for updated IDA10.12 definition
 
 1.7.0  11/02/2017
        Pass thru support for IDA10.12 (encapsulated Miniseed, payload emitted directly without unpacking)
