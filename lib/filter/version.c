@@ -1,14 +1,17 @@
-#pragma ident "$Id: version.c,v 1.6 2015/11/04 23:17:26 dechavez Exp $"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "filter.h"
 
-static VERSION version = {1, 1, 4};
+static VERSION version = {1, 1, 5};
 
 /* filter library release notes
+
+1.1.5  2019-04-15  dauerbach
+       response.c:  Add switch clause for FILTER_TYPE_LAPLACE so
+                    it doesn't fall through resulting in a0==1.0
 
 1.1.4  11/04/2015
        print.c: removed extraneous (and ignored) printf argument in PrintCoeff()

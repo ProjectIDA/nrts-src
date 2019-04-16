@@ -1,14 +1,18 @@
-#pragma ident "$Id: version.c,v 1.9 2015/12/01 22:17:31 dechavez Exp $:"
 /*======================================================================
- * 
+ *
  * library version management
  *
  *====================================================================*/
 #include "dccdb.h"
 
-static VERSION version = {1, 2, 6};
+static VERSION version = {1, 2, 7};
 
 /* dccdb library release notes
+
+1.2.7   2019-04-15 dauerbach
+        response.c: Check for FILTER_TYPE_LAPLACE poles and zeros response to skip call to
+                    filterResponse() same as for FILTER_TYPE_ANALOG poles and zeros response
+                    This fixes problem with stage 0 A0 calculation for LAPLACE responses
 
 1.2.6   12/01/2015
         response.c: don't fail if units lookup returns NULL
@@ -45,7 +49,7 @@ static VERSION version = {1, 2, 6};
         response.c: fixed bug in setting cascade->a0 (multiply by mag(resp), NOT the inverse!)
 
 1.2.0   08/24/2015
-        dccdb.h: added DCCDB_ERRCODE_* constants, turned stage izero and leadfac to 
+        dccdb.h: added DCCDB_ERRCODE_* constants, turned stage izero and leadfac to
            unused1 and unused2, added a0 and errcode to DCCDB_CASCADE,
            added dccdbSetCascadeA0Freq() prototype
         cascade.c: added a0 and removed izero and leadfac from dccdbPrintCascade(), added a0 to dccdbBuildCascades()

@@ -1,4 +1,3 @@
-#pragma ident "$Id: response.c,v 1.3 2015/12/01 22:15:16 dechavez Exp $"
 /*======================================================================
  *
  *  Compute the stage 0 sensitivity for a given DCCDB_CASCADE
@@ -23,7 +22,7 @@ char str1[1024];
         stage = &cascade->entry[i];
         units = filterUnitsCode(stage->iunits); /* NULL return OK */
         cascade->a0 *= (stage->gnom * stage->gcalib);
-        if (stage->filter.type != FILTER_TYPE_ANALOG) {
+        if ((stage->filter.type != FILTER_TYPE_ANALOG) && (stage->filter.type != FILTER_TYPE_LAPLACE)) {
             if (!filterResponse(&stage->filter, freq, units, stage->srate, &StageResponse)) {
                 cascade->errcode = DCCDB_ERRCODE_RESPONSE_ERROR;
                 return FALSE;
@@ -66,7 +65,11 @@ char str1[1024];
 
 /* Revision History
  *
- * $Log: response.c,v $
+ * Revision 1.4  2019/04/15 18:00:00  dauerbach
+ * Check for FILTER_TYPE_LAPLACE poles and zeros response to skip call to
+ * filterResponse() same as for FILTER_TYPE_ANALOG poles and zeros response
+ * This fixes problem with stage 0 A0 calculation for LAPLACE responses
+ *
  * Revision 1.3  2015/12/01 22:15:16  dechavez
  * Don't fail if units lookup returns NULL. The return value is only used in
  * the call to filterResponse(), and doesn't mind.

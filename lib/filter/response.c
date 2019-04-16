@@ -148,6 +148,9 @@ static char *fid = "filterResponse";
       case FILTER_TYPE_ANALOG:
         AnalogTrans(&filter->data.pz, freq, &b);
         break;
+      case FILTER_TYPE_LAPLACE:
+        AnalogTrans(&filter->data.pz, freq, &b);
+        break;
       case FILTER_TYPE_IIR_PZ:
         IIRtrans(&filter->data.pz, wsint, &b);
         break;
@@ -207,7 +210,10 @@ UTIL_COMPLEX resp;
 
 /* Revision History
  *
- * $Log: response.c,v $
+ * Revision 1.5  2019/04/15 18:00:00  dauerbach
+ * Add switch clause for FILTER_TYPE_LAPLACE so
+ * it doesn't fall through resulting in a0==1.0
+ *
  * Revision 1.4  2015/09/04 00:49:07  dechavez
  * fixed bug in IIRtrans()
  *
