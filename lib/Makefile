@@ -40,7 +40,20 @@ all: \
     #tristar \
 
 idadcc: \
-    dccdb
+    cssio \
+    dbio \
+    dccdb \
+    dmc \
+    filter \
+    iacp \
+    ida \
+    ida10 \
+    isi \
+    isidb \
+    liss \
+    logio \
+    mseed \
+    util
 
 cssio: FORCE
 	cd cssio; $(MAKE)

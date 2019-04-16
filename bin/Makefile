@@ -52,6 +52,7 @@ idadcc: \
      idaresponse \
      isiwww \
      jd \
+     podir \
      soh_blk
 
 aps: FORCE

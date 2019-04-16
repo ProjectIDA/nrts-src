@@ -4,6 +4,10 @@
 all: lib bin
 install: all
 
+idadcc: FORCE
+	cd lib; $(MAKE) $@
+	cd bin; $(MAKE) $@
+
 lib: FORCE
 	date
 	cd lib; $(MAKE)
