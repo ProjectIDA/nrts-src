@@ -8,16 +8,17 @@
 
 #define MY_MOD_ID PODIR_MOD_STAGE
 
-static void Print(int type, DCCDB_STAGE *stage, REAL64 freq, REAL64 srate)
+static void Print(int type, DCCDB_STAGE *stage, REAL64 freq, REAL64 srate, REAL64 a0)
 {
-    if (strcasecmp(stage->sta, "AAK") != 0) return;
-    if (strcasecmp(stage->chn, "BHZ") != 0 && strcasecmp(stage->chn, "LHZ") != 0 && strcasecmp(stage->chn, "VHZ") != 0) return;
+    if (strcasecmp(stage->sta, "BFO") != 0) return;
+    if (strcasecmp(stage->chn, "LG1") != 0) return;
     if (strcasecmp(stage->loc,  "00") != 0) return;
-    if ((UINT32) stage->begt != (UINT32) 655689600) return;
+    /* if ((UINT32) stage->begt != (UINT32) 655689600) return; */
     if (srate < 0.0) {
         printf("   ProcessStage: stageid=%d empty B%d\n", stage->stageid, type);
     } else {
-        printf("   ProcessStage: stageid=%d B%d freq=%lf, srate=%lf filter=%s/%s\n", stage->stageid, type, freq, srate, stage->dir, stage->dfile);
+        printf("   ProcessStage: stageid=%d B%d freq=%lf, srate=%lf, a0=%lf, filter=%s/%s\n",
+                stage->stageid, type, freq, srate, a0, stage->dir, stage->dfile);
     }
 }
 

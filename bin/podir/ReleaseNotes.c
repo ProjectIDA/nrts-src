@@ -1,8 +1,10 @@
-#pragma ident "$Id: ReleaseNotes.c,v 1.9 2017/04/14 19:38:19 dechavez Exp $"
-
-char *VersionIdentString = "Release 1.1.3";
+char *VersionIdentString = "Release 1.2.0";
 
 /* Release notes
+
+1.2.0 2019-04-15 dauerbach
+      Fresh build with libdccdb v2.5.7 and libfilter v1.1.5
+      This addresses issues with FILTER_TYPE_LAPLACE responses
 
 1.1.3 02/21/2018 dauerbach
       Fresh build with Antelope 5.7 libraries
