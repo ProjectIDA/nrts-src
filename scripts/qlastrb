@@ -1,0 +1,146 @@
+#!/bin/csh -f
+
+######################################################################
+# Look through tee files and last 15 gz files in ./<sta>330/iso/stage
+# using qpp to find QDP CMB records indicating the Q330 rebooting.
+# Takes the Q330 hostname as the first (required) parameter and
+# an option diskoop name as the second parameter (e.g. xbfo330).
+# If second param not supplied, the `nrsDefaultSystem`330 diskloop
+# is assumed.
+######################################################################
+
+set myname = `basename "$0"`
+set debug = 0
+
+# General setup
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup"
+    goto failure
+endif
+source $setup
+
+if ($#argv == 1) then
+	set qdiskloop = `nrtsDefaultSystem`330
+else if ($#argv == 2) then
+    set qdiskloop = $2
+else
+   goto usage
+endif
+
+# check diskloop directory
+if (! -d ${NRTS_HOME}/$qdiskloop) then
+    set msg = "ERROR: Diskloop directory ${HOME}/${qdiskloop} not found."
+    logger -t $myname"[$$]" -p local0.error "$msg"
+    echo $msg
+    exit 1
+endif
+
+# check that q330 is in DB
+grep $1 ${NRTS_HOME}/etc/q330.cfg >& /dev/null
+set status = $?
+if ($status) then
+    set msg = "ERROR: $1 not found in q330.cfg"
+    logger -t $myname"[$$]" -p local0.error "$msg"
+    echo $msg
+    exit 1
+endif
+
+# get Q330 SN#'s
+# first make sure can talk to Q330...
+qverify $1 c >& /dev/null
+set status = $?
+if ($status) then
+    set msg = "ERROR: qverify failure querying device $1"
+    logger -t $myname"[$$]" -p local0.error "$msg"
+    echo $msg
+    exit 1
+endif
+
+# now actually query and extract SN
+set qsn = `qverify $1 c | awk '{print $3}'`
+set status = $?
+if ($status) then
+    set msg = "ERROR: qverify retrieving serial number for device $1"
+    logger -t $myname"[$$]" -p local0.error "$msg"
+    echo $msg
+    exit 1
+endif
+
+# check that tee dir exists (it should)
+set teedir = ${NRTS_HOME}/$qdiskloop/tee
+if (! -d ${teedir}) then
+    set msg = "ERROR: Diskloop directory ${teedir} not found."
+    logger -t $myname"[$$]" -p local0.error "$msg"
+    echo $msg
+    exit 1
+endif
+
+# tee file wild card. This will be ok until ~2100+
+set filelist = `ls ${teedir}/????????000*`
+set cmd = "cat $filelist | qpp print=cmb meta=${NRTS_HOME}/${qdiskloop}/meta keep=$qsn | grep -i last | sort | uniq | tail -n 1 | xargs"
+if ($debug) then
+    logger -t $myname"[$$]" -p local0.debug "$cmd"
+    echo $cmd
+endif
+set lrb = "`cat $filelist | qpp print=cmb meta=../meta keep=$qsn | grep -i last | sort | uniq | tail -n 1 | xargs`"
+
+# if no reboot fond in tee files, lets check gz files in staging.
+if ("$lrb" == "") then
+
+    # check that stage dir exists (it should)
+    set stagedir = ${NRTS_HOME}/$qdiskloop/iso/stage
+    if (! -d ${stagedir}) then
+        set msg = "ERROR: Diskloop directory ${stagedir} not found."
+        logger -t $myname"[$$]" -p local0.error "$msg"
+        echo $msg
+        exit 1
+    endif
+
+    set filelist = `ls ${NRTS_HOME}/$qdiskloop/iso/stage/*.gz | tail -n 15`
+    set cmd = "cat $filelist | qpp print=cmb meta=${NRTS_HOME}/${qdiskloop}/meta keep=$qsn | grep -i last | sort | uniq | tail -n 1 | xargs"
+    if ($debug) then
+        logger -t $myname"[$$]" -p local0.debug "$cmd"
+        echo $cmd
+    endif
+    set lrb = "`cat $filelist | qpp print=cmb meta=../meta keep=$qsn | grep -i last | sort | uniq | tail -n 1 | xargs`"
+
+endif
+
+if ("$lrb" != "") then 
+
+    if ($debug) then
+        set msg = "$lrb"
+        logger -t $myname"[$$]" -p local0.info "${1}: $msg"
+        echo $msg
+    endif
+
+    set qrebootlog = ${NRTS_HOME}/log/$1.last_reboot
+    if ( ! -e $qrebootlog) then
+       touch $qrebootlog
+    endif
+
+    set lastlast_reboot = `tail -n 1 $qrebootlog`
+    if (! ("$lrb" == "$lastlast_reboot") ) then
+        rm $qrebootlog
+        echo "$lrb" > $qrebootlog
+        SendStealthEvent "${1}: ${lrb}" "q330-reboot"
+    endif
+
+else
+    logger -t $myname"[$$]" -p local0.info "No recent reboots found for ${1}"
+endif
+
+exit 0
+
+usage:
+    echo "Usage:  $myname <q330-host> [<q330-disk-loop>]"
+	echo 
+	echo "   for example:"
+	echo 
+	echo "       $myname kdak00"
+    echo "     or:"
+    echo "       $myname xpfo70 xpfo330"
+    exit 1
+
