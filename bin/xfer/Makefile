@@ -15,8 +15,10 @@ LIBRARIES   = $(LIBDIR)/libcssio.a
 LIBRARIES  += $(LIBDIR)/libsacio.a
 LIBRARIES  += $(LIBDIR)/libutil.a
 LIBRARIES  += $(LIBDIR)/libseed.a
+LIBRARIES  += $(LIBDIR)/libmseed.a
+LIBRARIES  += $(LIBDIR)/libdmc.a
 #OUTPUT = xfer_tap xfer_prt xfer_tocss xfer_togse xfer_tosac xfer_toseed eztap
-OUTPUT = eztap
+OUTPUT = xfer_tap eztap
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE
 	cd OBJS/$(PLATFORM); \
@@ -52,7 +54,7 @@ ars: $(VPATH)ars.c $(LIBRARIES)
 	$(CC) $(CFLAGS) -o $@ $(VPATH)ars.c -lxfer -lnrts -lida10 -lida -lisidb -ldbio -lseed -lutil -llogio -lmseed $(SOCKLIBS) -lm
 
 xfer_tap: $(VPATH)tap.c $(LIBRARIES)
-	$(CC) $(CFLAGS) -o $@ $(VPATH)tap.c -lxfer -lnrts -lida -lisidb -ldbio -lida10 -lisidb -lutil -lseed -llogio -lmseed $(SOCKLIBS) -lm $(SQLLIBS) $(MTLIBS)
+	$(CC) $(CFLAGS) -o $@ $(VPATH)tap.c -lxfer -lnrts -lida -lisidb -ldbio -lida10 -lisidb -lutil -lseed -llogio -lmseed -ldmc $(SOCKLIBS) -lm $(SQLLIBS) $(MTLIBS)
 
 xfer_prt: $(VPATH)prt.c $(LIBRARIES)
 	$(CC) $(CFLAGS) -o $@ $(VPATH)prt.c -lxfer -lnrts -lida -lisidb -ldbio -lida10 -lisidb -lseed -lutil -llogio -lmseed $(SOCKLIBS) -lm $(SQLLIBS) $(MTLIBS)
