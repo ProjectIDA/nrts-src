@@ -24,18 +24,27 @@ set log    = ${myname}.log
 set sta    = $DefaultSite
 set stadir = $NRTS_HOME/$sta
 set caldir = $stadir/cal
+set altsite = ""
 set port   = 4
 set mon    = 6
 set date   = `date +%Y:%j-%H:%M:%S`
 
-if ($#argv != 2) then
-    echo "usage: ${myname} { hf | lf | both } { 00 | 10 }"
-    echo "eg: ${myname} hf 00   (rbhf cal on the 00 digitizer)"
-    echo "eg: ${myname} both 10 (rbhf AND rblf cals on the 10 digitizer)"
+if (($#argv != 2) && ($#argv != 3)) then
+    echo "usage: ${myname} { hf | lf | both } { 00 | 10 } [ alt-site ]"
+    echo "eg: ${myname} hf 00         (rbhf cal on the 00 digitizer)"
+    echo "eg: ${myname} both 10       (rbhf AND rblf cals on the 10 digitizer)"
+    echo "eg: ${myname} both 50 xbfo  (rbhf AND rblf cals on the 50 digitizer"
+    echo "                          for alternate site xbfo, e.g. xbfo50, when running on bfo)"
     exit 1
 else 
     set test = $argv[1]
     set loc  = $argv[2]
+    if ($#argv == 3) then
+        set altsite = $argv[3]
+        set digitizer = ${altsite}${loc}
+    else
+        set digitizer = ${sta}${loc}
+    endif
 endif
        
 if (! -e $caldir) then
@@ -54,13 +63,13 @@ if ($status != 0) then
 endif
 
 if ($test == "both") then
-    idacal hf $loc
+    idacal hf $loc $altsite
     if ($status != 0) exit $status
-    idacal lf $loc
+    idacal lf $loc $altsite
     exit $status
 endif
 
-set digitizer = ${sta}${loc}
+# set digitizer = ${sta}${loc}
 
 CheckConfigPort:
 set command = "qverify -q $digitizer c"
@@ -82,7 +91,7 @@ endif
 
 set caltag    = rb${test}
 set tokens    = ${caltag}${loc}A${mon}
-set digitizer = ${sta}${loc}:${port}:${tokens}:${sta}
+set digitizer = ${digitizer}:${port}:${tokens}:${sta}
 set command   = "qcal $digitizer $caltag cal=123 mon=$mon"
 echo $date - $command >> $log
 $command >> $log
