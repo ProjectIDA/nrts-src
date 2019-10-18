@@ -47,11 +47,11 @@ endif
 
 set xml00 = $XmlDir/default00.xml
 set xml10 = $XmlDir/default10.xml
-set tst00 = $XmlDir/tst00.xml
+set ate00 = $XmlDir/ate00.xml
 set auth = $NRTS_HOME/etc/q330/auth
 
 if ($ate) then
-    set list = "$tst00 $auth"
+    set list = "$ate00 $auth"
 else
     set list = "$xml00 $xml10 $auth"
 endif
@@ -160,7 +160,7 @@ endif
 
 set tagno    = $idstring[2]
 set serialno = $idstring[3]
-set command = "q330 set tst00 $tagno $serialno"
+set command = "q330 set ate00 $tagno $serialno"
 #echo $command
 $command
 if ($status != 0) then
@@ -168,11 +168,11 @@ if ($status != 0) then
     exit 1
 endif
 
-set sta     = tst
+set sta     = ate
 set ip      = 172.16.4.10
 set sensorA = none
 set sensorB = none
-set xml     = $tst00
+set xml     = $ate00
 q330 $SerialPort config sta=$sta ip=$ip a=$sensorA b=$sensorB $xml
 chmod 444 $auth
 
