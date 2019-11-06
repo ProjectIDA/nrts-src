@@ -42,8 +42,8 @@ if ($osname == sunos) then
         set curselib = "-L/usr/gnu/lib -lcurses -ltermcap"
     endif
 else if ($osname == darwin) then
-        set osver_len = `expr $osver : '[0-9]*\.[0-9]*'`
-        set osver     = `expr substr $osver 1 $osver_len`
+        #set osver_len = `expr $osver : '[0-9]*\.[0-9]*'`
+        #set osver     = `expr substr $osver 1 $osver_len`
         set ostype   = SVR4
         set ranlib   = /usr/bin/ranlib
         set install  = /usr/bin/install
@@ -56,6 +56,9 @@ else if ($osname == darwin) then
             setenv XML2LIBS "/usr/local/lib/libxml2.a -lm -lz"
         else if (-d /usr/include/libxml2) then
             setenv XML2INCS /usr/include/libxml2
+            setenv XML2LIBS "-lxml2"
+        else if (-d /usr/local/opt/libxml2/include/libxml2) then
+            setenv XML2INCS /usr/local/opt/libxml2/include/libxml2/
             setenv XML2LIBS "-lxml2"
         endif
 else if ($osname == linux) then
