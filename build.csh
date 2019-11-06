@@ -1,9 +1,9 @@
 #!/usr/bin/env csh
 
-source env/platform
-source env/envrc
-source env/pathrc
-source env/aliases
+source env-build/platform
+source env-build/envrc
+source env-build/pathrc
+source env-build/aliases
 
 make remove
 make
