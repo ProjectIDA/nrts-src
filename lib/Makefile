@@ -33,11 +33,11 @@ all: \
     sacio \
     sbd \
     seed \
+    tristar \
     ttyio \
     udpio \
     util \
     xfer
-    #tristar \
 
 idadcc: \
     cssio \
