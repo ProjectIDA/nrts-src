@@ -1,0 +1,69 @@
+# Determine development platform and compiler switches.
+
+set install  = ""
+set socklibs = ""
+set osname   = `uname -s | tr "[A-Z]" "[a-z]"`
+set osver    = `uname -r | sed 's/-RELEASE//'`
+set machine  = `uname -m`
+set nodename = `uname -n`
+
+if ($osname == solaris || $osname == sunos) then
+    set machine  = `arch`
+    uname -p >& /dev/null
+    if ($status == 0) then
+        set ostype   = SVR4
+        @ SolarisVersion = `/usr/ucb/expr substr $osver 3 1`
+        set ranlib   = echo
+        set install  = /usr/ucb/install
+        set curselib = "-lcurses"
+        set socklibs = "-lsocket -lnsl"
+        if ($osver == 5.5.1) then
+            setenv MTLIBS "-lpthread -lposix4"
+        else
+            setenv MTLIBS "-lpthread -lrt"
+        endif
+    else
+        set osname = sunos
+        set ostype = BSD
+        set curselib = "-L/usr/gnu/lib -lcurses -ltermcap"
+    endif
+else if ($osname == linux) then
+        if ($machine == i386) set machine = i86pc
+        if ($machine == i486) set machine = i86pc
+        if ($machine == i586) set machine = i86pc
+        if ($machine == i686) set machine = i86pc
+        set osver = `expr substr $osver 1 3`
+        set ostype   = SVR4
+        set install  = /usr/bin/install
+        set socklibs = ""
+        set curselib = "-lcurses"
+        setenv POSIX4LIB ""
+        setenv MTLIBS "-lpthread"
+else if ($osname == openbsd || $osname == freebsd) then
+        if ($machine == i386) set machine = i86pc
+        if ($machine == i486) set machine = i86pc
+        if ($machine == i586) set machine = i86pc
+        if ($machine == i686) set machine = i86pc
+        set ostype = BSD
+        set ranlib   = /usr/bin/ranlib
+        set install  = /usr/bin/install
+        set curselib = "-lcurses"
+        set curselib = "-lncurses"
+        setenv MTLIBS "-lpthread"
+else
+    echo "ERROR: unsupported operating system.  Update .platform file!"
+endif
+
+if ($machine == i86pc) then
+    set order = LTL_ENDIAN_ORDER
+else
+    set order = BIG_ENDIAN_ORDER
+endif
+
+setenv TARGET $osname.$machine
+
+set gnuinstall = /opt/gnu/bin/install
+if ($install == "" && -e $gnuinstall) set install = $gnuinstall
+
+set platform = $osname.$osver.$machine
+set target = $osname.$machine

@@ -1,0 +1,22 @@
+alias ls 'ls -F'
+alias lsh 'ls -lst \!* | head -20'
+alias ll 'ls -Fl'
+alias la 'ls -Fla'
+alias isi 'isi server=localhost'
+alias df 'df -h'
+alias mon 'nrts_mon'
+alias pd pushd
+alias pop popd
+alias h history
+alias j jobs
+alias cls clear
+alias cp '/bin/cp -i'
+alias mv '/bin/mv -i'
+alias today 'date -u +20%y%j'
+alias pid 'ps -aux | egrep "(\!*|USER)" | egrep -v "(grep| ps -)"'
+alias pib 'ps -ax -o user,pid,%cpu,%mem,state,start,command | grep "\!*" | egrep -v "(grep| ps -)" | sort -k 7'
+alias bcd isiIsoToThumbdrive
+alias fb 'isiStageTeeFiles FORCE'
+alias iso isiReportIsoStats
+alias e300 telnet e300 2001
+alias dbpick iwv
