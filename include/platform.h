@@ -116,6 +116,9 @@
 #   define HAVE_STRLCPY
 #   define HAVE_RLIMIT
 #   define HAVE_FORK
+#   ifndef unix
+#      define unix
+#   endif
 #endif /* DARWIN */
 
 /* Linux */
