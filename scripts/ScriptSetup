@@ -1,7 +1,7 @@
 # $Id: ScriptSetup,v 1.24 2017/01/13 17:34:44 dechavez Exp $
 # General purpose setup for NRTS/ISP scripts
 
-setenv NRTS_HOME /usr/nrts
+#setenv NRTS_HOME /usr/nrts
 if (-e $NRTS_HOME/UNCONFIGURED) exit 0
 
 # Ensure the required ancillary files are all present
@@ -35,21 +35,6 @@ else
     @ SystemsCount = 0
     set DefaultSite = "DEFAULTSITE"
 endif
-
-if (-e /usr/ucb/mail) then
-    set mail = /usr/ucb/mail
-else 
-    set mail = /usr/bin/Mail
-endif
-    
-@ errors = 0
-foreach file ($mail)
-    if ( ! -e $file ) then
-        echo "Missing $file"
-        @ errors += 1
-    endif
-end
-set status = $errors
 
 set DebugDir = $NRTS_HOME/etc/debug
 
