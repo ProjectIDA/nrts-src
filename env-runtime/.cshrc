@@ -28,10 +28,10 @@ else
         set DefaultSite = `nrtsDefaultSystem`
         if ($status == 0) then
             setenv ISP_SYSTEM $DefaultSite
+            set cdpath = (~)
             set cdpath = ($cdpath ~/etc)
             set cdpath = ($cdpath ~/$DefaultSite)
             set cdpath = ($cdpath ~/$DefaultSite/iso)
-            set cdpath = ($cdpath ~/$DefaultSite/isp)
         endif
         set boot = $home/etc/start/boot
         set Boot = $boot
