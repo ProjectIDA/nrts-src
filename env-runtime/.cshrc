@@ -10,7 +10,7 @@ if (`whoami` == root) then
         set prompt="`hostname`# "
 else
     set myname = nrts
-    set home   = /usr/nrts
+    set home   = $NRTS_HOME
     set rcfiles = ""
     set rcfiles = "$rcfiles ~/.platform"
     set rcfiles = "$rcfiles ~/.envrc"
