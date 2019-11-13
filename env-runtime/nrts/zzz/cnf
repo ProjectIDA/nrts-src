@@ -1,0 +1,97 @@
+# ZZZ NRTS disk loop
+
+ida10       # system type
+1024        # raw packet length
+zzz         # station name
+
+# 40 Hz streams
+# 100800 = 7 days of user data
+#   3600 = 6 hours of hidden data
+# 104400 = disk buffer length
+
+   bhz10 104400 3600
+   bh110 104400 3600
+   bh210 104400 3600
+
+   bhz00 104400 3600
+   bh100 104400 3600
+   bh200 104400 3600
+
+#QEP   bdf00 104400 3600
+
+# 20 Hz streams
+# 50400 = 1 days of user data
+#  1800 = 6 hours of hidden data
+# 52200 = disk buffer length
+
+# 1 Hz streams
+# 2520 = 7 days of user data
+#   90 = 6 hour of hidden data
+# 2610 = disk buffer length
+
+   lhz00 2610   90
+   lh100 2610   90
+   lh200 2610   90
+
+   lnz00 2610   90
+   ln100 2610   90
+   ln200 2610   90
+
+#QEP   ldf00 2610   90
+#SETRA   ldi00 2610   90
+
+#PARO
+       ldi10 2610   90
+
+#QEP   lei30 2610   90
+#QEP   lwd30 2610   90
+#QEP   lws30 2610   90
+#QEP   lko30 2610   90
+#QEP   lio30 2610   90
+#QEP   les30 2610   90
+#QEP   ler30 2610   90
+#QEP   ldi30 2610   90
+#QEP   lki30 2610   90
+#QEP   lii30 2610   90
+#QEP   lri30 2610   90
+#QEP   lrh30 2610   90
+#QEP   lkh30 2610   90
+#QEP   leh30 2610   90
+
+   lhz10 2610   90
+   lh110 2610   90
+   lh210 2610   90
+
+   lcq00 2610   90
+   lce00 2610   90
+   lcl00 2610   90
+
+   lcq10 2610   90
+   lce10 2610   90
+   lcl10 2610   90
+
+#SIOMET   lkr00 2610   90
+#SIOMET   lir00 2610   90
+#SIOMET   ldr00 2610   90
+
+# 0.1 Hz streams
+# 252 = 7 days of user data
+#   9 = 6 hour of hidden data
+# 261 = disk buffer length
+
+   vmu00 261   9
+   vmv00 261   9
+   vmw00 261   9
+
+   vmu10 261   9
+   vmv10 261   9
+   vmw10 261   9
+
+# Triggered streams
+# 252000 = 7 days of user data
+#   9000 = 6 hours of hidden data
+# 261000 = disk buffer length
+
+   enz00 261000 9000
+   en100 261000 9000
+   en200 261000 9000
