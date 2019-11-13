@@ -1,0 +1,1 @@
+nrts    ALL=NOPASSWD:   /usr/bin/tar,/usr/bin/chown,/usr/bin/chmod,/usr/sbin/init,/usr/bin/pkill,/usr/sbin/arp,/usr/bin/csh,/usr/bin/tcsh,/usr/bin/bash,/usr/sbin/shutdown,/usr/sbin/reboot,/usr/bin/mount,/usr/bin/umount,/usr/bin/netstat,/home/nrts/scripts/inithumb
