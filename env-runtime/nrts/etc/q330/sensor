@@ -1,0 +1,46 @@
+# $Id: sensor,v 1.12 2017/03/02 18:44:13 dechavez Exp $
+#
+# The sensor file defines the control lines, and consists of 5 arguments
+#
+#  1 - Unique name for the instrument, up to 10 characters long.
+#  2 - The active state.  Use 'hi' for active high, 'lo' for active low, and 'na' for other.
+#  3 - Sensor A control lines (contents described below)
+#  4 - Sensor B control lines
+#  5 - Quote delimited description of the sensor
+#
+#  The control lines are described by a set of up to 8 comma delimited strings,
+#  each of the form line:ctl where line is the physical control line number
+#  (1 thru 8) and ctl is a 3 character code describing the operation thus:
+#
+#      ctl  Operation
+#      ---  ---------
+#      idl  line is idle
+#      cen  mass recenter
+#      cal  calibration enable
+#      cap  capacitive coupling
+#      lck  lock
+#      unl  unlock
+#      dpr  deploy/remove
+#      ax1  auxiliary 1
+#      ax2  auxiliary 2
+#
+# Name       hi/lo      Sensor A Lines           Sensor B Lines       Description
+# --------   ----   -----------------------  -----------------------  -----------
+  sts1        na    1:idl,2:idl,3:idl,4:idl  5:idl,6:idl,7:idl,8:idl "Streckeisen STS-1"
+  sts2        hi    1:cen,2:idl,3:idl,4:cal  5:cen,6:idl,7:idl,8:cal "Streckeisen STS-2"
+  sts2.5      hi    1:cen,2:idl,3:idl,4:cal  5:cen,6:idl,7:idl,8:cal "Streckeisen STS-2.5"
+  sts5        hi    1:cen,2:dpr,3:idl,4:cal  5:cen,6:dpr,7:idl,8:cal "Streckeisen STS-5A"
+  sts6        hi    1:cen,2:dpr,3:idl,4:cal  5:cen,6:dpr,7:idl,8:cal "Streckeisen STS-6"
+  m2166       na    1:idl,2:idl,3:idl,4:idl  5:idl,6:idl,7:idl,8:idl "Metrozet M2166-VBB"
+  trillium    hi    1:cen,2:idl,3:idl,4:cal  5:cen,6:idl,7:idl,8:cal "Nanometrics Trillium 120, 240, 360 (surface)"
+  t360-bh     hi    1:idl,2:cen,3:idl,4:cal  5:idl,6:cen,7:idl,8:cal "Nanometrics Trillium 360 (borehole)"
+  ks54000     hi    1:idl,2:idl,3:idl,4:cal  5:idl,6:idl,7:idl,8:cal "Geotech KS-54000"
+  cmg3t       lo    1:cen,2:lck,3:unl,4:cal  5:cen,6:lck,7:unl,8:cal "Guralp CMG-3T"
+  gurhi       hi    1:cen,2:lck,3:unl,4:cal  5:cen,6:lck,7:unl,8:cal "generic Guralp, active hi"
+  gurlo       lo    1:cen,2:lck,3:unl,4:cal  5:cen,6:lck,7:unl,8:cal "generic Guralp, active low"
+  episensor   hi    1:idl,2:idl,3:idl,4:cal  5:idl,6:idl,7:idl,8:cal "Kinemetrics EpiSensor"
+  fba23       na    1:idl,2:idl,3:idl,4:cal  5:idl,6:idl,7:idl,8:cal "Kinemetrics FBA-23"
+  gs13        na    1:idl,2:idl,3:idl,4:idl  5:idl,6:idl,7:idl,8:idl "Geotech GS-13"
+  setra       na    1:idl,2:idl,3:idl,4:idl  5:idl,6:idl,7:idl,8:idl "Setra barometer"
+  other       na    1:idl,2:idl,3:idl,4:idl  5:idl,6:idl,7:idl,8:idl "sensor present, no control lines"
+  none        na    1:idl,2:idl,3:idl,4:idl  5:idl,6:idl,7:idl,8:idl "no sensor"

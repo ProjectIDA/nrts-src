@@ -1,0 +1,66 @@
+#!/bin/csh -f
+#
+# NRTS boot startup script
+#
+
+# Load the login environment
+
+set envrc = $NRTS_HOME/.envrc
+if (-e $envrc) then
+    source $envrc
+else
+    echo "warning: missing $envrc"
+endif
+
+set path = ($NRTS_HOME/scripts $NRTS_HOME/bin $path)
+
+# Make sure that permissions are correct
+
+if ( -e $NRTS_HOME/scripts/nrtsSetPerms ) then
+    nrtsSetPerms $NRTS_HOME/bin
+else
+    echo "WARNING: missing nrtsSetPerms"
+endif
+
+if ( -e $NRTS_HOME/scripts/SetSerialPortPerms ) then
+    if (`whoami` == root) SetSerialPortPerms
+else
+    echo "WARNING: missing SetSerialPortPerms"
+endif
+
+# If this is a new deployment, build the disk loops
+
+if ($?BOOT_BUILD_FLAG && -e $BOOT_BUILD_FLAG) then
+    echo "Boot build flag is set, building fresh disk loops"
+    isiDeleteEverything >& /dev/null
+    if ($status != 0) then
+        echo "isiDeleteEverything failed!"
+        goto failure
+    endif
+    isiCreateDiskLoops >& /dev/null
+    if ($status != 0) then
+        echo "isiCreateDiskLoops failed!"
+        goto failure
+    endif
+    chown -R nrts:nrts /usr/home/nrts
+    rm $BOOT_BUILD_FLAG
+endif
+
+# Start all data servers
+
+foreach server (isid ringserver)
+    $NRTS_HOME/etc/init.d/$server bounce
+end
+
+# Start data acquisition
+
+#TEST isidl isi=coco@idahub.ucsd.edu:39137 zzz -bd
+
+# SET UP FOR EXAMPLE STATION ZZZ
+#isidl q330=zzz00:1 q330=zzz10:1 zzz330 -bd
+#qhlp -ida10 -lcase zzz330 zzz net=49136 -bd
+#paro10 zzz /dev/cuau0:9600:ldi10:1000 dl=localhost:49136 -bd
+#siomet zzz /dev/cuau1:9600:1000:lkr00:lir00:ldr00 dl=localhost:49136 -bd
+#tristar10 moxa=192.168.1.20 dl=localhost:49136 zzz -bd
+
+exit 0

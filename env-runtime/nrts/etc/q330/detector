@@ -1,0 +1,21 @@
+# $Id: detector,v 1.2 2010/12/16 22:00:47 dechavez Exp $
+#
+# The detector file is used to define the qhlp event detector and consists
+# of a variable number of items.  The first 6 are always the same:
+#
+#   1 - The site name for which this is to be applied, or 'default'
+#   2 - A comma delimited string listing the names of the triggered channels
+#   3 - mininum number of 'on' channels required to declare an event
+#   4 - Pre-event memory, in packets
+#   5 - Post-event memory, in packets
+#   6 - Type of detector.  Currently only 'stalta' is supported.
+#
+# The remaining parameters are specific to the type of detector.  For stalta
+#
+#   7 - STA window length, in samples
+#   8 - LTA window length, in samples
+#   9 - STA/LTA ratio needed to transition from off to on
+#  10 - STA/LTA ratio needed to transition from on to off
+#
+# Site       Channels     Votes Pre Post   Type  STA  LTA   On  Off
+ default enz00,en100,en200    2   3   40  stalta 250 4000 12.0  5.0

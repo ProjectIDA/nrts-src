@@ -1,0 +1,630 @@
+# $Id: lcq,v 1.6 2015/12/07 20:36:53 dechavez Exp $
+#
+# The lcq file defines sets of logical channel queues.  Entries consist
+# of a character string tag (token set) followed by an arbitrary number
+# of lines with 5 items per line:
+#
+#   1 - channel code
+#   2 - location code
+#   3 - LCQ src byte 1, hexadecimal
+#   4 - LCQ src byte 2, decimal
+#   5 - sample interval seconds
+#
+
+rbhf00A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 00  0xe0 5  0.010
+  hh1 00  0xe1 5  0.010
+  hh2 00  0xe2 5  0.010
+  ccf 00  0xe3 5  0.010
+
+rbhf00A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 00  0xe0 5  0.010
+  hh1 00  0xe1 5  0.010
+  hh2 00  0xe2 5  0.010
+  ccf 00  0xe4 5  0.010
+
+rbhf00A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 00  0xe0 5  0.010
+  hh1 00  0xe1 5  0.010
+  hh2 00  0xe2 5  0.010
+  ccf 00  0xe5 5  0.010
+
+rbhf10A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 10  0xe0 5  0.010
+  hh1 10  0xe1 5  0.010
+  hh2 10  0xe2 5  0.010
+  ccf 10  0xe3 5  0.010
+
+rbhf10A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 10  0xe0 5  0.010
+  hh1 10  0xe1 5  0.010
+  hh2 10  0xe2 5  0.010
+  ccf 10  0xe4 5  0.010
+
+rbhf10A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 10  0xe0 5  0.010
+  hh1 10  0xe1 5  0.010
+  hh2 10  0xe2 5  0.010
+  ccf 10  0xe5 5  0.010
+
+rbhf20A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 20  0xe0 5  0.010
+  hh1 20  0xe1 5  0.010
+  hh2 20  0xe2 5  0.010
+  ccf 20  0xe3 5  0.010
+
+rbhf20A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 20  0xe0 5  0.010
+  hh1 20  0xe1 5  0.010
+  hh2 20  0xe2 5  0.010
+  ccf 20  0xe4 5  0.010
+
+rbhf20A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 20  0xe0 5  0.010
+  hh1 20  0xe1 5  0.010
+  hh2 20  0xe2 5  0.010
+  ccf 20  0xe5 5  0.010
+
+rbhf30A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 30  0xe0 5  0.010
+  hh1 30  0xe1 5  0.010
+  hh2 30  0xe2 5  0.010
+  ccf 30  0xe3 5  0.010
+
+rbhf30A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 30  0xe0 5  0.010
+  hh1 30  0xe1 5  0.010
+  hh2 30  0xe2 5  0.010
+  ccf 30  0xe4 5  0.010
+
+rbhf30A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 30  0xe0 5  0.010
+  hh1 30  0xe1 5  0.010
+  hh2 30  0xe2 5  0.010
+  ccf 30  0xe5 5  0.010
+
+rbhf40A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 40  0xe0 5  0.010
+  hh1 40  0xe1 5  0.010
+  hh2 40  0xe2 5  0.010
+  ccf 40  0xe3 5  0.010
+
+rbhf40A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 40  0xe0 5  0.010
+  hh1 40  0xe1 5  0.010
+  hh2 40  0xe2 5  0.010
+  ccf 40  0xe4 5  0.010
+
+rbhf40A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 40  0xe0 5  0.010
+  hh1 40  0xe1 5  0.010
+  hh2 40  0xe2 5  0.010
+  ccf 40  0xe5 5  0.010
+
+rbhf50A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 50  0xe0 5  0.010
+  hh1 50  0xe1 5  0.010
+  hh2 50  0xe2 5  0.010
+  ccf 50  0xe3 5  0.010
+
+rbhf50A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 50  0xe0 5  0.010
+  hh1 50  0xe1 5  0.010
+  hh2 50  0xe2 5  0.010
+  ccf 50  0xe4 5  0.010
+
+rbhf50A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 50  0xe0 5  0.010
+  hh1 50  0xe1 5  0.010
+  hh2 50  0xe2 5  0.010
+  ccf 50  0xe5 5  0.010
+
+rbhf60A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 60  0xe0 5  0.010
+  hh1 60  0xe1 5  0.010
+  hh2 60  0xe2 5  0.010
+  ccf 60  0xe3 5  0.010
+
+rbhf60A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 60  0xe0 5  0.010
+  hh1 60  0xe1 5  0.010
+  hh2 60  0xe2 5  0.010
+  ccf 60  0xe4 5  0.010
+
+rbhf60A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 60  0xe0 5  0.010
+  hh1 60  0xe1 5  0.010
+  hh2 60  0xe2 5  0.010
+  ccf 60  0xe5 5  0.010
+
+rbhf70A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 70  0xe0 5  0.010
+  hh1 70  0xe1 5  0.010
+  hh2 70  0xe2 5  0.010
+  ccf 70  0xe3 5  0.010
+
+rbhf70A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 70  0xe0 5  0.010
+  hh1 70  0xe1 5  0.010
+  hh2 70  0xe2 5  0.010
+  ccf 70  0xe4 5  0.010
+
+rbhf70A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 70  0xe0 5  0.010
+  hh1 70  0xe1 5  0.010
+  hh2 70  0xe2 5  0.010
+  ccf 70  0xe5 5  0.010
+
+#----------------------
+
+rblf00A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 00  0xe0 0  1.000
+  lh1 00  0xe1 0  1.000
+  lh2 00  0xe2 0  1.000
+  ccs 00  0xe3 0  1.000
+
+rblf00A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 00  0xe0 0  1.000
+  lh1 00  0xe1 0  1.000
+  lh2 00  0xe2 0  1.000
+  ccs 00  0xe4 0  1.000
+
+rblf00A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 00  0xe0 0  1.000
+  lh1 00  0xe1 0  1.000
+  lh2 00  0xe2 0  1.000
+  ccs 00  0xe5 0  1.000
+
+rblf10A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 10  0xe0 0  1.000
+  lh1 10  0xe1 0  1.000
+  lh2 10  0xe2 0  1.000
+  ccs 10  0xe3 0  1.000
+
+rblf10A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 10  0xe0 0  1.000
+  lh1 10  0xe1 0  1.000
+  lh2 10  0xe2 0  1.000
+  ccs 10  0xe4 0  1.000
+
+rblf10A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 10  0xe0 0  1.000
+  lh1 10  0xe1 0  1.000
+  lh2 10  0xe2 0  1.000
+  ccs 10  0xe5 0  1.000
+
+rblf20A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 20  0xe0 0  1.000
+  lh1 20  0xe1 0  1.000
+  lh2 20  0xe2 0  1.000
+  ccs 20  0xe3 0  1.000
+
+rblf20A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 20  0xe0 0  1.000
+  lh1 20  0xe1 0  1.000
+  lh2 20  0xe2 0  1.000
+  ccs 20  0xe4 0  1.000
+
+rblf20A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 20  0xe0 0  1.000
+  lh1 20  0xe1 0  1.000
+  lh2 20  0xe2 0  1.000
+  ccs 20  0xe5 0  1.000
+
+rblf30A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 30  0xe0 0  1.000
+  lh1 30  0xe1 0  1.000
+  lh2 30  0xe2 0  1.000
+  ccs 30  0xe3 0  1.000
+
+rblf30A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 30  0xe0 0  1.000
+  lh1 30  0xe1 0  1.000
+  lh2 30  0xe2 0  1.000
+  ccs 30  0xe4 0  1.000
+
+rblf30A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 30  0xe0 0  1.000
+  lh1 30  0xe1 0  1.000
+  lh2 30  0xe2 0  1.000
+  ccs 30  0xe5 0  1.000
+
+rblf40A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 40  0xe0 0  1.000
+  lh1 40  0xe1 0  1.000
+  lh2 40  0xe2 0  1.000
+  ccs 40  0xe3 0  1.000
+
+rblf40A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 40  0xe0 0  1.000
+  lh1 40  0xe1 0  1.000
+  lh2 40  0xe2 0  1.000
+  ccs 40  0xe4 0  1.000
+
+rblf40A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 40  0xe0 0  1.000
+  lh1 40  0xe1 0  1.000
+  lh2 40  0xe2 0  1.000
+  ccs 40  0xe5 0  1.000
+
+rblf50A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 50  0xe0 0  1.000
+  lh1 50  0xe1 0  1.000
+  lh2 50  0xe2 0  1.000
+  ccs 50  0xe3 0  1.000
+
+rblf50A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 50  0xe0 0  1.000
+  lh1 50  0xe1 0  1.000
+  lh2 50  0xe2 0  1.000
+  ccs 50  0xe4 0  1.000
+
+rblf50A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 50  0xe0 0  1.000
+  lh1 50  0xe1 0  1.000
+  lh2 50  0xe2 0  1.000
+  ccs 50  0xe5 0  1.000
+
+rblf60A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 60  0xe0 0  1.000
+  lh1 60  0xe1 0  1.000
+  lh2 60  0xe2 0  1.000
+  ccs 60  0xe3 0  1.000
+
+rblf60A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 60  0xe0 0  1.000
+  lh1 60  0xe1 0  1.000
+  lh2 60  0xe2 0  1.000
+  ccs 60  0xe4 0  1.000
+
+rblf60A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 60  0xe0 0  1.000
+  lh1 60  0xe1 0  1.000
+  lh2 60  0xe2 0  1.000
+  ccs 60  0xe5 0  1.000
+
+rblf70A4
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 70  0xe0 0  1.000
+  lh1 70  0xe1 0  1.000
+  lh2 70  0xe2 0  1.000
+  ccs 70  0xe3 0  1.000
+
+rblf70A5
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 70  0xe0 0  1.000
+  lh1 70  0xe1 0  1.000
+  lh2 70  0xe2 0  1.000
+  ccs 70  0xe4 0  1.000
+
+rblf70A6
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  lhz 70  0xe0 0  1.000
+  lh1 70  0xe1 0  1.000
+  lh2 70  0xe2 0  1.000
+  ccs 70  0xe5 0  1.000
+
+#----------------------
+
+rbhf00B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 00  0xe3 5  0.010
+  hh1 00  0xe4 5  0.010
+  hh2 00  0xe5 5  0.010
+  ccf 00  0xe0 5  0.010
+
+rbhf00B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 00  0xe3 5  0.010
+  hh1 00  0xe4 5  0.010
+  hh2 00  0xe5 5  0.010
+  ccf 00  0xe1 5  0.010
+
+rbhf00B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 00  0xe3 5  0.010
+  hh1 00  0xe4 5  0.010
+  hh2 00  0xe5 5  0.010
+  ccf 00  0xe2 5  0.010
+
+rbhf10B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 10  0xe3 5  0.010
+  hh1 10  0xe4 5  0.010
+  hh2 10  0xe5 5  0.010
+  ccf 10  0xe0 5  0.010
+
+rbhf10B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 10  0xe3 5  0.010
+  hh1 10  0xe4 5  0.010
+  hh2 10  0xe5 5  0.010
+  ccf 10  0xe1 5  0.010
+
+rbhf10B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 10  0xe3 5  0.010
+  hh1 10  0xe4 5  0.010
+  hh2 10  0xe5 5  0.010
+  ccf 10  0xe2 5  0.010
+
+rbhf20B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 20  0xe3 5  0.010
+  hh1 20  0xe4 5  0.010
+  hh2 20  0xe5 5  0.010
+  ccf 20  0xe0 5  0.010
+
+rbhf20B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 20  0xe3 5  0.010
+  hh1 20  0xe4 5  0.010
+  hh2 20  0xe5 5  0.010
+  ccf 20  0xe1 5  0.010
+
+rbhf20B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 20  0xe3 5  0.010
+  hh1 20  0xe4 5  0.010
+  hh2 20  0xe5 5  0.010
+  ccf 20  0xe2 5  0.010
+
+rbhf30B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 30  0xe3 5  0.010
+  hh1 30  0xe4 5  0.010
+  hh2 30  0xe5 5  0.010
+  ccf 30  0xe0 5  0.010
+
+rbhf30B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 30  0xe3 5  0.010
+  hh1 30  0xe4 5  0.010
+  hh2 30  0xe5 5  0.010
+  ccf 30  0xe1 5  0.010
+
+rbhf30B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 30  0xe3 5  0.010
+  hh1 30  0xe4 5  0.010
+  hh2 30  0xe5 5  0.010
+  ccf 30  0xe2 5  0.010
+
+rbhf40B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 40  0xe3 5  0.010
+  hh1 40  0xe4 5  0.010
+  hh2 40  0xe5 5  0.010
+  ccf 40  0xe0 5  0.010
+
+rbhf40B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 40  0xe3 5  0.010
+  hh1 40  0xe4 5  0.010
+  hh2 40  0xe5 5  0.010
+  ccf 40  0xe1 5  0.010
+
+rbhf40B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 40  0xe3 5  0.010
+  hh1 40  0xe4 5  0.010
+  hh2 40  0xe5 5  0.010
+  ccf 40  0xe2 5  0.010
+
+rbhf50B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 50  0xe3 5  0.010
+  hh1 50  0xe4 5  0.010
+  hh2 50  0xe5 5  0.010
+  ccf 50  0xe0 5  0.010
+
+rbhf50B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 50  0xe3 5  0.010
+  hh1 50  0xe4 5  0.010
+  hh2 50  0xe5 5  0.010
+  ccf 50  0xe1 5  0.010
+
+rbhf50B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 50  0xe3 5  0.010
+  hh1 50  0xe4 5  0.010
+  hh2 50  0xe5 5  0.010
+  ccf 50  0xe2 5  0.010
+
+rbhf60B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 60  0xe3 5  0.010
+  hh1 60  0xe4 5  0.010
+  hh2 60  0xe5 5  0.010
+  ccf 60  0xe0 5  0.010
+
+rbhf60B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 60  0xe3 5  0.010
+  hh1 60  0xe4 5  0.010
+  hh2 60  0xe5 5  0.010
+  ccf 60  0xe1 5  0.010
+
+rbhf60B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 60  0xe3 5  0.010
+  hh1 60  0xe4 5  0.010
+  hh2 60  0xe5 5  0.010
+  ccf 60  0xe2 5  0.010
+
+rbhf70B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 70  0xe3 5  0.010
+  hh1 70  0xe4 5  0.010
+  hh2 70  0xe5 5  0.010
+  ccf 70  0xe0 5  0.010
+
+rbhf70B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 70  0xe3 5  0.010
+  hh1 70  0xe4 5  0.010
+  hh2 70  0xe5 5  0.010
+  ccf 70  0xe1 5  0.010
+
+rbhf70B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  hhz 70  0xe3 5  0.010
+  hh1 70  0xe4 5  0.010
+  hh2 70  0xe5 5  0.010
+  ccf 70  0xe2 5  0.010
+
+#----------------------
+
+rbsm00B1
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  enz 00  0xe3 5  0.010
+  en1 00  0xe4 5  0.010
+  en2 00  0xe5 5  0.010
+  ccf 00  0xe0 5  0.010
+  lnz 00  0xe3 0  1.000
+  ln1 00  0xe4 0  1.000
+  ln2 00  0xe5 0  1.000
+  ccs 00  0xe0 0  1.000
+
+rbsm00B2
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  enz 00  0xe3 5  0.010
+  en1 00  0xe4 5  0.010
+  en2 00  0xe5 5  0.010
+  ccf 00  0xe1 5  0.010
+  lnz 00  0xe3 0  1.000
+  ln1 00  0xe4 0  1.000
+  ln2 00  0xe5 0  1.000
+  ccs 00  0xe1 0  1.000
+
+rbsm00B3
+# Chn Lc Src 1 2  Sint
+# --- -- ----- - ------
+  enz 00  0xe3 5  0.010
+  en1 00  0xe4 5  0.010
+  en2 00  0xe5 5  0.010
+  ccf 00  0xe2 5  0.010
+  lnz 00  0xe3 0  1.000
+  ln1 00  0xe4 0  1.000
+  ln2 00  0xe5 0  1.000
+  ccs 00  0xe2 0  1.000
