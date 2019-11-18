@@ -54,7 +54,10 @@ end
 
 # Start data acquisition
 
-#TEST isidl isi=coco@idahub.ucsd.edu:39137 zzz -bd
+#FOR TEST
+# isidl isi=<SYSTEM_NAME_HERE>@idahub.ucsd.edu:39137 zzz -bd
+#
+
 
 # SET UP FOR EXAMPLE STATION ZZZ
 #isidl q330=zzz00:1 q330=zzz10:1 zzz330 -bd
