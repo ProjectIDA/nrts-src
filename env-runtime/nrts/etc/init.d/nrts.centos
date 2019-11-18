@@ -7,6 +7,9 @@
 case "$1" in
 'start')
 
+    # need to make platform indepedent
+    . /etc/environment
+
     NRTSRC="$NRTS_HOME/etc/start/boot"
     if [ -f ${NRTSRC} ]; then
         echo "Starting NRTS"
