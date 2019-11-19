@@ -2,7 +2,7 @@ setenv PAGER more
 setenv EDITOR vi
 setenv NRTS_HOME $NRTS_HOME
 setenv IDA_DBDIR  $NRTS_HOME
-setenv Q330_ROOT  $NRTS_HOME
+setenv Q330_ROOT  $NRTS_HOME/etc
 #setenv CSS30_DATABASE_PATH "/usr/nrts/db/Antelope/IDA/{IDA}"
 setenv DBIO_DATABASE $NRTS_HOME
 setenv BLOCKSIZE 1024
