@@ -207,6 +207,7 @@ VOID LogPar(PARAM *par)
 {
     LogMsg(LOG_INFO, "Database    %s",  par->glob.db->dbid);
     LogMsg(LOG_INFO, "Home Dir    %s",  par->glob.root);
+    LogMsg(LOG_INFO, "Log         %s", par->log);
     LogMsg(LOG_INFO, "ISI Port    %hu", par->port);
     LogMsg(LOG_INFO, "NRTS Port   %hu", par->nrts);
     LogMsg(LOG_INFO, "StatusPort  %hu", par->status);
