@@ -26,7 +26,7 @@ static char *Copyright = "Copyright (C) 2003-2008 - Regents of the University of
 #define DEFAULT_BUFLEN         32768
 #define DEFAULT_RECVBUFLEN     DEFAULT_BUFLEN
 #define DEFAULT_SENDBUFLEN     DEFAULT_BUFLEN
-#define DEFAULT_BACKGROUND_LOG "syslogd:local3"
+#define DEFAULT_BACKGROUND_LOG "syslogd:local0"
 #define DEFAULT_FOREGROUND_LOG "-"
 #define DEFAULT_TIMEOUT        IACP_MINTIMEO
 #ifdef USE_FLATFILE_DB
