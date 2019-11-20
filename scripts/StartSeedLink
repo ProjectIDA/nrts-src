@@ -4,7 +4,7 @@
 # SeedLink startup script
 #
 
-foreach rcfile (/usr/nrts/.platform /usr/nrts/.envrc)
+foreach rcfile ($NRTS_HOME/.platform $NRTS_HOME/.envrc)
     if (-e $rcfile) then
         source $rcfile
     else
