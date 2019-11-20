@@ -46,7 +46,7 @@ if ($#argv == 1) then
     endsw
 endif
 
-echo "Usage: /usr/nrts/etc/init.d/ringserver { start | stop | restart | bounce }"
+echo "Usage: $NRTS_HOME/etc/init.d/ringserver { start | stop | restart | bounce }"
 exit 1
 
 # Start server
