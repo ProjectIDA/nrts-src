@@ -42,7 +42,7 @@ if ($?BOOT_BUILD_FLAG && -e $BOOT_BUILD_FLAG) then
         echo "isiCreateDiskLoops failed!"
         goto failure
     endif
-    chown -R nrts:nrts /usr/home/nrts
+    chown -R nrts:nrts $NRTS_HOME/nrts
     rm $BOOT_BUILD_FLAG
 endif
 
