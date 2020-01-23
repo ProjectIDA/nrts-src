@@ -29,9 +29,9 @@ static void help(char *myname)
     exit(1);
 }
 
-static void ListSupportedCommands(int device) 
+static void ListSupportedCommands(int device)
 {
-int i, maxlen; 
+int i, maxlen;
 char format[MAXPATHLEN+1];
 
     for (maxlen = 0, i = 0; TS_CMD_MAP[i].code != TS_CMD_NONE; i++) {
@@ -68,12 +68,12 @@ char *server = NULL, *cmdstr = NULL;
         } else if (strncasecmp(argv[i], "spc=", strlen("spc=")) == 0) {
             server = argv[i] + strlen("spc=");
         } else if (strncasecmp(argv[i], "bto=", strlen("bto=")) == 0) {
-            if ((opt.bto = atoi(argv[i])) <= 0) {
+            if ((opt.bto = atoi(argv[i] + strlen("bto="))) <= 0) {
                 fprintf(stderr, "ERROR: illegal bto '%s'\n", argv[i]);
                 help(argv[0]);
             }
         } else if (strncasecmp(argv[i], "rto=", strlen("rto=")) == 0) {
-            if ((opt.rto = atoi(argv[i])) <= 0) {
+            if ((opt.rto = atoi(argv[i] + strlen("rto="))) <= 0) {
                 fprintf(stderr, "ERROR: illegal rto '%s'\n", argv[i]);
                 help(argv[0]);
             }
