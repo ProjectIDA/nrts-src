@@ -117,8 +117,8 @@ static char *fid = "dccdbOpenDatabase";
     if (!dccdbReadChan(db)     ) return FreeDB(db);
     if (!dccdbReadSeedloc(db)  ) return FreeDB(db);
     if (!dccdbReadSite(db)     ) return FreeDB(db);
-    if (!dccdbReadStage(db)    ) return FreeDB(db);
     if (!dccdbReadUnits(db)    ) return FreeDB(db);
+    if (!dccdbReadStage(db)    ) return FreeDB(db);
     if (!GenerateB30(db)       ) return FreeDB(db);
     if (!dccdbBuildCascades(db)) return FreeDB(db);
 
