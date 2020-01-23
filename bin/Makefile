@@ -39,14 +39,15 @@ all: \
      stripcat \
      substring \
      trim \
+     tristar \
      ttylb \
      txtoida10 \
      uniqpath \
      vhfilt \
      xfer
-     #isi330 \
-     #tristar \
-     #tristar10
+#     tristar10
+
+     #isi330 
 
 idadcc: \
      idaresponse \
