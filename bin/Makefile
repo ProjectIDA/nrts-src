@@ -35,6 +35,7 @@ all: \
      qmon \
      qpp \
      qverify \
+     sbds \
      siomet \
      stripcat \
      substring \
