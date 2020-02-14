@@ -56,6 +56,9 @@ idadcc: \
     mseed \
     util
 
+addoss: FORCE
+	cd addoss; $(MAKE)
+
 cssio: FORCE
 	cd cssio; $(MAKE)
 
