@@ -2,6 +2,7 @@
 # Make all libraries
 
 all: \
+    addoss \
     cssio \
     dali \
     dbio \
