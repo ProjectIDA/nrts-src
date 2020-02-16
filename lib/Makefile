@@ -2,6 +2,7 @@
 # Make all libraries
 
 all: \
+    addoss \
     cssio \
     dali \
     dbio \
@@ -54,6 +55,9 @@ idadcc: \
     logio \
     mseed \
     util
+
+addoss: FORCE
+	cd addoss; $(MAKE)
 
 cssio: FORCE
 	cd cssio; $(MAKE)

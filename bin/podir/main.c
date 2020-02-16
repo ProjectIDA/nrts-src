@@ -26,6 +26,7 @@ static void help(char *myname)
     fprintf(stderr, "   KEEP=sta1,... => comma delimited list of stations to include (case sensitive)\n");
     fprintf(stderr, "exclude=sta1,... => comma delimited list of stations to exclude (case insensitive)\n");
     fprintf(stderr, "EXCLUDE=sta1,... => comma delimited list of stations to exclude (case sensitive)\n");
+    fprintf(stderr, "instance=# => index (1-based) of SITE instance to build. (e.g. ARU, KIV, PFO, XPF)\n");
     fprintf(stderr, "     debug=level => verbosity (0=terse output, higher numbers increase verbosity)\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "The keep/KEEP/exclude/EXCLUDE options are mutually exlusive.  Use only one or none.\n");
@@ -39,6 +40,8 @@ DCCDB *db;
 LOGIO *lp;
 BOOL verbose = FALSE;
 int i, logthreshold = PODIR_DEFAULT_THRESHOLD;
+int site_instance = 1;  // request instances of site. relevant for sites have more than 1 entry in the database (e.g. ARU, KIV, PFO, XPF).
+int site_count;         // instance counter used when searching for target instance.
 char dirpath[MAXPATHLEN+1], workdir[MAXPATHLEN+1], headerdir[MAXPATHLEN+1];
 char *net_id = NULL;;
 char *dbpath = NULL;
@@ -64,6 +67,8 @@ static char *fid = "main";
             if (!BuildStationSelectionList(argv[i] + strlen("KEEP="), PODIR_ACTION_INCLUDE, FALSE)) help(argv[0]);
         } else if (strncasecmp(argv[i], "net=", strlen("net=")) == 0) {
             net_id = argv[i] + strlen("net=");
+        } else if (strncasecmp(argv[i], "instance=", strlen("instance=")) == 0) {
+            site_instance = atoi(argv[i] + strlen("instance="));
         } else if (strncasecmp(argv[i], "debug=", strlen("debug=")) == 0) {
             logthreshold = atoi(argv[i] + strlen("debug="));
             if (logthreshold > PODIR_DEFAULT_THRESHOLD) verbose = TRUE;
@@ -158,11 +163,16 @@ static char *fid = "main";
 /* Loop over all the stations */
 
     for (i = 0; i < db->nsite; i++) {
-        if (ProcessThisSite(&db->site[i])) {
+        if ((i > 0) && (strcmp(db->site[i-1].sta, db->site[i].sta) == 0)) {
+            site_count++;
+        } else {
+            site_count = 1;
+        }
+        if ((site_count == site_instance) && ProcessThisSite(&db->site[i])) {
             LogMsg(2, "processing station '%s'\n", db->site[i].sta);
             ProcessSite(db, &db->site[i], net_id, headerdir);
         } else {
-            LogMsg(2, "skipping station '%s'\n", db->site[i].sta);
+            LogMsg(2, "skipping station:instance '%s:%d'\n", db->site[i].sta, site_count);
             continue;
         }
     }

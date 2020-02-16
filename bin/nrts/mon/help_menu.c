@@ -32,21 +32,25 @@ int ret, w1, h1, bx1, by1, w2, h2, bx2, by2;
 	helpwin_maxy = 12;
 	helpwin_maxx = 36;
 
-  getmaxyx(helpwin, w2, h2);
-  getbegyx(helpwin, by2, bx2);
+  /* getmaxyx(helpwin, w2, h2); */
+  /* getbegyx(helpwin, by2, bx2); */
   //w1 = statwin->_maxx;
   //h1 = statwin->_maxy;
   //bx1 = statwin->_begx;
   //by1 = statwin->_begy;
 
-  bx2 = w1/2 - 18;
-  by2 = by1 + 3;
+  /* bx2 = w1/2 - 18; */
+  /* by2 = by1 + 3; */
 
-  helpwin = subwin(statwin, helpwin_maxy, helpwin_maxx, by2, bx2);
-	
-/*
+ /* fprintf(stderr, "helpwin*= %d", helpwin); */
+ /* fprintf(stderr, "statwin:len =%d, beg_y = %d, winswide = %d", statwinlen, statwinbeg_y, winswide); */
+ /* fprintf(stderr, "statwin:h =%d, w = %d, by = %d, bx = %d\n", h1, w1, by1, bx1); */
+ /* fprintf(stderr, "helpwin:h =%d, w = %d, by = %d, bx = %d\n", h2, w2, by2, bx2); */
+  /* helpwin = subwin(statwin, helpwin_maxy, helpwin_maxx, by2, bx2); */
+
+
 	helpwin = newwin(helpwin_maxy, helpwin_maxx, helpwin_begy, helpwin_begx);
-*/
+
   getmaxyx(helpwin, w2, h2);
   getbegyx(helpwin, by2, bx2);
   //h2 = helpwin->_maxy;
@@ -57,8 +61,8 @@ int ret, w1, h1, bx1, by1, w2, h2, bx2, by2;
   mvcur(0, COLS-1, LINES-1, 0);
   endwin();
 
- fprintf(stderr, "statwin:h =%d, w = %d, by = %d, bx = %d\n", h1, w1, by1, bx1); 
- fprintf(stderr, "helpwin:h =%d, w = %d, by = %d, bx = %d\n", h2, w2, by2, bx2); 
+ fprintf(stderr, "statwin:h =%d, w = %d, by = %d, bx = %d\n", h1, w1, by1, bx1);
+ fprintf(stderr, "helpwin:h =%d, w = %d, by = %d, bx = %d\n", h2, w2, by2, bx2);
   exit(0);
 */
 	drawhelpwin(helpwin);
@@ -91,7 +95,7 @@ int ret, w1, h1, bx1, by1, w2, h2, bx2, by2;
 				break;
 			}
 		}
-	}  
+	}
 
 	nocbreak();
 	halfdelay(1);
@@ -176,7 +180,7 @@ int w1, h1, bx1, by1, w2, h2, bx2, by2;
   by2 = by1 + 3;
 
   helpwin = subwin(statwin, helpwin_maxy, helpwin_maxx, by2, bx2);
-	
+
 /*
 	helpwin = newwin(helpwin_maxy, helpwin_maxx, helpwin_begy, helpwin_begx);
 */
@@ -197,7 +201,7 @@ int w1, h1, bx1, by1, w2, h2, bx2, by2;
 
 	c = wgetch(helpwin);
 	mydelwin(helpwin);
-		
+
 }
 
 void nomoresys()
@@ -243,7 +247,7 @@ int w1, h1, bx1, by1, w2, h2, bx2, by2;
 
 	c = wgetch(helpwin);
 	mydelwin(helpwin);
-		
+
 }
 
 /* Revision History
