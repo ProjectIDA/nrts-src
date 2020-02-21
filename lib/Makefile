@@ -182,6 +182,7 @@ xfer: FORCE
 	cd xfer; $(MAKE)
 
 clean: FORCE
+	cd addoss;   $(MAKE) $@
 	cd cssio;    $(MAKE) $@
 	cd dali;     $(MAKE) $@
 	cd dbio;     $(MAKE) $@
@@ -221,6 +222,7 @@ clean: FORCE
 	cd xfer;     $(MAKE) $@
 
 remove: FORCE
+	cd addoss;   $(MAKE) $@
 	cd cssio;    $(MAKE) $@
 	cd dali;     $(MAKE) $@
 	cd dbio;     $(MAKE) $@
@@ -261,6 +263,7 @@ remove: FORCE
 	rm -rf ../../lib/$(PLATFORM)
 
 REMOVE: FORCE
+	cd addoss;   $(MAKE) $@
 	cd cssio;    $(MAKE) $@
 	cd dali;     $(MAKE) $@
 	cd dbio;     $(MAKE) $@
