@@ -8,14 +8,14 @@ set myname = "build"
 
 # General setup
 set debug = 0
-set install = 0
+set doinstall = 0
 
 # Command line setup
 set error = 0
 if ($#argv == 0) then
 else if ($#argv == 1) then
     set deployroot = $argv[1]
-    set install = 1
+    set doinstall = 1
 else
     set error = 1
 endif
@@ -28,7 +28,7 @@ if ($error) then
 endif
 
 # Check deploy directory exists
-if ($install) then
+if ($doinstall) then
     if (! -d $deployroot) then
         echo "ERROR: $deployroot does not exist"
         echo "ERROR: required directories are missing"
@@ -49,23 +49,32 @@ make
 
 
 # install to deployroot, if requested
-if ($install) then
+if ($doinstall) then
     # Work in the built binary directory
     set bindir = ../bin/$PLATFORM
-    cd $bindir
     if (! -d $bindir) then
         echo "ERROR: $bindir does not exist"
         goto failure
     endif
+    cd $bindir
 
-    # copy binaries
-    cp $bindir/* ${deployroot}/bin/
+    # deploy binaries
+    if (! -d ${deployroot}/bin) mkdir -p ${deployroot}/bin
+    chmod 755 ${deployroot}/bin/*
+    ls -l ${deployroot}/bin
+    \cp $bindir/* ${deployroot}/bin/
+    chmod 555 ${deployroot}/bin/*
 
-    # copy scripts
-    cp * scripts/* ${deployroot}/scripts/
-
+    # deploy scripts
+    if (! -d ${deployroot}/scripts) mkdir -p ${deployroot}/scripts
+    chmod 755 ${deployroot}/scripts/*
+    \cp scripts/* ${deployroot}/scripts/
+    chmod 555 ${deployroot}/scripts/*
     # copy init.d scripts
-    cp * scripts/init.d/* ${deployroot}/scripts/init.d/
+    if (! -d ${deployroot}/scripts/init.d) mkdir -p ${deployroot}/scripts/init.d
+    chmod -R 755 ${deployroot}/scripts/init.d
+    \cp scripts/init.d/* ${deployroot}/scripts/init.d/
+    chmod 555 ${deployroot}/scripts/init.d/*
 endif
 
 # Normal exit
