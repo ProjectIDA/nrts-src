@@ -30,9 +30,12 @@ endif
 # Check deploy directory exists
 if ($doinstall) then
     if (! -d $deployroot) then
-        echo "ERROR: $deployroot does not exist"
-        echo "ERROR: required directories are missing"
-        goto failure
+        echo "INFO: $deployroot does not exist"
+        mkdir -p $deployroot >& /dev/null
+        if ($status != 0) then
+            echo "ERROR: can not create the deploy directory: $deployroot"
+            goto failure
+        endif
     endif
 endif
 
@@ -44,37 +47,29 @@ source env-build/pathrc
 source env-build/aliases
 
 # do build
-make remove
+# make remove
 make
 
 
 # install to deployroot, if requested
 if ($doinstall) then
-    # Work in the built binary directory
-    set bindir = ../bin/$PLATFORM
-    if (! -d $bindir) then
-        echo "ERROR: $bindir does not exist"
-        goto failure
-    endif
-    cd $bindir
 
     # deploy binaries
     if (! -d ${deployroot}/bin) mkdir -p ${deployroot}/bin
-    chmod 755 ${deployroot}/bin/*
-    ls -l ${deployroot}/bin
-    \cp $bindir/* ${deployroot}/bin/
-    chmod 555 ${deployroot}/bin/*
+    chmod 755 ${deployroot}/bin/* >& /dev/null
+    \cp ../bin/${PLATFORM}/* ${deployroot}/bin/ >& /dev/null
+    chmod 555 ${deployroot}/bin/*  >& /dev/null
 
     # deploy scripts
     if (! -d ${deployroot}/scripts) mkdir -p ${deployroot}/scripts
-    chmod 755 ${deployroot}/scripts/*
-    \cp scripts/* ${deployroot}/scripts/
-    chmod 555 ${deployroot}/scripts/*
+    chmod 755 ${deployroot}/scripts/*  >& /dev/null
+    \cp scripts/* ${deployroot}/scripts/  >& /dev/null
+    chmod 555 ${deployroot}/scripts/*  >& /dev/null
     # copy init.d scripts
     if (! -d ${deployroot}/scripts/init.d) mkdir -p ${deployroot}/scripts/init.d
-    chmod -R 755 ${deployroot}/scripts/init.d
-    \cp scripts/init.d/* ${deployroot}/scripts/init.d/
-    chmod 555 ${deployroot}/scripts/init.d/*
+    chmod -R 755 ${deployroot}/scripts/init.d  >& /dev/null
+    \cp scripts/init.d/* ${deployroot}/scripts/init.d/  >& /dev/null
+    chmod 555 ${deployroot}/scripts/init.d/*  >& /dev/null
 endif
 
 # Normal exit
