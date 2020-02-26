@@ -62,12 +62,12 @@ static char *fid = "OpenIDA10dl";
 
     if ((entry.site = strdup(site)) == NULL) {
         LogMsg(LOG_ERR, "*** IGNORED ERROR *** %s: strdup: %s", fid, strerror(errno));
-        return;
+        return NULL;
     }
 
     if ((entry.dl = isidlOpenDiskLoop(glob, site, lp, ISI_RDWR, options)) == NULL) {
         LogMsg(LOG_ERR, "*** IGNORED ERROR *** %s: can't open '%s' IDA10 disk loop", fid, site);
-        return;
+        return NULL;
     }
     LogMsg(LOG_INFO, "ISI disk loop '%s' opened for IDA10 read/write", site);
     if (seedlink) InitSeedLinkOption(entry.dl, net);
@@ -75,12 +75,12 @@ static char *fid = "OpenIDA10dl";
 
     if (!listAppend(&head, &entry, sizeof(ENTRY))) {
         LogMsg(LOG_ERR, "*** IGNORED ERROR *** %s: listAppend: %s", fid, strerror(errno));
-        return;
+        return NULL;
     }
 
     if ((dl = GetIDA10dl(site, net, seedlink)) == NULL) {
         LogMsg(LOG_ERR, "*** IGNORED ERROR *** %s: can't get back my own DL???", fid);
-        return;
+        return NULL;
     }
 
     return dl;
