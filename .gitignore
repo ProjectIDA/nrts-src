@@ -10,6 +10,7 @@ windows
 **/*.swp
 *.a
 *.o
+*.code-workspace
 cmake-*
 CMakeLists.txt
 .idea
