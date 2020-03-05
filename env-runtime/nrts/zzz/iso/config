@@ -1,3 +1,0 @@
-set PktRev = 10
-set PktLen = 1024
-set DefaultMaxMbytes = 500
