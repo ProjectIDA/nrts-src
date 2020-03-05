@@ -14,7 +14,7 @@ set doinstall = 0
 set error = 0
 if ($#argv == 0) then
 else if ($#argv == 1) then
-    set deployroot = $argv[1]
+    set nrtsroot = $argv[1]
     set doinstall = 1
 else
     set error = 1
@@ -23,17 +23,17 @@ endif
 if ($error) then
     set message = "bad command line, error $error"
     echo "${myname}: $message"
-    echo "usage: $myname build-root deploy-root"
+    echo "usage: $myname nrtsrootdir"
     goto failure
 endif
 
 # Check deploy directory exists
 if ($doinstall) then
-    if (! -d $deployroot) then
-        echo "INFO: $deployroot does not exist"
-        mkdir -p $deployroot >& /dev/null
+    if (! -d $nrtsroot) then
+        echo "INFO: $nrtsroot does not exist"
+        mkdir -p $nrtsroot >& /dev/null
         if ($status != 0) then
-            echo "ERROR: can not create the deploy directory: $deployroot"
+            echo "ERROR: can not create the deploy directory: $nrtsroot"
             goto failure
         endif
     endif
@@ -47,29 +47,28 @@ source env-build/pathrc
 source env-build/aliases
 
 # do build
-# make remove
+make remove
 make
 
-
-# install to deployroot, if requested
+# install to nrtsroot, if requested
 if ($doinstall) then
 
     # deploy binaries
-    if (! -d ${deployroot}/bin) mkdir -p ${deployroot}/bin
-    chmod 755 ${deployroot}/bin/* >& /dev/null
-    \cp ../bin/${PLATFORM}/* ${deployroot}/bin/ >& /dev/null
-    chmod 555 ${deployroot}/bin/*  >& /dev/null
+    if (! -d ${nrtsroot}/bin) mkdir -p ${nrtsroot}/bin
+    chmod 755 ${nrtsroot}/bin/* >& /dev/null
+    \cp ../bin/${PLATFORM}/* ${nrtsroot}/bin/ >& /dev/null
+    chmod 555 ${nrtsroot}/bin/*  >& /dev/null
 
     # deploy scripts
-    if (! -d ${deployroot}/scripts) mkdir -p ${deployroot}/scripts
-    chmod 755 ${deployroot}/scripts/*  >& /dev/null
-    \cp scripts/* ${deployroot}/scripts/  >& /dev/null
-    chmod 555 ${deployroot}/scripts/*  >& /dev/null
+    if (! -d ${nrtsroot}/scripts) mkdir -p ${nrtsroot}/scripts
+    chmod 755 ${nrtsroot}/scripts/*  >& /dev/null
+    \cp scripts/* ${nrtsroot}/scripts/  >& /dev/null
+    chmod 555 ${nrtsroot}/scripts/*  >& /dev/null
     # copy init.d scripts
-    if (! -d ${deployroot}/scripts/init.d) mkdir -p ${deployroot}/scripts/init.d
-    chmod -R 755 ${deployroot}/scripts/init.d  >& /dev/null
-    \cp scripts/init.d/* ${deployroot}/scripts/init.d/  >& /dev/null
-    chmod 555 ${deployroot}/scripts/init.d/*  >& /dev/null
+    if (! -d ${nrtsroot}/scripts/init.d) mkdir -p ${nrtsroot}/scripts/init.d
+    chmod -R 755 ${nrtsroot}/scripts/init.d  >& /dev/null
+    \cp scripts/init.d/* ${nrtsroot}/scripts/init.d/  >& /dev/null
+    chmod 555 ${nrtsroot}/scripts/init.d/*  >& /dev/null
 endif
 
 # Normal exit
