@@ -1,8 +1,7 @@
 #!/bin/sh
 #
-# start/stop NRTS processes
+# start/stop NRTS processes - FreeBSD v7-v10
 #
-# $Id: nrts,v 1.1 2015/12/18 18:56:59 dechavez Exp $
 
 . /etc/rc.subr
 
@@ -13,7 +12,7 @@ stop_cmd="${name}_stop"
 
 nrts_start()
 {
-    NRTSRC="/usr/nrts/etc/start/boot"
+    NRTSRC="{{ nrts_home }}/etc/start/boot"
     if [ -f ${NRTSRC} ]; then
         echo "Starting NRTS"
         csh ${NRTSRC} > /dev/null &
@@ -27,7 +26,6 @@ nrts_stop()
     pkill -TERM -x isidl
     pkill -TERM -x isi330
     pkill -TERM -x i10dld
-    pkill -TERM -x ispd
     pkill -TERM -x nrts_edes
     pkill -TERM -x qhlp
     pkill -TERM -x tristar10
@@ -40,7 +38,3 @@ nrts_stop()
 load_rc_config ${name}
 run_rc_command "$@"
 
-# $Log: nrts,v $
-# Revision 1.1  2015/12/18 18:56:59  dechavez
-# created for FreeBSD 10.1
-#

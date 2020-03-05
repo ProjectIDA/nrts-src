@@ -7,7 +7,7 @@
 case "$1" in
 'start')
 
-    NRTSRC="/usr/nrts/etc/start/boot"
+    NRTSRC="{{ nrts_home }}/etc/start/boot"
     if [ -f ${NRTSRC} ]; then
         echo "Starting NRTS"
         csh ${NRTSRC} > /dev/null &
@@ -16,24 +16,19 @@ case "$1" in
         
 'stop')
     echo "Stopping NRTS"
-    pkill -TERM -x AlphaSend
-    pkill -TERM -x drmd
     pkill -TERM -x isid
     pkill -TERM -x isidl
-    pkill -TERM -x isimerge
-    pkill -TERM -x ispd
-    pkill -TERM -x nrts_alpha
+    pkill -TERM -x i10dld
+    pkill -TERM -x isi330
     pkill -TERM -x nrts_edes
-    pkill -TERM -x nrts_wrtdl
     pkill -TERM -x qhlp
     pkill -TERM -x tristar10
     pkill -TERM -x paro10
-    pkill -TERM -x auz_isi
     pkill -TERM -x sbds
     sleep 2
     pkill -TERM -x ringserver
     ;;
 *)
-    echo "Usage: /etc/init.d/nrts { start | stop }"
+    echo "Usage: {{ nrts_home }}/scripts/init.d/nrts { start | stop }"
     ;;
 esac
