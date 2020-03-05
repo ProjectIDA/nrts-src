@@ -17,6 +17,13 @@ LIBRARIES  += $(LIBDIR)/libutil.a
 LIBRARIES  += $(LIBDIR)/libseed.a
 LIBRARIES  += $(LIBDIR)/libmseed.a
 LIBRARIES  += $(LIBDIR)/libdmc.a
+LIBRARIES  += $(LIBDIR)/libxfer.a
+LIBRARIES  += $(LIBDIR)/libnrts.a
+LIBRARIES  += $(LIBDIR)/libida.a
+LIBRARIES  += $(LIBDIR)/libida10.a
+LIBRARIES  += $(LIBDIR)/libisidb.a
+LIBRARIES  += $(LIBDIR)/liblogio.a
+LIBRARIES  += $(LIBDIR)/libdbio.a
 #OUTPUT = xfer_tap xfer_prt xfer_tocss xfer_togse xfer_tosac xfer_toseed eztap
 OUTPUT = xfer_tap eztap
 
