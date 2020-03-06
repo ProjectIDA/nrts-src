@@ -10,7 +10,6 @@ if (`whoami` == root) then
         set prompt="`hostname`# "
 else
     set myname = nrts
-    set home   = $NRTS_HOME
     set rcfiles = ""
     set rcfiles = "$rcfiles ~/.platform"
     set rcfiles = "$rcfiles ~/.envrc"
@@ -21,6 +20,7 @@ else
         if (-e $rcfile) source $rcfile
     end
 
+    set home   = $NRTS_HOME
     if ( $?prompt ) then
         stty erase ^H
         set prompt="$myname@$nodename \!> "
