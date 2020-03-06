@@ -64,11 +64,18 @@ if ($doinstall) then
     chmod 755 ${nrtsroot}/scripts/*  >& /dev/null
     \cp scripts/* ${nrtsroot}/scripts/  >& /dev/null
     chmod 555 ${nrtsroot}/scripts/*  >& /dev/null
+
     # copy init.d scripts
     if (! -d ${nrtsroot}/scripts/init.d) mkdir -p ${nrtsroot}/scripts/init.d
     chmod -R 755 ${nrtsroot}/scripts/init.d  >& /dev/null
     \cp scripts/init.d/* ${nrtsroot}/scripts/init.d/  >& /dev/null
     chmod 555 ${nrtsroot}/scripts/init.d/*  >& /dev/null
+
+    # copy default ~nrts/etc environment
+    if (! -d ${nrtsroot}/etc) mkdir -p ${nrtsroot}/etc
+    \cp -pR env-runtime/nrts/etc/* ${nrtsroot}/etc/  >& /dev/null
+    # chmod 555 ${nrtsroot}/scripts/init.d/*  >& /dev/null
+
 endif
 
 # Normal exit
