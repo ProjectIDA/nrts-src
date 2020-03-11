@@ -63,12 +63,6 @@ if ($doinstall) then
     \cp scripts/* ${nrtsroot}/scripts/  >& /dev/null
     chmod 555 ${nrtsroot}/scripts/*  >& /dev/null
 
-    # copy init.d scripts
-    if (! -d ${nrtsroot}/scripts/init.d) mkdir -p ${nrtsroot}/scripts/init.d
-    chmod -R 755 ${nrtsroot}/scripts/init.d  >& /dev/null
-    \cp scripts/init.d/* ${nrtsroot}/scripts/init.d/  >& /dev/null
-    chmod 555 ${nrtsroot}/scripts/init.d/*  >& /dev/null
-
 endif
 
 # Normal exit
