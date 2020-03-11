@@ -19,6 +19,7 @@ all: \
      i10dld \
      isidl \
      isildl \
+     isiwww \
      isimkdl \
      misc \
      msdmx \
