@@ -1,8 +1,7 @@
 #!/bin/tcsh -f
 #
 # Build and optionally deploy NRTS binaries and scripts
-# MUST BE RUN FROM THE NRTS SRC Root directory
-
+# MUST BE RUN FROM THE NRTS SRC Root directory where this script lives
 
 set myname = "build"
 
@@ -27,7 +26,7 @@ if ($error) then
     goto failure
 endif
 
-# Check deploy directory exists
+Check deploy directory exists
 if ($doinstall) then
     if (! -d $nrtsroot) then
         echo "INFO: $nrtsroot does not exist"
@@ -47,7 +46,6 @@ source env-build/pathrc
 source env-build/aliases
 
 # do build
-make remove
 make
 
 # install to nrtsroot, if requested
@@ -70,11 +68,6 @@ if ($doinstall) then
     chmod -R 755 ${nrtsroot}/scripts/init.d  >& /dev/null
     \cp scripts/init.d/* ${nrtsroot}/scripts/init.d/  >& /dev/null
     chmod 555 ${nrtsroot}/scripts/init.d/*  >& /dev/null
-
-    # copy default ~nrts/etc environment
-    if (! -d ${nrtsroot}/etc) mkdir -p ${nrtsroot}/etc
-    \cp -pR env-runtime/nrts/etc/* ${nrtsroot}/etc/  >& /dev/null
-    # chmod 555 ${nrtsroot}/scripts/init.d/*  >& /dev/null
 
 endif
 
