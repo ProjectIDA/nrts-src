@@ -58,7 +58,6 @@ switch ($os)
     set candidate = "$candidate etc/rc2.d"
     set candidate = "$candidate etc/rc3.d"
     set candidate = "$candidate etc/rcS.d"
-    set candidate = "$candidate etc/init.d"
     set candidate = "$candidate etc/hosts.allow"
     set candidate = "$candidate etc/hosts.deny"
     set candidate = "$candidate etc/hostname*"
