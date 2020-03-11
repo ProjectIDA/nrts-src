@@ -3,7 +3,7 @@
 #
 # Bounce NRTS
 #
-# This should really be implemented as an extension of ~etc/init.d/nrts, but
+# This should really be implemented as an extension of ~scripts/init.d/nrts, but
 # that's an "sh" script and I am really busy right now and just want to get
 # this done for benefit of ida.adc1 that is having some odd problem with
 # memory consumption that I am convinced is hardware related but for which
@@ -52,13 +52,13 @@ endif
 # Bounce NRTS
 
 if ($debug) logger -t $myname"[$$]" -p local0.info "Stopping NRTS"
-$NRTS_HOME/etc/init.d/nrts stop >& /dev/null
+$NRTS_HOME/scripts/init.d/nrts stop >& /dev/null
 
 if ($debug) logger -t $myname"[$$]" -p local0.info "sleep($delay)"
 sleep $delay
 
 if ($debug) logger -t $myname"[$$]" -p local0.info "Starting NRTS"
-$NRTS_HOME/etc/init.d/nrts start >& /dev/null
+$NRTS_HOME/scripts/init.d/nrts start >& /dev/null
 
 exit 0
 
