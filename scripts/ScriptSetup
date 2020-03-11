@@ -1,7 +1,5 @@
-# $Id: ScriptSetup,v 1.24 2017/01/13 17:34:44 dechavez Exp $
 # General purpose setup for NRTS/ISP scripts
 
-#setenv NRTS_HOME /usr/nrts
 if (-e $NRTS_HOME/UNCONFIGURED) exit 0
 
 # Ensure the required ancillary files are all present
@@ -22,8 +20,6 @@ set path = ($NRTS_HOME/bin     $path)
 set path = ($NRTS_HOME/scripts $path)
 if (-e /opt/local/bin) set path = (/opt/local/bin $path)
 if (-e /usr/local/bin) set path = (/usr/local/bin $path)
-
-if (-e /ida/local/bin) set path = ($path /ida/local/bin)
 
 set SystemsFile = $NRTS_HOME/etc/Systems
 if (-e $SystemsFile && -e $NRTS_HOME/bin/stripcat) then
