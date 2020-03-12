@@ -1,6 +1,6 @@
 set MyPath = (.)
 set MyPath = ($MyPath /usb/0/scripts)
-set MyPath = ($MyPath ~/scripts/init.d)
+set MyPath = ($MyPath ~/etc/init.d)
 set MyPath = ($MyPath ~/scripts)
 set MyPath = ($MyPath ~/bin)
 set MyPath = ($MyPath ~/SeedLink/bin)
