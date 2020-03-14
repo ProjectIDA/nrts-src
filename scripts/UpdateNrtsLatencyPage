@@ -18,8 +18,3 @@ set stationdir = "Stations"
 set command = "isiwww isiserver=$isiserver webserver=$webserver webpath=$webpath stationdir=$stationdir htdocpath=$htdocpath"
 $command
 
-# for testing into 'TelemetryTest" directory. idahub only
-if ($isiserver == idahub.ucsd.edu) then
-    set command = "isiwww2 isiserver=$isiserver webserver=$webserver webpath=$webpathTEST stationdir=$stationdir htdocpath=$htdocpath"
-    $command
-endif
