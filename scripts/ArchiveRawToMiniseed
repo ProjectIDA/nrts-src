@@ -19,6 +19,8 @@ if ($#argv == 3) then
     set lsite = `echo $argv[1] | lcase`
     set year  = $argv[2]
     set oday = $argv[3]
+    set raw_root_dir = $argv[4]
+    set ms_root_dir = $argv[5]
 else
     set error = 1
 endif
@@ -32,8 +34,8 @@ if ($error) then
 endif
 
 # construct src and dst dirs
-set rawdir = $IDA_ARCHIVE_RAW_DIR/$lsite/$year/$oday
-set msdir = $IDA_ARCHIVE_MS_DIR/$lsite/$year/$oday
+set rawdir = $raw_root_door/$lsite/$year/$oday
+set msdir = $ms_root_dir/$lsite/$year/$oday
 # Nothing to do if src directory doesn't exist
 
 if (! -d $rawdir) then
@@ -88,7 +90,7 @@ else
 endif
 # run through dataselect
 
-set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.23.59.59.999999 -A ${IDA_ARCHIVE_MS_DIR}/${lsite}/${year}/${oday}/%n.%s.%l.%c.%Y.%j $tmpfn"
+set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.23.59.59.999999 -A ${msdir}/%n.%s.%l.%c.%Y.%j $tmpfn"
 if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
 $command
 if ($status != 0) then
@@ -96,11 +98,11 @@ if ($status != 0) then
     logger -t $myname"[$$]" -p local0.info "FAILED: $command"
     goto failure
 endif
-echo $command >>! ${IDA_ARCHIVE_MS_DIR}/${myname}.log
+echo $command >>! ${ms_root_dir}/${myname}.log
 
 
-set command = "msi -S ${IDA_ARCHIVE_MS_DIR}/${lsite}/${year}/${oday}/II.*.*.*.*.*"
-set invfn   = ${IDA_ARCHIVE_MS_DIR}/${lsite}/${year}/${oday}/inventory
+set command = "msi -S ${msdir}/II.*.*.*.*.*"
+set invfn   = ${msdir}/inventory
 if ($debug) logger -t $myname"[$$]" -p local0.info "$command '>!' $invfn"
 $command >! $invfn
 set savestat = $status

@@ -31,28 +31,34 @@ if ($status != 0) then
 endif
 
 
-if ($#argv != 2) then
+if ($#argv != 3) then
     logger -t $myname"[$$]" -p local0.info "bad command line"
-    echo "usage: $myname archive_dir stage_dir"
+    echo "usage: $myname raw_root_dir ms_root_dir stage_root_dir"
     goto failure
 endif
 
-set ArchiveDir = $argv[1]
-if (! -d $ArchiveDir) then
-    set message = "missing $ArchiveDir"
+set RawArchiveDir = $argv[1]
+if (! -d $RawArchiveDir) then
+    set message = "missing $RawArchiveDir"
     logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
 
-if ($#argv == 2) then
-    set StageDir = $argv[2]
-    if (! -d $StageDir) then
-        set message = "missing $StageDir"
-        logger -t $myname"[$$]" -p local0.info "$message"
-        echo "${myname}: $message"
-        goto failure
-    endif
+set MSArchiveDir = $argv[2]
+if (! -d $MSArchiveDir) then
+    set message = "missing $MSArchiveDir"
+    logger -t $myname"[$$]" -p local0.info "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+
+set StageDir = $argv[3]
+if (! -d $StageDir) then
+    set message = "missing $StageDir"
+    logger -t $myname"[$$]" -p local0.info "$message"
+    echo "${myname}: $message"
+    goto failure
 endif
 
 if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
@@ -74,9 +80,9 @@ endif
 foreach site ($SiteList)
 
     set tee = $NRTS_HOME/$site/tee
-    set archive = $ArchiveDir/$site
-    if (! -d $archive) then
-        set command = "mkdir $archive"
+    set raw_archive = $RawArchiveDir/$site
+    if (! -d $raw_archive) then
+        set command = "mkdir $raw_archive"
         if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
         if ($status != 0) then
@@ -98,7 +104,7 @@ foreach site ($SiteList)
         $command
     endif
 
-    set command = "ArchiveGzFiles $tee $archive"
+    set command = "ArchiveGzFiles $tee $site $RawArchiveDir $MSArchiveDir"
     if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
     $command
 

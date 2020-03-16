@@ -31,11 +31,14 @@ if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
 # Command line setup
 
 set error = 0
-if ($#argv == 2) then
+if ($#argv == 4) then
     set srcdir  = $argv[1]
-    set dstroot = $argv[2]
-    set site    = `basename $dstroot | ucase`
-    set lsite    = `basename $dstroot | lcase`
+    set lsite   = `echo $argv[2] | lcase`
+    set RawArchiveDir = $argv[3]
+    set MSArchiveDir = $argv[4]
+    set raw_dstroot = $RawArchiveDir/$lsite
+    set ms_dstroot = $MSArchiveDir/$lsite
+    set site    = `echo lsite | ucase`
 else
     set error = 1
 endif
@@ -44,13 +47,13 @@ if ($error) then
     set message = "bad command line, error $error"
     logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
-    echo "usage: $myname srcdir dstdir"
+    echo "usage: $myname srcdir lsite raw_root_dir ms_root_dir"
     goto failure
 endif
 
 # Nothing to do if the directories don't exist
 
-foreach dir ($srcdir $dstroot)
+foreach dir ($srcdir $raw_dstroot $ms_dstroot)
     if (! -d $dir) then
         logger -t $myname"[$$]" -p local0.info "ERROR: no such dir $dir"
         set error = 1
@@ -85,7 +88,7 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
             set msdays = ($msdays $date)
 
             # File will be put in $destdir (<sta>/<YYYY>/<jjj>)
-            set destdir = $dstroot/$date
+            set destdir = $raw_dstroot/$date
             if (! -d $destdir) then
                 set command = "mkdir -p $destdir"
                 if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
@@ -130,7 +133,7 @@ foreach day ($msdays)
     set year      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
     set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
 
-    ArchiveRawToMiniseed ${lsite} ${year} ${jday}
+    ArchiveRawToMiniseed ${lsite} ${year} ${jday} ${RawArchiveDir} ${MSArchiveDir}
 end
 
 
