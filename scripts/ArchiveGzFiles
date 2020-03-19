@@ -12,7 +12,7 @@ set myname = ArchiveGzFiles
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.error "$message"
     echo "${myname}: $message"
     goto failure
 endif
@@ -26,7 +26,7 @@ else
     set debug = 0
 endif
 
-if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "begin"
 
 # Command line setup
 
@@ -45,7 +45,7 @@ endif
 
 if ($error) then
     set message = "bad command line, error $error"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.error "$message"
     echo "${myname}: $message"
     echo "usage: $myname srcdir lsite raw_root_dir ms_root_dir"
     goto failure
@@ -55,7 +55,7 @@ endif
 
 foreach dir ($srcdir $raw_dstroot)
     if (! -d $dir) then
-        logger -t $myname"[$$]" -p local0.info "ERROR: no such dir $dir"
+        logger -t $myname"[$$]" -p local0.error "ERROR: no such dir $dir"
         set error = 1
     endif
 end
@@ -66,7 +66,7 @@ if (! -d $ms_dstroot) then
 endif
 
 if ($error) then
-    logger -t $myname"[$$]" -p local0.info "ERROR: required directories are missing"
+    logger -t $myname"[$$]" -p local0.error "ERROR: required directories are missing"
     goto failure
 endif
 
@@ -74,7 +74,7 @@ endif
 
 cd $srcdir
 if ($status != 0) then
-    logger -t $myname"[$$]" -p local0.info "ERROR: can't chdir $srcdir"
+    logger -t $myname"[$$]" -p local0.error "ERROR: can't chdir $srcdir"
     goto failure
 endif
 
@@ -96,34 +96,34 @@ foreach file ([4-9]???????????????????????.gz [4-9]???????????????????????.GZ)
             set destdir = $raw_dstroot/$date
             if (! -d $destdir) then
                 set command = "mkdir -p $destdir"
-                if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+                if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
                 $command
             endif
             if (! -d $destdir) then
-                logger -t $myname"[$$]" -p local0.info "ERROR: missing $destdir"
+                logger -t $myname"[$$]" -p local0.error "ERROR: missing $destdir"
                 rm $dummy
                 goto failure
             endif
             set destpath = `uniqpath suflen=3 $file $destdir`
             set command = "cp -p $file $destpath"
-            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+            if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
             $command
             if ($status != 0) then
-                logger -t $myname"[$$]" -p local0.info "FAILED: $command"
+                logger -t $myname"[$$]" -p local0.error "FAILED: $command"
                 rm $dummy
                 goto failure
             endif
 
             set command = "chmod 444 $destpath"
-            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+            if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
             $command
             set command = "dupchk $destpath"
-            if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+            if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
             $command
-            if ($status != 0) logger -t $myname"[$$]" -p local0.info "WARNING: $command FAILED (ignored)"
+            if ($status != 0) logger -t $myname"[$$]" -p local0.error "WARNING: $command FAILED (ignored)"
         end
         set command = "rm -f $file"
-        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+        if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
         $command
     endif
 end
@@ -139,7 +139,7 @@ foreach day ($msdays)
     set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
 
     set command = "ArchiveRawToMiniseed ${lsite} ${year} ${jday} ${RawArchiveDir} ${MSArchiveDir}"
-    if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+    if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
     $command
 end
 
@@ -147,10 +147,10 @@ end
 # Normal exit
 
 success:
-if ($debug) logger -t $myname"[$$]" -p local0.info "completed OK"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "completed OK"
 exit 0
 
 failure:
-logger -t $myname"[$$]" -p local0.info "exit 1"
+logger -t $myname"[$$]" -p local0.error "exit 1"
 exit 1
 
