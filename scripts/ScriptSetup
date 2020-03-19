@@ -1,11 +1,9 @@
 # General purpose setup for NRTS/ISP scripts
 
-if (-e $NRTS_HOME/UNCONFIGURED) exit 0
-
 # Ensure the required ancillary files are all present
 
 foreach file (.platform .envrc etc/retain)
-    set reqfile = $NRTS_HOME/$file
+    set reqfile = ~nrts/$file
     if ( -e $reqfile ) then
         source $reqfile
     else
@@ -13,6 +11,8 @@ foreach file (.platform .envrc etc/retain)
         exit 1
     endif
 end
+
+if (-e $NRTS_HOME/UNCONFIGURED) exit 0
 
 set status = 0
 
