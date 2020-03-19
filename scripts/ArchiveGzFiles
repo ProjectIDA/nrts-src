@@ -53,12 +53,17 @@ endif
 
 # Nothing to do if the directories don't exist
 
-foreach dir ($srcdir $raw_dstroot $ms_dstroot)
+foreach dir ($srcdir $raw_dstroot)
     if (! -d $dir) then
         logger -t $myname"[$$]" -p local0.info "ERROR: no such dir $dir"
         set error = 1
     endif
 end
+
+if (! -d $ms_dstroot) then
+    mkdir -p $ms_dstroot >& /dev/null
+    if ($? != 0) set error = 1
+endif
 
 if ($error) then
     logger -t $myname"[$$]" -p local0.info "ERROR: required directories are missing"
@@ -133,7 +138,9 @@ foreach day ($msdays)
     set year      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
     set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
 
-    ArchiveRawToMiniseed ${lsite} ${year} ${jday} ${RawArchiveDir} ${MSArchiveDir}
+    set command = "ArchiveRawToMiniseed ${lsite} ${year} ${jday} ${RawArchiveDir} ${MSArchiveDir}"
+    if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+    $command
 end
 
 
