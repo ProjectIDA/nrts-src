@@ -10,12 +10,11 @@ endif
 set webserver = ida.ucsd.edu
 
 set list = ""
-set list = "$list idahub.ucsd.edu"
-#set list = "$list xidahub.ucsd.edu"
-#set list = "$list gci.ida.ucsd.edu"
-set list = "$list femto.ucsd.edu"
-set list = "$list ida.iris.washington.edu"
-set list = "$list ida.adc1.iris.edu"
+set list = "$list idahub7.ucsd.edu"
+#set list = "$list idahub.ucsd.edu"
+#set list = "$list femto.ucsd.edu"
+#set list = "$list ida.iris.washington.edu"
+#set list = "$list ida.adc1.iris.edu"
 
 foreach isiserver ($list)
     /usr/nrts/scripts/UpdateNrtsLatencyPage $isiserver $webserver
