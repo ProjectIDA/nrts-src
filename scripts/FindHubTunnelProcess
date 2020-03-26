@@ -54,12 +54,13 @@ endif
 
 set dataport = `echo $hostports | awk '{print $2}'`
 set sshport = `echo $hostports | awk '{print $3}'`
+set hubhost = "localhost" ## "`hostname`.`dnsdomainname`"
 
 if ($debug) logger -t $myname"[$$]" -p local0.info "Tunnel Info: $hostname $dataport $sshport"
 
 foreach port ($dataport $sshport)
 
-    set sshdprocess = `sudo lsof -i tcp -u tunnel | egrep "^sshd.*idahub.ucsd.edu:$port \(L" | awk '{print $9,$1,"pid:",$2}' | sort | rev | column -t | rev`
+    set sshdprocess = `sudo lsof -i tcp -u tunnel | egrep "^sshd.*${hubhost}:$port \(L" | awk '{print $9,$1,"pid:",$2}' | sort | rev | column -t | rev`
     if ("$sshdprocess" != "") then
         set sshdpid = $sshdprocess[4]
         if ($debug) logger -t $myname"[$$]" -p local0.info "found sshd process $sshdpid for: ${hostname}:${port}"
