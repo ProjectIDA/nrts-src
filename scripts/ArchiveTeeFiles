@@ -104,10 +104,12 @@ foreach site ($SiteList)
     $command
 
     set stage = $StageDir/$site
+    set command = "StageGzFiles $tee $stage"
     if (-d $stage) then
-        set command = "StageGzFiles $tee $stage"
         if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
         $command
+    else
+        if ($debug) logger -t $myname"[$$]" -p local0.info "${stage} not found. Skipping: $command"
     endif
 
     set command = "ArchiveGzFiles $tee $site $RawArchiveDir $MSArchiveDir"
