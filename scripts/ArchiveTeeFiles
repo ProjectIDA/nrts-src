@@ -81,6 +81,12 @@ foreach site ($SiteList)
 
     set tee = $NRTS_HOME/$site/tee
     set raw_archive = $RawArchiveDir/$site
+
+    if (! -d $tee) then
+        if ($debug) logger -t $myname"[$$]" -p local0.info "Skipping $site. No tee dir found ($tee)."
+        continue
+    endif
+
     if (! -d $raw_archive) then
         set command = "mkdir $raw_archive"
         if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
