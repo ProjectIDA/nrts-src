@@ -1,5 +1,4 @@
 #!/bin/csh -f
-# $Id: ArchiveTeeFiles,v 1.10 2015/06/17 17:25:44 dechavez Exp $
 #
 # Compress tee files and move them to the archive
 set myname = ArchiveTeeFiles
@@ -31,9 +30,9 @@ if ($status != 0) then
 endif
 
 
-if ($#argv != 3) then
+if (($#argv != 3) && ($#argv != 4)) then
     logger -t $myname"[$$]" -p local0.info "bad command line"
-    echo "usage: $myname raw_root_dir ms_root_dir stage_root_dir"
+    echo "usage: $myname raw_root_dir ms_root_dir css_root_dir [net]"
     goto failure
 endif
 
@@ -47,18 +46,24 @@ endif
 
 set MSArchiveDir = $argv[2]
 if (! -d $MSArchiveDir) then
-    set message = "missing $MSArchiveDir"
+    set message = "missing $MSSArchiveDir"
     logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
 endif
 
-set StageDir = $argv[3]
-if (! -d $StageDir) then
-    set message = "missing $StageDir"
+set CSSArchiveDir = $argv[3]
+if (! -d $CSSArchiveDir) then
+    set message = "missing $CSSArchiveDir"
     logger -t $myname"[$$]" -p local0.info "$message"
     echo "${myname}: $message"
     goto failure
+endif
+
+if ($#argv == 4) then
+    set net = $argv[4]
+else
+    set net = 'II'
 endif
 
 if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
@@ -103,16 +108,7 @@ foreach site ($SiteList)
     if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
     $command
 
-    set stage = $StageDir/$site
-    set command = "StageGzFiles $tee $stage"
-    if (-d $stage) then
-        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
-        $command
-    else
-        if ($debug) logger -t $myname"[$$]" -p local0.info "${stage} not found. Skipping: $command"
-    endif
-
-    set command = "ArchiveGzFiles $tee $site $RawArchiveDir $MSArchiveDir"
+    set command = "ArchiveGzFiles $tee $site $RawArchiveDir $MSArchiveDir $CSSArchiveDir $net"
     if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
     $command
 

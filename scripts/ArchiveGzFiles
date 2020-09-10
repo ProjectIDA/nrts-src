@@ -3,7 +3,8 @@
 # Move all .gz (and .GZ) tee files from the named source dir to
 # year/day subdirectories in the named destination dir
 # and convert gz (ida10) files to miniseed, run through dataselect to
-# geenrate a 'buddir' like directory & file structure
+# geenrate a 'buddir' like directory & file structure. From the miniseed 
+# generate a CSS archive with nice clean day boundaries
 
 set myname = ArchiveGzFiles
 
@@ -31,14 +32,21 @@ if ($debug) logger -t $myname"[$$]" -p local0.debug "begin"
 # Command line setup
 
 set error = 0
-if ($#argv == 4) then
+if (($#argv == 5) || ($#argv == 6)) then
     set srcdir  = $argv[1]
     set lsite   = `echo $argv[2] | lcase`
     set RawArchiveDir = $argv[3]
     set MSArchiveDir = $argv[4]
+    set CSSArchiveDir = $argv[5]
     set raw_dstroot = $RawArchiveDir/$lsite
     set ms_dstroot = $MSArchiveDir/$lsite
+    set css_dstroot = $CSSArchiveDir/$lsite
     set site    = `echo lsite | ucase`
+    if ($#argv == 6) then
+	set net = $argv[6]
+    else
+	set net = 'II'
+    endif
 else
     set error = 1
 endif
@@ -51,7 +59,7 @@ if ($error) then
     goto failure
 endif
 
-# Nothing to do if the directories don't exist
+# Nothing to do if the src directories don't exist
 
 foreach dir ($srcdir $raw_dstroot)
     if (! -d $dir) then
@@ -62,6 +70,11 @@ end
 
 if (! -d $ms_dstroot) then
     mkdir -p $ms_dstroot >& /dev/null
+    if ($? != 0) set error = 1
+endif
+
+if (! -d $css_dstroot) then
+    mkdir -p $css_dstroot >& /dev/null
     if ($? != 0) set error = 1
 endif
 
@@ -138,7 +151,11 @@ foreach day ($msdays)
     set year      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\1/"`
     set jday      = `echo ${day} | sed -e "s/\([0-9]\{4\}\)\/\([0-9]\{3\}\)/\2/"`
 
-    set command = "ArchiveRawToMiniseed ${lsite} ${year} ${jday} ${RawArchiveDir} ${MSArchiveDir}"
+    set command = "ArchiveRawToMiniseed ${lsite} ${year} ${jday} ${RawArchiveDir} ${MSArchiveDir} ${net}"
+    if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
+    $command
+
+    set command = "ArchiveMiniseedToCSS ${lsite} ${year} ${jday} ${MSArchiveDir} ${CSSArchiveDir}"
     if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
     $command
 end

@@ -30,13 +30,20 @@ if ($debug) logger -t $myname"[$$]" -p local0.debug "begin"
 # Command line setup
 
 set error = 0
-if ($#argv == 5) then
+if (($#argv == 5) || ($#argv == 6)) then
     set site = `echo $argv[1] | ucase`
     set lsite = `echo $argv[1] | lcase`
     set year  = $argv[2]
     set oday = $argv[3]
     set raw_root_dir = $argv[4]
     set ms_root_dir = $argv[5]
+    if ($#argv == 6) then
+	set net = $argv[6]
+    else
+	set net = 'II'
+    endif
+else
+
 else
     set error = 1
 endif
@@ -78,10 +85,10 @@ endif
 set tmpfn = /tmp/$myname.$lsite.$$.ms
 rm -rf $tmpfn >& /dev/null
 
-set command = "cat $gzfiles | imseed sta=$lsite >>! $tmpfn"
+set command = "cat $gzfiles | imseed net=$net sta=$lsite >>! $tmpfn"
 if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
 
-(cat $gzfiles | imseed sta=$lsite >>! $tmpfn) >>& /dev/null
+(cat $gzfiles | imseed net=$net sta=$lsite >>! $tmpfn) >>& /dev/null
 
 if ($status != 0) then
     logger -t $myname"[$$]" -p local0.error "ERROR: Could not convert gzfiles to miniseed: $lsite $year $oday"
@@ -102,11 +109,11 @@ if (! -d $msdir ) then
         goto failure
     endif
 else
-    rm -rf $msdir/*.${year}.${oday} >& /dev/null
+    rm -rf $msdir/*.ms >& /dev/null
 endif
 # run through dataselect
 
-set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.23.59.59.999999 -A ${msdir}/%n.%s.%l.%c.%Y.%j $tmpfn"
+set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.23.59.59.999999 -A ${msdir}/%n.%s.%l.%c.%Y.%j.ms $tmpfn"
 if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
 $command
 if ($status != 0) then
@@ -117,7 +124,7 @@ endif
 echo $command >>! ${ms_root_dir}/${myname}.log
 
 
-set command = "msi -S ${msdir}/II.*.*.*.*.*"
+set command = "msi -S ${msdir}/*.ms"
 set invfn   = ${msdir}/inventory
 if ($debug) logger -t $myname"[$$]" -p local0.debug "$command '>!' $invfn"
 $command >! $invfn

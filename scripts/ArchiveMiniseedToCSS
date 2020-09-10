@@ -1,0 +1,142 @@
+#!/bin/tcsh -f
+#
+# Convert one or more miniseed files in the named miniseed archive 
+# site/year/day dir to CSS3.0 and place in the parallel CSS archive dir.
+# uses MSDMX to convert mniniseed data and then moves output
+# CSS and wfdisc files to appropriate directory
+
+
+# General setup
+set myname = `basename $0`
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    set message = "missing $setup"
+    logger -t $myname"[$$]" -p local0.error "$message"
+    echo "${myname}: $message"
+    goto failure
+endif
+source $setup
+
+# Check for debug flag
+
+if (-e $DebugDir/$myname) then
+    set debug = 1
+else
+    set debug = 0
+endif
+
+if ($debug) logger -t $myname"[$$]" -p local0.debug "begin"
+
+# Command line setup
+
+set error = 0
+if ($#argv == 5) then
+    set site = `echo $argv[1] | ucase`
+    set lsite = `echo $argv[1] | lcase`
+    set year  = $argv[2]
+    set oday = $argv[3]
+    set ms_root_dir = $argv[4]
+    set css_root_dir = $argv[5]
+else
+    set error = 1
+endif
+
+if ($error) then
+    set message = "Bad command line, error $error"
+    logger -t $myname"[$$]" -p local0.error "$message"
+    echo "${myname}: $message"
+    echo "usage: $myname site year oday"
+    goto failure
+endif
+
+# prep tmp locations
+set tmpdir = /tmp/$myname.$lsite.cssdir.$$
+rm -rf $tmpdir >& /dev/null
+set tmpfn = /tmp/$myname.$lsite.log.$$
+rm -rf $tmpfn >& /dev/null
+
+# construct src and dst dirs
+set msdir = $ms_root_dir/$lsite/$year/$oday
+set cssdir = $css_root_dir/$lsite/$year/$oday
+
+# Nothing to do if src directory doesn't exist
+if (! -d $msdir) then
+    logger -t $myname"[$$]" -p local0.error "ERROR: Source dir not found: $msdir"
+    goto failure
+endif
+
+# Work in the source directory
+
+cd $msdir
+
+if ($status != 0) then
+    logger -t $myname"[$$]" -p local0.error "ERROR: can't chdir $msdir"
+    goto failure
+endif
+
+set msfiles = (`ls *.ms`)
+if ($status != 0) then
+    logger =t $myname"[$$]" -p local0.error "No miniseeds files found in $msdir."
+    goto failure
+endif
+
+
+
+set command = "cat $msfiles | msdmx outdir=$tmpdir >>! $tmpfn"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
+
+(cat $msfiles | msdmx outdir=$tmpdir >>! $tmpfn) >>& /dev/null
+
+if ($status != 0) then
+    logger -t $myname"[$$]" -p local0.error "ERROR: Could not convert miniseed to CSS: $lsite $year $oday"
+    goto failure
+endif
+
+if (! -d $cssdir ) then
+    mkdir -p $cssdir   # make sure it exists
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p local0.error "ERROR: can't mkdir $cssdir"
+        goto failure
+    endif
+
+    chmod g+w $cssdir   # make sure it is group writable
+    if ($status != 0) then
+        logger -t $myname"[$$]" -p local0.error "ERROR: error making $cssdir group writable"
+        goto failure
+    endif
+else
+    rm -rf $cssdir/${oday}.wfdisc >& /dev/null
+    rm -rf $cssdir/data >& /dev/null
+endif
+
+# copy CSS data from /tmp to destination in CSS archive
+set command = "cp -p $tmpdir/css.wfdisc $cssdir/${oday}.wfdisc"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
+$command
+if ($status != 0) then
+    logger -t $myname"[$$]" -p local0.error "FAILED: $command"
+    goto failure
+endif
+
+set command = "cp -rp $tmpdir/data $cssdir/"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
+$command
+if ($status != 0) then
+    logger -t $myname"[$$]" -p local0.error "FAILED: $command"
+    goto failure
+endif
+
+
+success:
+rm -rf $tmpdir >& /dev/null
+rm -rf $tmpfn >& /dev/null
+if ($debug) logger -t $myname"[$$]" -p local0.debug "completed OK"
+exit 0
+
+failure:
+rm -rf $tmpdir >& /dev/null
+rm -rf $tmpfn >& /dev/null
+logger -t $myname"[$$]" -p local0.error "exit 1"
+exit 1
+
