@@ -13,7 +13,7 @@ if (! -e $setup ) then
 endif
 source $setup
 
-set mode      = 644
+set mode      = 664
 set adm       = nrtsmgr
 set tmp       = /tmp/$myname.$$
 set nrtslog   = $NRTS_HOME/log/nrtslog
