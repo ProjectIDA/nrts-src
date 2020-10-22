@@ -13,6 +13,7 @@ source $setup
 set envrc  = ~nrts/.envrc
 
 foreach sta ($SystemsList)
+	echo "### ${sta} ###"
 	set seqnum = `isildl $sta | grep "seqno = " | awk '{print $3$4$5}'`
 	set seqnumstr = "beg=$seqnum"
 	set cmd = `egrep "^ *isidl.* ${sta} " ~nrts/etc/start/boot`
@@ -20,4 +21,5 @@ foreach sta ($SystemsList)
 		echo "$cmd $seqnumstr"
 	endif
 	egrep "^ *#+ *isidl.* ${sta} " ~nrts/etc/start/boot
+	echo
 end
