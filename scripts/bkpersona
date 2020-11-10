@@ -92,7 +92,7 @@ switch ($os)
 endsw
 
 # NRTS files
-set nrts = usr/nrts
+set nrts = usr/home/nrts
 
 set candidate = "$candidate $nrts/etc"
 set candidate = "$candidate $nrts/.vim"
