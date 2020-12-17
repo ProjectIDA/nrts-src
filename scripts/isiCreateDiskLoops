@@ -37,7 +37,7 @@ foreach site ($SiteList)
     endif
 
     mkdir $SiteDir/tee >& /dev/null
-    mkdir $SiteDir/iso/done $SiteDir/iso/done/images $SiteDir/iso/done/gziped >& /dev/null
+    mkdir $SiteDir/iso/stage $SiteDir/iso/done $SiteDir/iso/done/images $SiteDir/iso/done/gziped >& /dev/null
 end
 
 success:
