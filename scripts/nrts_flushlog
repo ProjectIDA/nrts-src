@@ -67,7 +67,7 @@ foreach process ($list)
     if (-e $logdir) then
         set log = $logdir/$yyyyddd
         touch $log
-        fgrep -i $process $tmp >> $log
+        fgrep -i ${process}: $tmp >> $log
         chmod $mode $log
         find $logdir -mtime $FlushLogFindValue -a -exec rm -f {} \;
     endif
