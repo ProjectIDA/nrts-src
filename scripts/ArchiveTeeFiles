@@ -1,5 +1,4 @@
 #!/bin/csh -f
-# $Id: ArchiveTeeFiles,v 1.10 2015/06/17 17:25:44 dechavez Exp $
 #
 # Compress tee files and move them to the archive
 set myname = ArchiveTeeFiles
@@ -31,9 +30,9 @@ if ($status != 0) then
 endif
 
 
-if ($#argv != 3) then
+if (($#argv != 2) && ($#argv != 3)) then
     logger -t $myname"[$$]" -p local0.info "bad command line"
-    echo "usage: $myname raw_root_dir ms_root_dir stage_root_dir"
+    echo "usage: $myname raw_root_dir ms_root_dir [stage_root_dir]"
     goto failure
 endif
 
@@ -53,12 +52,17 @@ if (! -d $MSArchiveDir) then
     goto failure
 endif
 
-set StageDir = $argv[3]
-if (! -d $StageDir) then
-    set message = "missing $StageDir"
-    logger -t $myname"[$$]" -p local0.info "$message"
-    echo "${myname}: $message"
-    goto failure
+if ($#argv != 3) then
+    set use_staging_dir = 0
+else
+    set use_staging_dir = 1
+    set StageDir = $argv[3]
+    if (! -d $StageDir) then
+        set message = "missing $StageDir"
+        logger -t $myname"[$$]" -p local0.info "$message"
+        echo "${myname}: $message"
+        goto failure
+    endif
 endif
 
 if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
@@ -103,13 +107,15 @@ foreach site ($SiteList)
     if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
     $command
 
-    set stage = $StageDir/$site
-    set command = "StageGzFiles $tee $stage"
-    if (-d $stage) then
-        if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
-        $command
-    else
-        if ($debug) logger -t $myname"[$$]" -p local0.info "${stage} not found. Skipping: $command"
+    if ($use_staging_dir == 1) then
+       set stage = $StageDir/$site
+       set command = "StageGzFiles $tee $stage"
+       if (-d $stage) then
+           if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+           $command
+       else
+           if ($debug) logger -t $myname"[$$]" -p local0.info "${stage} not found. Skipping: $command"
+       endif
     endif
 
     set command = "ArchiveGzFiles $tee $site $RawArchiveDir $MSArchiveDir"
