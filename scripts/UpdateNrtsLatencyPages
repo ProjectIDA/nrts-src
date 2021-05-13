@@ -11,6 +11,8 @@ set webserver = ida.ucsd.edu
 
 set list = ""
 set list = "$list idahub.ucsd.edu"
+set list = "$list pri.hub.projectida.net"
+#set list = "$list sec.hub.projectida.net"
 set list = "$list femto.ucsd.edu"
 set list = "$list ida.iris.washington.edu"
 set list = "$list ida.adc1.iris.edu"
