@@ -77,6 +77,7 @@ switch ($os)
     set candidate = "$candidate etc/resolv.conf"
     set candidate = "$candidate etc/ntp.conf"
     set candidate = "$candidate etc/hosts"
+    set candidate = "$candidate etc/hosts.allow"
     set candidate = "$candidate etc/motd"
     set candidate = "$candidate etc/sudoers"
     set candidate = "$candidate etc/rsyslog.d"
