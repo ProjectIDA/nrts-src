@@ -9,6 +9,8 @@ extern char *VersionIdentString;
 #include "isi.h"
 #include "iacp.h"
 
+#define DEFAULT_USER "nrts"
+
 #define TXTOIDA10_OPTION_LCASE 0x00000001
 #define TXTOIDA10_DEFAULT_DEPTH 20
 

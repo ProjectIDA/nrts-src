@@ -15,6 +15,7 @@ static void help(char *myname)
     fprintf(stderr, "log=name               - set log file name (or syslod:facility)\n");
     fprintf(stderr, "dl=server:port[:depth] - write to remote disk loop\n");
     fprintf(stderr, "tee=name               - copy input strings to named file\n");
+    fprintf(stderr, "user=username          - run as user username\n");
     fprintf(stderr, "\n");
     fprintf(stderr, "If the remote disk loop option is selected then output to stdout is supressed.\n");
     fprintf(stderr, "    server - name or dot decimal IP address of server\n");
@@ -54,6 +55,7 @@ int i, lineno=0, status, rev = 1;
 char buf[MAXLINELEN+1];
 char *log = NULL, *dl = NULL, *tee = NULL;
 DECODE_FUNC DecodeFunc;
+static char *user = DEFAULT_USER;
 LNKLST *list;
 LNKLST_NODE *crnt;
 UINT32 options = 0;
@@ -74,6 +76,8 @@ LOGIO *lp;
             log = argv[i] + strlen("log=");
         } else if (strncmp(argv[i], "tee=", strlen("tee=")) == 0) {
             tee = argv[i] + strlen("tee=");
+        } else if (strncmp(argv[i], "user=", strlen("user=")) == 0) {
+            user = argv[i] + strlen("user=");
         } else if (strcasecmp(argv[i], "-lcase") == 0) {
             options |= TXTOIDA10_OPTION_LCASE;
         } else if (strncasecmp(argv[i], "dl=", strlen("dl=")) == 0) {
@@ -93,6 +97,8 @@ LOGIO *lp;
         fprintf(stderr, "unsupported line format '%d'\n", rev);
         exit(1);
     }
+
+    utilSetIdentity(user);
 
     lp = InitLogging(argv[0], log);
     if (dl != NULL && !SetDlOutput(dl, lp)) {
