@@ -83,6 +83,17 @@ UINT64 nsec_per_tic, EpochYearFactor = 0;
         ttag->status.receiver = ttag->q330.qual.bitmap;
         ttag->status.init = (ttag->q330.qual.bitmap & QDP_CQ_HAS_BEEN_LOCKED) == 0 ? FALSE : TRUE;
         ttag->status.avail = (ttag->q330.qual.bitmap & QDP_PLL_MASK) == QDP_PLL_OFF ? FALSE : TRUE;
+
+        /* check for erroneous tqual values < 10 and > 100 and set to 10 (which is what it should be).
+           this is due to long-standing bug in ./src/lib/qdp/clock.c that resulted in lcq's that rolled over
+           This can be removed once clock.c fix has been rolled out to ALL stations (including GSRAS).
+           Also not this is really a kludge and does not 'fix' qual.percentages that rolled over to 100, 90 or 80 or 70
+        */
+        if (((ttag->q330.qual.percent > 0) && (ttag->q330.qual.percent < 10)) ||
+            (ttag->q330.qual.percent > 100) ||
+            ((ttag->q330.qual.percent % 10 > 0) && (ttag->q330.qual.percent > 60)) ||
+            (ttag->q330.qual.percent == 70)) ttag->q330.qual.percent = INTERNAL_Q330_CLOCK_SUSPECT_THRESHOLD;
+
         ttag->status.locked = (ttag->q330.qual.percent >= INTERNAL_Q330_CLOCK_LOCKED_THRESHOLD) ? TRUE : FALSE;
         ttag->status.suspect = (ttag->q330.qual.percent < INTERNAL_Q330_CLOCK_SUSPECT_THRESHOLD) ? TRUE : FALSE;
         ttag->status.percent = ttag->q330.qual.percent;
