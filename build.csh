@@ -22,7 +22,7 @@ endif
 if ($error) then
     set message = "bad command line, error $error"
     echo "${myname}: $message"
-    echo "usage: $myname nrtsrootdir"
+    echo "usage: $myname [ nrts_home_dir ]"
     goto failure
 endif
 

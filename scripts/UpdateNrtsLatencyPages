@@ -11,12 +11,13 @@ set webserver = ida.ucsd.edu
 
 set list = ""
 set list = "$list idahub.ucsd.edu"
-#set list = "$list xidahub.ucsd.edu"
-#set list = "$list gci.ida.ucsd.edu"
+set list = "$list pri.hub.projectida.net"
+#set list = "$list sec.hub.projectida.net"
 set list = "$list femto.ucsd.edu"
 set list = "$list ida.iris.washington.edu"
 set list = "$list ida.adc1.iris.edu"
 
+# set list = "$list ec2-54-203-27-193.us-west-2.compute.amazonaws.com"
 foreach isiserver ($list)
     /usr/nrts/scripts/UpdateNrtsLatencyPage $isiserver $webserver
 end

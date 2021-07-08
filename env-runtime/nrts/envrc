@@ -1,6 +1,10 @@
 setenv PAGER more
 setenv EDITOR vi
-setenv NRTS_HOME $NRTS_HOME
+
+# set default home dir to /home/nrts
+# CHANGE AS NEEDED IF NRTS USER HOME DIR WILL BE ELSEWHERE 
+setenv NRTS_HOME /home/nrts
+
 setenv IDA_DBDIR  $NRTS_HOME
 setenv Q330_ROOT  $NRTS_HOME/etc
 setenv DBIO_DATABASE $NRTS_HOME

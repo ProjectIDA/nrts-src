@@ -36,7 +36,7 @@ set spth    = `echo "$stahost_spth" | awk -F':' '{print $2}'`
 set tpth = $argv[2]
 
 
-set setup  = /usr/nrts/scripts/ScriptSetup
+set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     echo "${myname}: missing $setup"
     exit 1

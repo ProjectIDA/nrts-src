@@ -14,7 +14,7 @@ endif
 set site = $argv[1]
 shift
 
-set setup  = /usr/nrts/scripts/ScriptSetup
+set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     echo "${myname}: missing $setup"
     exit 1

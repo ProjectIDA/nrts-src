@@ -23,7 +23,7 @@ TIME_SERIES new;
 static char *fid = "ReadInput:StartNewTimeseries";
 
     new.hdr = record->hdr;
-    if ((new.dat = (INT32 *) malloc(record->hdr.nsamp * sizeof(INT32))) == NULL) { 
+    if ((new.dat = (INT32 *) malloc(record->hdr.nsamp * sizeof(INT32))) == NULL) {
         LogErr("ERROR: %s: malloc: %s\n", fid, strerror(errno));
         GracefulExit(MY_MOD_ID + 3);
     }
@@ -59,7 +59,7 @@ TIME_SERIES *ts;
 static char *fid = "LocateContinuousTimeseries";
 
     crnt = listFirstNode(list);
-    while (crnt != NULL) { 
+    while (crnt != NULL) {
         ts = (TIME_SERIES *) crnt->payload;
         if (SignaturesMatch(&ts->hdr, &record->hdr)) {
             tear = mseedTimeTearInSamples(&ts->hdr, &record->hdr);
@@ -112,7 +112,7 @@ static char *fid = "ReadInput";
 FILE *fp;
 int i, count=0;
 
-    if ((list = listCreate()) == NULL) { 
+    if ((list = listCreate()) == NULL) {
         LogErr("%s: listCreate: %s\n", fid, strerror(errno));
         GracefulExit(MY_MOD_ID + 6);
     }
@@ -120,15 +120,15 @@ int i, count=0;
     while (mseedReadRecord(stdin, &record)) {
         if (!IsOneSpsLHchannel(&record)) continue;       /* Only process 1Hz LH* channels */
         if (record.hdr.format == MSEED_FORMAT_INT_32) {  /* Only accept INT32 data */
-            if ((ts = LocateContinuousTimeseries(list, &record)) == NULL) { 
+            if ((ts = LocateContinuousTimeseries(list, &record)) == NULL) {
                 StartNewTimeseries(list, &record);
             } else {
                 AppendTimeseries(ts, &record);
-            }       
+            }
         } else {
             RejectUnsupportedFormat(&record);
         }
-    }       
+    }
 
     if (!feof(stdin)) {
         LogErr("%s: mseedReadRecord: %s\n", fid, strerror(errno));
@@ -164,7 +164,9 @@ int i, count=0;
 
 /* Revision History
  *
- * $Log: read.c,v $
+ * Revision 1.5  2021/06/21 22:37:00  dauerbach
+ * Check tqual when comparing MSEED_HDR sig fields.
+ *
  * Revision 1.4  2015/12/08 22:39:36  dechavez
  * various minor tweaks to get clean Mac OS X builds
  *

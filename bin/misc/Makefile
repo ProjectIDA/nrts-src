@@ -20,6 +20,7 @@ OUTPUT += lcase
 OUTPUT += lttoa
 OUTPUT += ucase
 OUTPUT += unix2dos
+OUTPUT += validate
 #OUTPUT += cd2
 #OUTPUT += cd2
 #OUTPUT += i4echo
@@ -34,7 +35,6 @@ OUTPUT += unix2dos
 #OUTPUT += selrec
 #OUTPUT += stability
 #OUTPUT += ts
-#OUTPUT += validate
 #OUTPUT += ydtodmdy
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE

@@ -6,20 +6,18 @@
 set debug  = 1
 set myname = isiGenerateWfdiscFiles
 
-if ($debug) logger -t $myname"[$$]" -p local0.info "begin"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "begin"
 
 # General setup
 
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.error "$message"
     echo "${myname}: $message"
     exit 1
 endif
 source $setup
-set envrc  = $NRTS_HOME/.envrc
-if (-e $envrc) source $envrc
 
 set workdir = $NRTS_HOME/tmp/$myname.$$
 set master  = master.wfdisc
@@ -40,7 +38,7 @@ else if ($#argv == 2) then
     set wfdir  = $argv[2]
 else
     set message = "bad command line"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.error "$message"
     echo "${myname}: $message"
     exit 1
 endif
@@ -50,7 +48,7 @@ set sed_string = s\;/usr/nrts\;$wfdir\;
 
 filelock $lock $$
 if ($status != 0) then
-    if ($debug) logger -t $myname"[$$]" -p local0.info "another instance already active"
+    if ($debug) logger -t $myname"[$$]" -p local0.debug "another instance already active"
     goto success
 endif
 
@@ -64,7 +62,7 @@ mkdir $workdir
 set exitstatus = $status
 if ($exitstatus != 0) then
     set message = "can't mkdir $workdir : status = $exitstatus"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.error "$message"
     goto failure
 endif
 
@@ -72,24 +70,24 @@ cd $workdir
 set exitstatus = $status
 if ($exitstatus != 0) then
     set message = "can't cd $workdir : status = $exitstatus"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.error "$message"
     goto failure
 endif
 cp /dev/null $master
 
-if ($debug) logger -t $myname"[$$]" -p local0.info "creating master wfdisc"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "creating master wfdisc"
 set command = "isi server=localhost wd"
-if ($debug) logger -t $myname"[$$]" -p local0.info "$command"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
 $command | sed $sed_string | sed 's/ i4 / s4 /' >> $master
 set exitstatus = $status
 if ($exitstatus != 0) then
     set message = "command failed : status = $exitstatus"
-    logger -t $myname"[$$]" -p local0.info "$message"
+    logger -t $myname"[$$]" -p local0.error "$message"
     goto failure
 endif
 if ( -z $master) goto success
 
-if ($debug) logger -t $myname"[$$]" -p local0.info "creating station wfdiscs"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "creating station wfdiscs"
 foreach station ($SystemsList)
     set stawfdisc = $station.wfdisc
     rm -f $stawfdisc
@@ -100,7 +98,7 @@ end
 
 set dates = `cat $master | wdjdays | sort | uniq | tail -10`
 
-if ($debug) logger -t $myname"[$$]" -p local0.info "creating network day wfdiscs"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "creating network day wfdiscs"
 foreach date ($dates)
     validate $date >& /dev/null
     if ($status == 0) then
@@ -135,12 +133,12 @@ rm $outdir/dummy.wfdisc
 success:
 cd $outdir
 rm -rf $workdir
-if ($debug) logger -t $myname"[$$]" -p local0.info "exit 0"
+if ($debug) logger -t $myname"[$$]" -p local0.debug "exit 0"
 exit 0
 
 failure:
 cd $outdir
 rm -rf $workdir
-logger -t $myname"[$$]" -p local0.info "exit 1"
+logger -t $myname"[$$]" -p local0.error "exit 1"
 exit 1
 

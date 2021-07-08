@@ -77,13 +77,14 @@ switch ($os)
     set candidate = "$candidate etc/resolv.conf"
     set candidate = "$candidate etc/ntp.conf"
     set candidate = "$candidate etc/hosts"
-    set candidate = "$candidate etc/motd"
+    set candidate = "$candidate etc/hosts.allow"
     set candidate = "$candidate etc/sudoers"
     set candidate = "$candidate etc/rsyslog.d"
     set candidate = "$candidate etc/fstab"
     set candidate = "$candidate etc/exports"
     set candidate = "$candidate etc/ssh/*key*"
     set candidate = "$candidate var/spool/cron"
+    set candidate = "$candidate etc/sysconfig/network-scripts/route-*"
     breaksw
   default:
     echo "'$os' is not a supported operating system."
@@ -92,7 +93,7 @@ switch ($os)
 endsw
 
 # NRTS files
-set nrts = usr/nrts
+set nrts = usr/home/nrts
 
 set candidate = "$candidate $nrts/etc"
 set candidate = "$candidate $nrts/.vim"

@@ -21,6 +21,7 @@ all: \
      isildl \
      isiwww \
      isimkdl \
+     jd \
      misc \
      msdmx \
      msgrep \
@@ -55,6 +56,7 @@ idadcc: \
      idaresponse \
      isiwww \
      jd \
+     last24 \
      podir \
      soh_blk
 
@@ -129,6 +131,9 @@ isiwww: FORCE
 
 jd: FORCE
 	cd jd; $(MAKE) install
+
+last24: FORCE
+	cd last24; $(MAKE) install
 
 misc: FORCE
 	cd misc; $(MAKE) install
@@ -261,6 +266,8 @@ clean: FORCE
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
+	cd jd;         $(MAKE) $@
+	cd last24;     $(MAKE) $@
 	cd misc;       $(MAKE) $@
 	cd msdmx;      $(MAKE) $@
 	cd msgrep;     $(MAKE) $@
@@ -307,6 +314,8 @@ remove: FORCE
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
+	cd jd;         $(MAKE) $@
+	cd last24;     $(MAKE) $@
 	cd misc;       $(MAKE) $@
 	cd msdmx;      $(MAKE) $@
 	cd msgrep;     $(MAKE) $@
@@ -355,6 +364,8 @@ REMOVE: FORCE
 	cd isidl;      $(MAKE) $@
 	cd isildl;     $(MAKE) $@
 	cd isimkdl;    $(MAKE) $@
+	cd jd;         $(MAKE) $@
+	cd last24;     $(MAKE) $@
 	cd misc;       $(MAKE) $@
 	cd msdmx;      $(MAKE) $@
 	cd msgrep;     $(MAKE) $@
