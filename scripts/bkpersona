@@ -50,6 +50,7 @@ switch ($os)
     set candidate = "$candidate etc/ntp.conf"
     set candidate = "$candidate etc/hosts"
     set candidate = "$candidate etc/motd"
+    set candidate = "$candidate etc/pf.conf"
     set candidate = "$candidate etc/ssh/*key*"
     breaksw
   case SunOS:
