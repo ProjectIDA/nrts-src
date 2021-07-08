@@ -13,7 +13,6 @@
 static BOOL SignaturesMatch(MSEED_HDR *a, MSEED_HDR *b)
 {
     if (strcmp(a->sig, b->sig) != 0) return FALSE;
-    if (a->tqual != b->tqual) return FALSE;
     return TRUE;
 }
 
