@@ -8,6 +8,7 @@
 
 UINT8 qdpClockQuality(QDP_TOKEN_CLOCK *dp_clock, QDP_MN232_DATA *mn232)
 {
+INT32 tmpval;
 UINT8 result;
 
     if (mn232->qual >= QDP_PLL_TRACK || (mn232->qual & QDP_CQ_IS_LOCKED) != 0) {
@@ -19,11 +20,12 @@ UINT8 result;
         }
     } else if ((mn232->qual & QDP_CQ_HAS_BEEN_LOCKED) != 0) {
         if (dp_clock->maxlim != 0) {
-            result = dp_clock->maxhbl - (mn232->loss / dp_clock->maxlim);
+            tmpval = dp_clock->maxhbl - (mn232->loss / dp_clock->maxlim);
         } else {
-            result = dp_clock->maxhbl;
+            tmpval = dp_clock->maxhbl;
         }
-        if (result < dp_clock->minhbl) result = dp_clock->minhbl;
+        if (tmpval < dp_clock->minhbl) tmpval = dp_clock->minhbl;
+        result = tmpval;
     } else {
         result = dp_clock->nbl;
     }
