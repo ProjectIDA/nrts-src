@@ -20,7 +20,7 @@ else
 endif
 
 set sta = $DefaultSite
-set meta = /usr/nrts/${sta}330/meta
+set meta = ~nrts/${sta}330/meta
 if (! -e $meta) then
     echo "Station '$sta' is not configured as a Q330 based site."
     exit 0
