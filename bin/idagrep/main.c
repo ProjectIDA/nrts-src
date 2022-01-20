@@ -52,7 +52,7 @@ int i, ntoken, sf;
 char *copy, *arg, *token[IDA10_MAX_SUBFORMAT];
 
     if (input == NULL) {
-        for (i = 0; i < IDA10_MAX_SUBFORMAT; i++) subformat[i] = 1;
+        for (i = 0; i <= IDA10_MAX_SUBFORMAT; i++) subformat[i] = 1;
         return TRUE;
     }
 
