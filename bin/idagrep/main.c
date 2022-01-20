@@ -21,7 +21,7 @@ typedef struct {
     UINT16 filt;
     char cname[IDA10_CNAMLEN + 1];
 } CF;
-static int subformat[IDA10_MAX_SUBFORMAT];
+static int subformat[IDA10_MAX_SUBFORMAT + 1]; // subformat is zero-based
 static CF cf[MAX_CF];
 static int ncf = -1;
 
