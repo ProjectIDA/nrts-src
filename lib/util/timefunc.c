@@ -30,6 +30,7 @@
  *       14       dd mnth yyyy (ddd)
  *       15       hh:mm:ss
  *       16       yyyyddd mm dd, yyyy hh:mm:ss
+ *       17       yyyy:ddd-hh:mm:ss.u, microseconds
  *
  *  No newline is appended.
  *
@@ -117,7 +118,7 @@ static char *day_name[] = {
 static char *UnsupportedCode = "<UNSUPPORTED FORMAT CODE>";
 
 #define MINIMUM_CODE 0
-#define MAXIMUM_CODE 16
+#define MAXIMUM_CODE 17
 static char   *EmptyString[MAXIMUM_CODE - MINIMUM_CODE + 1] = {
     "                     ",
     "                         ",
@@ -322,6 +323,9 @@ static char mtunsafe[] = "xxxxxxxxxxxxxxxxxxxxxxxxx plus some extra";
             break;
         case 16:
             sprintf((char *) buf,"%04d%03d %s %d, %04d %02d:%02d:%02d", tm.tm_year, tm.tm_yday, month_name[tm.tm_mon], tm.tm_mday, tm.tm_year, tm.tm_hour, tm.tm_min, tm.tm_sec);
+            break;
+        case 17:
+            sprintf((char *) buf,"%4.4d:%3.3d-%2.2d:%2.2d:%09.6lf", dt.year, dt.doy, dt.hour, dt.minute, dt.second);
             break;
 
         default:
