@@ -150,9 +150,9 @@ static char mt_unsafe_buffer[1024];
 
     sprintf(msgbuf, "%-4s", hdr->sname);
     sprintf(msgbuf + strlen(msgbuf), " %-5s", hdr->cname);
-    sprintf(msgbuf + strlen(msgbuf), " %s", utilDttostr(hdr->tofs, 0, tbuf));
+    sprintf(msgbuf + strlen(msgbuf), " %s", utilDttostr(hdr->tofs, 17, tbuf));
     sprintf(msgbuf + strlen(msgbuf), " %s", ClockStatusString(&hdr->cmn.ttag.beg.status, tbuf));
-    sprintf(msgbuf + strlen(msgbuf), " %s", utilDttostr(hdr->tols, 0, tbuf));
+    sprintf(msgbuf + strlen(msgbuf), " %s", utilDttostr(hdr->tols, 17, tbuf));
     sprintf(msgbuf + strlen(msgbuf), " %s", ClockStatusString(&hdr->cmn.ttag.beg.status, tbuf));
     sprintf(msgbuf + strlen(msgbuf), " %6.3lf", hdr->sint);
     sprintf(msgbuf + strlen(msgbuf), " %3d", hdr->gain);
