@@ -127,6 +127,7 @@ static char *fid = "mseedPackHeader";
     utilDecomposeTimestamp(record->hdr.tstamp, &year, &day, &hr, &mn, &sc, &nsec);
     usec = nsec / USEC_PER_NANOSEC;
     frac = usec / 100;
+    usec -= frac * 100; // usec for blockette 1001 is the OFFSET from toms (tenths of milliseconds) timestamp in FSDH
 
 /* We will always include blockette 1000.  Blockette 1001 is included if we have
  * time quality and blockette 100 is included if we have actual sample interval.
