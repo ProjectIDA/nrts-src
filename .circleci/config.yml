@@ -10,8 +10,8 @@ jobs:
             mkdir src_root
             cd src_root
             mkdir bin && mkdir lib
-            git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/src.git src
-            cd src
+            git clone https://danauerbach:$GITHUB_AUTH@github.com/ProjectIDA/nrts-src.git nrts-src
+            cd nrts-src
             tcsh build.csh
       # - run:
       #     name: Create dirs
