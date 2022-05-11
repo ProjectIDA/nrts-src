@@ -1,0 +1,269 @@
+#!/bin/tcsh
+#
+# assumes:
+#   interractive execution by user nrts with $NRTS_HOME set
+#   execution from script directory
+
+set myname = nrts-config-capture
+
+if (! $?NRTS_HOME) then
+    echo "ERROR: Evnironment variable NRTS_HOME must be set."
+    echo "Quitting."
+    exit 1
+endif
+
+# # General setup
+set debug = 0
+set nos3 = 0
+
+process cmdline options
+foreach opt ($argv)
+    if ( "$opt" == "-d" ) then
+        set debug = 1
+    else if ( "$opt" == "--no-s3" ) then
+        set nos3 = 1
+#     else if ( "$opt" == "isodirs" ) then
+#         set isodirs = 1
+#     else if ( "$opt" == "wfdiscdir" ) then
+#         set wfdiscdir = 1
+#     else if ( "$opt" == "systemd-enable" ) then
+#         set systemd_enable = 1
+#         set systemd_install = 1
+#     else if ( "$opt" == "systemd-install" ) then
+#         set systemd_install = 1
+    endif
+end
+
+# check for and set NRTS config dir
+set config_root = ${NRTS_HOME}/.nrts/config
+if ( ! -e ${config_root} ) then 
+    mkdir -p ${config_root}
+    if ( $status != 0 ) then
+        echo "ERROR creating config root directory: $config_root. Quitting."
+        exit 1
+    endif
+endif
+if ($debug) echo "Config Root: $config_root"
+
+set templates_root = ${NRTS_HOME}/.nrts/templates
+if ($debug) echo "Templates Root: $templates_root"
+
+set etc_config_dir = ${config_root}/nrts/etc
+mkdir -p ${etc_config_dir}
+if ($debug) echo "Etc Config Dir: $etc_config_dir"
+
+set diskloop_config_dir = ${config_root}/nrts/etc/config
+mkdir -p ${diskloop_config_dir}
+if ($debug) echo "Disk Loop Config Dir: $diskloop_config_dir"
+
+set sl_config_dir = ${config_root}/nrts/SeedLink
+mkdir -p ${sl_config_dir}
+if ($debug) echo "SeedLink Config Dir: $sl_config_dir"
+
+set system_config_dir = ${config_root}/system
+mkdir -p ${system_config_dir}
+if ($debug) echo "System Config Dir: $system_config_dir"
+
+
+###########################################
+# CAPTURE ETC and ETC/DEBUG FILES
+###########################################
+set etc_file_list = (isid Processes Systems retain sint Tunnels init.d .tunnel q330.cfg q330 debug start xml)
+foreach fil ($etc_file_list)
+
+    if ( -e ${NRTS_HOME}/etc/${fil} ) then
+        if ($debug) echo "Capturing current ${NRTS_HOME}/etc/${fil}..."
+        \cp -rp $NRTS_HOME/etc/${fil} ${etc_config_dir}/
+        if ( $status != 0 ) echo "Warning: error copying ${NRTS_HOME}/etc/${fil} to ${etc_config_dir}/${fil}"
+    else
+        echo "${NRTS_HOME}/etc/${fil} not found. Skipping"
+    endif
+
+end
+
+###########################################
+# CAPTURE wdiscs DIR status
+###########################################
+if (-e ${NRTS_HOME}/wfdiscs) then
+    if ($debug) echo "enabling wfdisc dir..."
+    touch ${config_root}/nrts/wfdiscs
+else
+    rm -f ${config_root}/nrts/wfdiscs
+endif
+
+###########################################
+#  CAPTURE SEEDLINK CONFIG
+###########################################
+if (-e ${NRTS_HOME}/SeedLink/ring.conf) then
+    if ($debug) echo "Capturing SeedLink ring.conf..."
+    \cp -p ${NRTS_HOME}/SeedLink/ring.conf ${sl_config_dir}/ring.conf
+else
+    \rm -f ${config_root}/nrts/SeedLink/ring.conf
+endif
+
+
+###########################################
+# CAPTURE DISK LOOP INFO
+###########################################
+set SystemsFile = ${NRTS_HOME}/etc/Systems
+if ($debug) echo "Capturing disk loop list from ${NRTS_HOME}/etc/Systems file..."
+
+if (-e $SystemsFile && -e $NRTS_HOME/bin/stripcat) then
+    set SystemsList = `stripcat $SystemsFile`
+    @ SystemsCount = $#SystemsList
+    set DefaultSite = $SystemsList[1]
+else
+    echo "ERROR processing $SystemsFile. Quitting."
+    exit 1
+endif
+
+# capture current ISI DL seq numbers
+if ($debug) echo "Capturing DL seq numbers into: boot.current_seqnums"
+if ( -f ${etc_config_dir}/start/boot.current_seqnums ) \rm ${etc_config_dir}/start/boot.current_seqnums
+MakeRestartScript > ${etc_config_dir}/start/boot.current_seqnums
+
+# Loop for each site
+foreach site ($SystemsList)
+
+    echo $site | grep 330 > /dev/null
+    if ( $status == 0 ) then
+        set type = qdp
+    else
+        set type = ida
+    endif
+
+    set SiteDir    = $NRTS_HOME/$site
+
+    if ( -e ${SiteDir}/cnf ) then
+        if ($debug) echo "Capturing disk loop cnf file $NRTS_HOME/$site/cnf..."
+        mkdir -p ${diskloop_config_dir}/cnf
+        \cp -p ${SiteDir}/cnf ${diskloop_config_dir}/cnf/cnf.${site}
+    endif
+
+    if ( -d ${SiteDir}/tee) then
+        if ($debug) echo "Capturing tee dir ${SiteDir}/tee..."
+        mkdir -p ${diskloop_config_dir}/tee
+        touch ${diskloop_config_dir}/tee/tee.${site} >& /dev/null
+    else
+        if ($debug) echo "Disabling tee dir for ${SiteDir}..."
+        \rm -rf ${diskloop_config_dir}/tee/tee.${site}
+    endif
+
+    if ( -d ${SiteDir}/iso) then
+        if ($debug) echo "Capturing iso dir ${SiteDir}/iso..."
+        mkdir -p ${diskloop_config_dir}/iso
+        touch ${diskloop_config_dir}/iso/iso.${site} >& /dev/null
+	else
+        if ($debug) echo "Disabling iso dir for ${SiteDir}..."
+        \rm -rf ${diskloop_config_dir}/iso/iso.${site}
+    endif
+
+end
+
+
+##############################
+# CAPTURE SYSTEM CONFIGURATION
+##############################
+
+if ($debug) echo "Capturing systemd service status..."
+
+set sysd_status = `systemctl status nrts`
+if ($status != 0) then
+    if ($debug) echo "NRTS systemd service not installed..."
+    \rm -f ${system_config_dir}/systemd.enabled
+else
+    systemctl status nrts | grep enable > /dev/null
+    if ($status == 0) then 
+        if ($debug) echo "Capturing NRTS systemd service is enabled..."
+        touch ${system_config_dir}/systemd.enabled
+    else
+        if ($debug) echo "Capturing NRTS systemd service is disabled..."
+        \rm -f ${system_config_dir}/systemd.enabled
+    endif
+endif
+
+# capture MOTD
+if ($debug) echo "Capturing MOTD..."
+if ( -e /etc/motd ) then
+    # if ( ! -l /etc/motd ) then
+        \cp -p /etc/motd ${system_config_dir}/motd
+        \rm -f ${system_config_dir}/motd.tail
+    # else
+    #     if ( -e /etc/motd.tail ) then
+    #         \cp -p /etc/motd.tail ${system_config_dir}/motd.tail
+    #         \rm -f ${system_config_dir}/motd
+    #     endif
+    # endif
+
+else
+    echo "/etc/motd file not found..."
+endif
+
+# capture hosts file
+if ($debug) echo "Capturing HOSTS file..."
+if ( -e /etc/hosts ) then
+    \cp -p /etc/hosts ${system_config_dir}/hosts
+else
+    echo "/etc/hosts file not found..."
+endif
+
+# capture host keys
+if ($debug) echo "Capturing host keys..."
+mkdir -p ${system_config_dir}/keys
+sudo \cp /etc/ssh/*key* ${system_config_dir}/keys/
+
+# capture crontab file
+if ($debug) echo "Capturing NRTS CRONTAB file..."
+crontab -l >! ${system_config_dir}/crontab
+
+# install user NRTS .ssh authorized_keys
+if ( -e $NRTS_HOME/.ssh/authorized_keys) then
+    if ($debug) echo "Capturing user nrts authorized_keys..."
+     mkdir -p ${config_root}/nrts/ssh
+    \cp -p $NRTS_HOME/.ssh/authorized_keys ${config_root}/nrts/ssh/authorized_keys
+else
+    echo "$NRTS_HOME/.ssh/authorized_keys not found"
+    \rm -f ${config_root}/nrts/ssh/authorized_keys
+endif
+
+
+# capture user NRTS .ssh known_hosts files
+if ( -e  $NRTS_HOME/.ssh/known_hosts) then
+    if ($debug) echo "Capturing user nrts known_hosts..."
+    \cp -p $NRTS_HOME/.ssh/known_hosts ${config_root}/nrts/ssh/known_hosts
+else
+    echo "$NRTS_HOME/.ssh/known_hosts not found"
+    \rm -f ${config_root}/nrts/ssh/known_hosts
+endif
+
+# capture user TUNNEL .ssh authorized_keys
+getent passwd tunnel > /dev/null
+if ($status != 0) then
+# if (! -e ~tunnel) then
+    echo "User tunnel not found, skipping user tunnel configuration."
+else
+    if ($debug) echo "Capturing user tunnel authorized_keys..."
+    if ( -e ~tunnel/.ssh/authorized_keys ) then
+        mkdir -p ${config_root}/nrts/tunnel/ssh
+        sudo \cp ~tunnel/.ssh/authorized_keys ${config_root}/nrts/tunnel/ssh/authorized_keys >& /dev/null
+        sudo chown nrts:nrts ${config_root}/nrts/tunnel/ssh/authorized_keys
+        sudo chmod 600 ${config_root}/nrts/tunnel/ssh/authorized_keys
+    else
+        echo "~tunnel/.ssh/authorized_keys not found"
+    endif
+endif
+
+
+###############
+# tar up the config dir for transport
+set config_tar_file = "${HOSTNAME}-nrts-cfg.tgz"
+pushd ${NRTS_HOME}/.nrts
+tar czf ${NRTS_HOME}/.nrts/${config_tar_file} config
+popd
+
+
+# copy to S3 ops bucket
+aws s3 cp  ${NRTS_HOME}/.nrts/${config_tar_file} s3://projectida.nrts.ops/hub-configs/
+
+
+exit 0
