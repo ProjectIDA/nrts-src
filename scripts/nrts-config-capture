@@ -6,6 +6,14 @@
 
 set myname = nrts-config-capture
 
+
+set setup  = ~nrts/scripts/ScriptSetup
+if (! -e $setup ) then
+    echo "missing $setup"
+    goto failure
+endif
+source $setup
+
 if (! $?NRTS_HOME) then
     echo "ERROR: Evnironment variable NRTS_HOME must be set."
     echo "Quitting."
@@ -120,7 +128,7 @@ endif
 # capture current ISI DL seq numbers
 if ($debug) echo "Capturing DL seq numbers into: boot.current_seqnums"
 if ( -f ${etc_config_dir}/start/boot.current_seqnums ) \rm ${etc_config_dir}/start/boot.current_seqnums
-MakeRestartScript > ${etc_config_dir}/start/boot.current_seqnums
+MakeRestartScript > "${etc_config_dir}/start/boot.current_seqnums"
 
 # Loop for each site
 foreach site ($SystemsList)
@@ -253,17 +261,22 @@ else
     endif
 endif
 
-
 ###############
 # tar up the config dir for transport
-set config_tar_file = "${HOSTNAME}-nrts-cfg.tgz"
+
+set config_tar_file = "${HOST}-nrts-cfg.tgz"
+#set config_tar_file = "dmc-pri-testname--nrts-cfg.tgz"
+if ($debug) echo "Creating TGZ of config: ${NRTS_HOME}/.nrts/${config_tar_file}"
 pushd ${NRTS_HOME}/.nrts
 tar czf ${NRTS_HOME}/.nrts/${config_tar_file} config
 popd
 
 
 # copy to S3 ops bucket
-aws s3 cp  ${NRTS_HOME}/.nrts/${config_tar_file} s3://projectida.nrts.ops/hub-configs/
-
+if ( ! $nos3 ) then
+     if ($debug) echo "Copying config to s3://projectida.nrts.ops/hub-configs/"
+    /usr/bin/aws s3 cp  ${NRTS_HOME}/.nrts/${config_tar_file} s3://projectida.nrts.ops/hub-configs/
+     if ($debug) echo "Successful copy of config to s3://projectida.nrts.ops/hub-configs/"
+endif
 
 exit 0
