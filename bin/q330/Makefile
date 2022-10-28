@@ -51,6 +51,7 @@ OBJS += set.o
 OBJS += spp.o
 OBJS += status.o
 OBJS += tokens.o
+OBJS += triginfo.o
 OBJS += xml.o
 
 OUTPUT  = q330

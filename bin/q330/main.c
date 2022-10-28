@@ -149,6 +149,10 @@ int exitstatus = 0;
         combo(&q330);
         break;
 
+      case Q330_CMD_TRIGINFO:
+        triginfo(&q330);
+        break;
+
       default:
         printf("ERROR: command '%s' is unsupported\n", q330.cmd.name);
         exitstatus = 1;

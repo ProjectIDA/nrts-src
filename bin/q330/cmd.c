@@ -40,6 +40,7 @@ COMMAND_MAP map[] = {
     {Q330_CMD_SAVEBOOT, "save reboot", NULL},
     {Q330_CMD_XML,              "xml", "XML dump of current programming"},
     {Q330_CMD_CONFIG,        "config", "configure digitizer"},
+    {Q330_CMD_TRIGINFO,    "triginfo", "view Detector and Control Detector info for a particular data port"},
     {-1, NULL, NULL}
 };
 
@@ -119,6 +120,7 @@ static char *fid = "VerifyQ330Cmd";
       case Q330_CMD_INPUT:    return VerifyInput(q330);
       case Q330_CMD_EP:       return VerifyEp(q330);
       case Q330_CMD_PREAMP:   return VerifyPreamp(q330);
+      case Q330_CMD_TRIGINFO: return VerifyTriginfo(q330);
     }
 
     printf("ERROR: unrecognized command '%s'\n", q330->cmd.name);

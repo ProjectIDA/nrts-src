@@ -103,6 +103,7 @@ typedef struct {
 #define Q330_CMD_EP_DELAY   34
 #define Q330_CMD_COMBO      35
 #define Q330_CMD_PREAMP     36
+#define Q330_CMD_TRIGINFO   37
 
 typedef struct {
     int code; /* one of Q33_CMD_x, above */
@@ -270,6 +271,11 @@ void status(Q330 *q330);
 void TokensHelp(char *name, int argc, char **argv);
 BOOL VerifyTokens(Q330 *q330);
 void tokens(Q330 *q330);
+
+/* triginfo.c */
+void TriginfoHelp(char *name, int argc, char **argv);
+BOOL VerifyTriginfo(Q330 *q330);
+void triginfo(Q330 *q330);
 
 /* xml.c */
 void XmlHelp(char *name, int argc, char **argv);

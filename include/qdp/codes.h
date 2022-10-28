@@ -251,7 +251,7 @@
 #define QDP_CDS_EQ_AND      3
 #define QDP_CDS_EQ_OR       4
 #define QDP_CDS_EQ_EOR      5
-#define QDP_CDS_EQ_DONE     6
+#define QDP_CDS_EQ_DONE   255
 
 /* Global preamp bitmap */
 #define QDP_PREAMP_CHANDISABLED  0x00

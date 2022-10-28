@@ -833,17 +833,36 @@ static char *DefaultName = "";
 
 UINT8 qdpControlDetectorFilterCode(QDP_DP_TOKEN *token, char *string)
 {
-int i, j;
-char *filter;
-QDP_TOKEN_LCQ *lcq;
-static UINT8 DefaultCode = QDP_UNDEFINED_ID;
+    int i, j;
+    UINT8 filter_token_ndx = 0;
+    char *filter;
+    QDP_TOKEN_LCQ *lcq;
+    static UINT8 DefaultCode = QDP_UNDEFINED_ID;
 
     for (i = 0; i < token->lcq.count; i++) {
         lcq = (QDP_TOKEN_LCQ *) token->lcq.array[i];
-        if (strncmp(lcq->ident.name, string, strlen(lcq->ident.name)) == 0) {
-            filter = string + strlen(lcq->ident.name) + 1;
-            for (j = 0; j < QDP_LCQ_NUM_DETECT; j++) {
-                if (lcq->detect[j].set && strcmp(filter, lcq->detect[j].base.name) == 0) return lcq->detect[j].use;
+
+        /* loop through all detectors of all lcq's in this token       */
+        /* need to count the number of detectors in token because      */
+        /* the index of the detector IN THE ENTIRE TOKEN is the 'code' */
+        /* that gets or'd with the the equation det element code       */
+        for (j = 0; j < QDP_LCQ_NUM_DETECT; j++) {
+
+            if (lcq->detect[j].set) {
+
+                if (strncmp(lcq->ident.name, string, strlen(lcq->ident.name)) == 0) { 
+
+                    filter = string + strlen(lcq->ident.name) + 1;
+
+                    if (strcmp(filter, lcq->detect[j].base.name) == 0) {
+
+                        lcq->detect[j].use = filter_token_ndx;                        
+                        return filter_token_ndx; /* lcq->detect[j].use; */
+
+                    }
+
+                }
+                filter_token_ndx++;   /* ok, got index of this detector */
             }
         }
     }
