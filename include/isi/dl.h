@@ -267,7 +267,7 @@ typedef struct {
     } fd;                    /* file descriptors for disk loop writer */
 #define MAXTP 32
     int ntp;
-    struct timeb tp[MAXTP];
+    /* struct timeb tp[MAXTP]; */
     struct {
         FILE *fp;
         int perm;
