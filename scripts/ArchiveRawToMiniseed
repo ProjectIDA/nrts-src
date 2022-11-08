@@ -11,8 +11,8 @@ set myname = `basename $0` #ArchiveRawToMiniseed
 set setup  = ~nrts/scripts/ScriptSetup
 if (! -e $setup ) then
     set message = "missing $setup"
-    logger -t $myname"[$$]" -p local0.error "$message"
-    echo "${myname}: $message"
+    logger -t ${myname} $myname"[$$]" -p local0.error "$message"
+    echo "${myname} $message"
     goto failure
 endif
 source $setup
@@ -25,7 +25,7 @@ else
     set debug = 0
 endif
 
-if ($debug) logger -t $myname"[$$]" -p local0.debug "begin"
+if ($debug) logger -t ${myname} $myname"[$$]" -p local0.debug "begin"
 
 # Command line setup
 
@@ -43,8 +43,8 @@ endif
 
 if ($error) then
     set message = "Bad command line, error $error"
-    logger -t $myname"[$$]" -p local0.error "$message"
-    echo "${myname}: $message"
+    logger -t ${myname} $myname"[$$]" -p local0.error "$message"
+    echo "${myname} $message"
     echo "usage: $myname site year oday"
     goto failure
 endif
@@ -55,7 +55,7 @@ set msdir = $ms_root_dir/$lsite/$year/$oday
 # Nothing to do if src directory doesn't exist
 
 if (! -d $rawdir) then
-    logger -t $myname"[$$]" -p local0.error "ERROR: Source dir not found: $rawdir"
+    logger -t ${myname} $myname"[$$]" -p local0.error "ERROR: Source dir not found: $rawdir"
     goto failure
 endif
 
@@ -64,7 +64,7 @@ endif
 cd $rawdir
 
 if ($status != 0) then
-    logger -t $myname"[$$]" -p local0.error "ERROR: can't chdir $rawdir"
+    logger -t ${myname} $myname"[$$]" -p local0.error "ERROR: can't chdir $rawdir"
     goto failure
 endif
 
@@ -79,12 +79,12 @@ set tmpfn = /tmp/$myname.$lsite.$$.ms
 rm -rf $tmpfn >& /dev/null
 
 set command = "cat $gzfiles | imseed sta=$lsite >>! $tmpfn"
-if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
+if ($debug) logger -t ${myname} $myname"[$$]" -p local0.debug "$command"
 
 (cat $gzfiles | imseed sta=$lsite >>! $tmpfn) >>& /dev/null
 
 if ($status != 0) then
-    logger -t $myname"[$$]" -p local0.error "ERROR: Could not convert gzfiles to miniseed: $lsite $year $oday"
+    logger -t ${myname} $myname"[$$]" -p local0.error "ERROR: Could not convert gzfiles to miniseed: $lsite $year $oday"
     rm -rf $tmpfn >& /dev/null
     exit 1
 endif
@@ -92,13 +92,13 @@ endif
 if (! -d $msdir ) then
     mkdir -p $msdir   # make sure it exists
     if ($status != 0) then
-        logger -t $myname"[$$]" -p local0.error "ERROR: can't mkdir $msdir"
+        logger -t ${myname} $myname"[$$]" -p local0.error "ERROR: can't mkdir $msdir"
         goto failure
     endif
 
     chmod g+w $msdir   # make sure it is group writable
     if ($status != 0) then
-        logger -t $myname"[$$]" -p local0.error "ERROR: error making $msdir group writable"
+        logger -t ${myname} $myname"[$$]" -p local0.error "ERROR: error making $msdir group writable"
         goto failure
     endif
 else
@@ -107,11 +107,11 @@ endif
 # run through dataselect
 
 set command = "dataselect -Ps -ts ${year}.${oday}.00.00.00 -te ${year}.${oday}.23.59.59.999999 -A ${msdir}/%n.%s.%l.%c.%Y.%j $tmpfn"
-if ($debug) logger -t $myname"[$$]" -p local0.debug "$command"
+if ($debug) logger -t ${myname} $myname"[$$]" -p local0.debug "$command"
 $command
 if ($status != 0) then
     rm -rf $tmpfn >& /dev/null
-    logger -t $myname"[$$]" -p local0.error "FAILED: $command"
+    logger -t ${myname} $myname"[$$]" -p local0.error "FAILED: $command"
     goto failure
 endif
 echo $command >>! ${ms_root_dir}/${myname}.log
@@ -119,20 +119,20 @@ echo $command >>! ${ms_root_dir}/${myname}.log
 
 set command = "msi -S ${msdir}/II.*.*.*.*.*"
 set invfn   = ${msdir}/inventory
-if ($debug) logger -t $myname"[$$]" -p local0.debug "$command '>!' $invfn"
+if ($debug) logger -t ${myname} $myname"[$$]" -p local0.debug "$command '>!' $invfn"
 $command >! $invfn
 set savestat = $status
 if ($savestat != 0) then
-    logger -t $myname"[$$]" -p local0.error "FAILED: [retcode: $savestat] $command '>!' $invfn"
+    logger -t ${myname} $myname"[$$]" -p local0.error "FAILED: [retcode: $savestat] $command '>!' $invfn"
     goto failure
 endif
 
 success:
 rm -rf $tmpfn >& /dev/null
-if ($debug) logger -t $myname"[$$]" -p local0.debug "completed OK"
+if ($debug) logger -t ${myname} $myname"[$$]" -p local0.debug "completed OK"
 exit 0
 
 failure:
-logger -t $myname"[$$]" -p local0.error "exit 1"
+logger -t ${myname} $myname"[$$]" -p local0.error "exit 1"
 exit 1
 
