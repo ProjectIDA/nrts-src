@@ -1,0 +1,13 @@
+#!/bin/csh -f
+#
+# Look for Release idents
+
+foreach file ($argv)
+    echo -n "${file}: "
+    if (! -e $file) then
+        echo "no such file"
+    else
+        strings $file | grep "^Release "
+        if ($status != 0) echo ""
+    endif
+end
