@@ -18,6 +18,9 @@ else
 endif
 
 set bindir = /usr/local/bin
+if (! -e $bindir/ringserver) then
+    set bindir = $NRTS_HOME/SeedLink/bin
+endif
 set server = $bindir/ringserver
 set conf   = $SeedLink/ring.conf
 
