@@ -100,7 +100,8 @@ UINT16 next;
 REAL32 actual;
 int fact, mult, lenp2;
 char *staid, *netid, *chnid, *locid;
-int year, day, hr, mn, sc, nsec, usec, frac;
+int year, day, hr, mn, sc, nsec, microsec, frac;
+INT8 usec; // for blockette 1001 microsecond offset
 static char space = ' ';
 static char *fid = "mseedPackHeader";
 
@@ -125,9 +126,9 @@ static char *fid = "mseedPackHeader";
 /* Split time time stamp into BTIME components */
 
     utilDecomposeTimestamp(record->hdr.tstamp, &year, &day, &hr, &mn, &sc, &nsec);
-    usec = nsec / USEC_PER_NANOSEC;
-    frac = usec / 100;
-    usec -= frac * 100; // usec for blockette 1001 is the OFFSET from toms (tenths of milliseconds) timestamp in FSDH
+    microsec = nsec / USEC_PER_NANOSEC;
+    frac = microsec / 100; // microsecond fraction value but with only tenths of millisecond precision, i.e last 2 digits are 0
+    usec = microsec - frac * 100; // usec for blockette 1001 is the OFFSET from toms (tenths of milliseconds) timestamp in FSDH. Should be positive (0-99)
 
 /* We will always include blockette 1000.  Blockette 1001 is included if we have
  * time quality and blockette 100 is included if we have actual sample interval.
@@ -176,7 +177,6 @@ static char *fid = "mseedPackHeader";
 
     if (b1001) {
         next = (record->hdr.asint > 0) ? (UINT16) (ptr - packed->data) + MSEED_B1001_LEN : 0;
-        usec = usec - (frac * 100);
 
         ptr += utilPackUINT16(ptr, 1001);             /* Blockette type - 1001 */
         ptr += utilPackUINT16(ptr, next);             /* Next blockette's byte number */
