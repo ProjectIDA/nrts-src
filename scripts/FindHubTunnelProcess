@@ -60,7 +60,7 @@ if ($debug) logger -t $myname"[$$]" -p local0.info "Tunnel Info: $hostname $data
 
 foreach port ($dataport $sshport)
 
-    set sshdprocess = `sudo lsof -i tcp -u tunnel -e /run/user/1000/gvfs | egrep "^sshd.*${hubhost}:$port \(L" | awk '{print $9,$1,"pid:",$2}' | sort | rev | column -t | rev`
+    set sshdprocess = `sudo lsof -i tcp -u tunnel | egrep "^sshd.*${hubhost}:$port \(L" | awk '{print $9,$1,"pid:",$2}' | sort | rev | column -t | rev`
     if ("$sshdprocess" != "") then
         set sshdpid = $sshdprocess[4]
         if ($debug) logger -t $myname"[$$]" -p local0.info "found sshd process $sshdpid for: ${hostname}:${port}"
