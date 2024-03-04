@@ -56,9 +56,9 @@ idadcc: \
      idaresponse \
      isiwww \
      jd \
-     last24 \
      podir \
      soh_blk
+#     last24 \
 
 aps: FORCE
 	cd aps; $(MAKE) install
@@ -256,6 +256,7 @@ clean: FORCE
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
 	cd idagrep;    $(MAKE) $@
+	cd idaresponse;$(MAKE) $@
 	cd idaspan;    $(MAKE) $@
 	cd idatomseed; $(MAKE) $@
 	cd imseed;     $(MAKE) $@
@@ -275,6 +276,7 @@ clean: FORCE
 	cd nrts;       $(MAKE) $@
 	cd paro10;     $(MAKE) $@
 	cd paroutil;   $(MAKE) $@
+	cd podir;      $(MAKE) $@
 	cd q330;       $(MAKE) $@
 	cd qcal;       $(MAKE) $@
 	cd qdpgrep;    $(MAKE) $@
@@ -304,6 +306,7 @@ remove: FORCE
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
 	cd idagrep;    $(MAKE) $@
+	cd idaresponse;$(MAKE) $@
 	cd idaspan;    $(MAKE) $@
 	cd idatomseed; $(MAKE) $@
 	cd imseed;     $(MAKE) $@
@@ -323,6 +326,7 @@ remove: FORCE
 	cd nrts;       $(MAKE) $@
 	cd paro10;     $(MAKE) $@
 	cd paroutil;   $(MAKE) $@
+	cd podir;      $(MAKE) $@
 	cd q330;       $(MAKE) $@
 	cd qcal;       $(MAKE) $@
 	cd qdpgrep;    $(MAKE) $@
@@ -354,6 +358,7 @@ REMOVE: FORCE
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
 	cd idagrep;    $(MAKE) $@
+	cd idaresponse;$(MAKE) $@
 	cd idaspan;    $(MAKE) $@
 	cd idatomseed; $(MAKE) $@
 	cd imseed;     $(MAKE) $@
@@ -373,6 +378,7 @@ REMOVE: FORCE
 	cd nrts;       $(MAKE) $@
 	cd paro10;     $(MAKE) $@
 	cd paroutil;   $(MAKE) $@
+	cd podir;      $(MAKE) $@
 	cd q330;       $(MAKE) $@
 	cd qcal;       $(MAKE) $@
 	cd qdpgrep;    $(MAKE) $@
