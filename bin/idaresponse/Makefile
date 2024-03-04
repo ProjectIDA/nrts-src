@@ -44,6 +44,7 @@ REMOVE: FORCE
  
 doinstall: $(OUTPUT)
 	rm -f $(BINDIR)/$(OUTPUT)
+	mkdir -p $(BINDIR)
 	cp $(OUTPUT) $(BINDIR)/$(OUTPUT)
 	chmod 755 $(BINDIR)/$(OUTPUT)
  
