@@ -1,5 +1,6 @@
 #pragma ident "$Id: chlog.c,v 1.3 2015/12/09 18:39:33 dechavez Exp $"
 #include <curses.h>
+#include <string.h>
 #include "nrts_mon.h"
 
 extern WINDOW *logtitle;

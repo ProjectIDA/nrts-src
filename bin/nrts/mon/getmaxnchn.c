@@ -1,6 +1,8 @@
 #pragma ident "$Id: getmaxnchn.c,v 1.5 2015/12/09 18:39:33 dechavez Exp $"
 #include <sys/param.h>
 #include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 #include "nrts_mon.h"
 

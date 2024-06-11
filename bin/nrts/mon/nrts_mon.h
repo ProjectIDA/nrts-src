@@ -28,23 +28,6 @@ int do_cmd(struct nrts_mmap *map, char *home, struct nrts_files *file, struct nr
 int help_win();
 void stat_win();
 void die();
-int Cols, Lines;
-int logwinlen;
-int winswide;
-int logwinarg;
-int statwinlen;
-int statwinbeg_y;
-int statwinlines;
-int flag_y;
-int flag_x;
-long curpos;
-int indices;
-int times;
-int nsys;
-WINDOW *logwin;
-WINDOW *statwin;
-WINDOW *logtitle;
-WINDOW *stattitle;
 
 #endif
 

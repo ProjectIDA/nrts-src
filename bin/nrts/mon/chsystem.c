@@ -17,12 +17,9 @@
 
 extern WINDOW *statwin;
 extern int Cols;
-extern int Lines;
 extern int nsys;
-extern int csys;
 extern char **Systems;
 
-char Hostname[MAXHOSTNAMELEN];
 
 void chsystem(char *site, char *home)
 {
