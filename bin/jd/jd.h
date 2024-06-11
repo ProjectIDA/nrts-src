@@ -1,0 +1,13 @@
+int multm(short inttv[], float flval);
+int addtm(short inttv[], short abstv[]);
+int subtm(short inttv[], short abstv[]);
+void settm(short tv1[], short tv2[]);
+int ieqtm(short tv1[], short tv2[]);
+int doy(int mon, int day, int year);
+int dom(int dofy, int *mon, int *day, int year);
+int sample(short strttv[], short samptv[], float samper, float *isamp);
+int difftm(short abstv1[], short abstv2[], short inttv[], int *sign);
+int lpyr(int year);
+int chktma(short abstv[]);
+int chktmi(short inttv[]);
+int inttm(int integer, short inttv[], int units);

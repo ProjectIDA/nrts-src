@@ -1,7 +1,7 @@
 #pragma ident "$Id: main.c,v 1.1 2014/10/29 22:21:23 dechavez Exp $"
 /*
  *	jd
- *  
+ *
  *     This program converts Julian date (day of year - doy) to
  *	conventional date and visa versa.
  *      Usage: jd [-n] yeardoy
@@ -15,6 +15,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <strings.h>
+#include <string.h>
+#include "jd.h"
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -24,69 +27,10 @@
 
 extern char *VersionIdentString;
 
-char *mname[12] = 
+char *mname[12] =
 	{"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
 
-main(argc,argv)
-	int argc;
-	char **argv;
-{
-	int i,month,day,year,dofy;
-	char *name;
-	static int mnum=FALSE;
-
-	if((argc <  2) || (argc > 4)) usage();
-
-	for( argc--,argv++; *argv[0]=='-' && argc; argc--,argv++) {
-		switch (argv[0][1]) {
-		case 'n':			/* output month number */
-			mnum = TRUE;
-			break;
-		default:
-			printf("Unrecognizable option %s\n",*argv);
-			usage();
-			break;
-		}
-	}
-	if (argc < 3) {				/* to month day year */
-		if(argc == 1) {			/* given yeardoy */
-			dofy = year = atoi(*argv);
-			year /= 1000;
-			dofy -= year*1000;
-		}
-		else {				/* given doy year */
-			dofy = atoi(*argv++);
-			year = atoi(*argv);
-		}
-			if(!dom(dofy,&month,&day,year)) usage();
-			if(mnum)
-				printf("%02d %02d %d\n",month,day,year);
-			else
-				printf("%s %02d %d\n",mname[month-1],day,year);
-	}
-	else {					/* to Julian day */
-		if( isalpha(*argv[0]) ) {	/* given month name */
-			name = *argv;		/* get month number */
-			for(i=0; i<3; i++) {
-				name[i] = (isupper(name[i])) ?
-					tolower(name[i]) : name[i];
-			}
-			for (month = 0; month < 12; month++)  {
-				if( !strncmp(name,mname[month],3) ) 
-					break;
-			}
-			if(++month > 12) usage();
-		}
-		else				/* given month number */
-			month = atoi(*argv);
-		day = atoi(*++argv);
-		year = atoi(*++argv);
-		if( (dofy = doy(month,day,year)) == 0) usage();
-		else printf("day of year = %d\n",dofy);
-	}
-}
-
-usage()
+void usage()
 {
 	printf("usage: jd [-n] yeardoy\n");
 	printf("       jd [-n] doy year\n");
@@ -140,9 +84,7 @@ usage()
  * multm returns an error, otherwise OK (1) is returned.
  */
 
-samptm(strttv,isamp,samper,samptv)
-	short strttv[], samptv[];
-	float isamp, samper;
+int samptm(short strttv[], float isamp, float samper, short samptv[])
 {
 	int i, erflag;
 	short temptv[6];
@@ -182,20 +124,18 @@ samptm(strttv,isamp,samper,samptv)
 /* SAMPLE
  *
  * Given a starting time vector (strttv[]), a time vector for the sample time
- * (samptv[]) and the sampling period in seconds (samper), this subroutine 
+ * (samptv[]) and the sampling period in seconds (samper), this subroutine
  * calculates the sample number (isamp) closest to the specified sample time.
  */
 
 double sconv[6]         = {0.0, 86400.0, 3600.0, 60.0, 1.0, 0.001};
 
-sample(strttv,samptv,samper,isamp)
-	short strttv[], samptv[];
-	float samper, *isamp;
+int sample(short strttv[], short samptv[], float samper, float *isamp)
 {
 	int sign, i, erflag;
 	short difftv[6];
 	double secs;
-	
+
 	/* determine the difference between start and sample times */
 	erflag = difftm(samptv,strttv,difftv,&sign);
 
@@ -228,8 +168,7 @@ int limit[6] 	= {10000,366,24,60,60,1000};
 int low[6]	= {0,1,0,0,0,0};
 int borow[6]    = {0,365,24,60,60,1000};
 
-addtm(inttv,abstv)
-	short inttv[], abstv[];
+int addtm(short inttv[], short abstv[])
 {
 	int i, rem;
 	if (lpyr(abstv[YR])) limit[DY] = 367;
@@ -258,8 +197,7 @@ addtm(inttv,abstv)
  * the subroutine returns 1.
  */
 
-subtm(inttv,abstv)
-	short inttv[], abstv[];
+int subtm(short inttv[], short abstv[])
 {
 	int rem, i;
 	if (lpyr(abstv[YR]-1))  limit[DY] = 367;
@@ -290,9 +228,7 @@ subtm(inttv,abstv)
  *     -1 if abstv1 < abstv2
  */
 
-difftm(abstv1,abstv2,inttv,sign)
-	short abstv1[], abstv2[], inttv[];
-	int *sign;
+int difftm(short abstv1[], short abstv2[], short inttv[], int *sign)
 {
 	int i, yrdiff, rem;
 
@@ -302,7 +238,7 @@ difftm(abstv1,abstv2,inttv,sign)
 	for (i=YR; i<=MS; i++) {
 		inttv[i] = 0;
 	}
-	
+
 	/* determine sign of difference and return if zero */
 	*sign = ieqtm(abstv1,abstv2);
 	if (*sign == 0)   return(OK);
@@ -347,7 +283,7 @@ difftm(abstv1,abstv2,inttv,sign)
 
 /* MULTM
  *
- * Multm multiplies a time interval vector by a non-negative floating point 
+ * Multm multiplies a time interval vector by a non-negative floating point
  * number and returns the time interval vector product in the original vector
  *
  * If flval is less than 0.0, or there is overflow, multm will return ERROR (0);
@@ -356,9 +292,7 @@ difftm(abstv1,abstv2,inttv,sign)
 
 double conv[6] = {0.0, 86400000.0, 3600000.0, 60000.0, 1000.0, 1.0};
 
-multm(inttv,flval)
-	short inttv[];
-	float flval;
+int multm(short inttv[], float flval)
 {
 	int i;
 	short tinttv[6];
@@ -394,12 +328,11 @@ multm(inttv,flval)
 
 /* CHKTMA
  *
- * This function checks whether abstv is a legal absolute time vector, 
+ * This function checks whether abstv is a legal absolute time vector,
  * returning TRUE (1) if it is and FALSE (0) if it is not.
  */
 
-chktma(abstv)
-	short abstv[];
+int chktma(short abstv[])
 {
 	int maxdays;
 	maxdays = 365;
@@ -422,8 +355,7 @@ chktma(abstv)
  * returning TRUE (1) if it is and FALSE (0) if it is not.
  */
 
-chktmi(inttv)
-	short inttv[];
+int chktmi(short inttv[])
 {
 	if (inttv[YR] != 0) return(FALSE);
 	if (inttv[DY]<0 || inttv[DY]>364) return(FALSE);
@@ -437,23 +369,22 @@ chktmi(inttv)
 /******************************************************************************/
 
 /* DOY
- * 
+ *
  * This function will convert mon and day within the year and return it as
- * the value of the function.  If mon or day are illegal values, the value 
+ * the value of the function.  If mon or day are illegal values, the value
  * of the function will be FALSE (0).
  */
 
 int ndays[13] = {0,0,31,59,90,120,151,181,212,243,273,304,334};
 
-doy(mon,day,year)
-	int mon, day, year;
+int doy(int mon, int day, int year)
 {
 	int inc;
 	if (mon < 1 || mon > 12) return(FALSE);
 	if (day < 1 || day > 31) return(FALSE);
 	if (lpyr(year) && mon > 2) inc = 1;
 	else inc = 0;
-	
+
 	return(ndays[mon] + day + inc);
 }
 
@@ -462,14 +393,13 @@ doy(mon,day,year)
 /* DOM
  *
  * This function converts a day within the year (dofy) to the month and
- * day of the month.  If dofy is an illegal value, mon and day will be 
+ * day of the month.  If dofy is an illegal value, mon and day will be
  * returned as 0.
  */
 
 int mdays[13] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
 
-dom(dofy,mon,day,year)
-	int dofy,*mon,*day,year;
+int dom(int dofy, int *mon, int *day, int year)
 {
 	int iday;
 	if (dofy < 1) {
@@ -494,12 +424,11 @@ dom(dofy,mon,day,year)
 /******************************************************************************/
 
 /* LPYR
- * 
+ *
  * This function returns TRUE if year is a leap year.
  */
 
-lpyr(year)
-	int year;
+int lpyr(int year)
 {
 	if (year%400 == 0) return(TRUE);
 	if (year%4 != 0) return(FALSE);
@@ -514,8 +443,7 @@ lpyr(year)
  * Subroutine settm sets time vector tv1 equal to tv2.
  */
 
-settm(tv1,tv2)
-	short tv1[], tv2[];
+void settm(short tv1[], short tv2[])
 {
 	int i;
 	for (i=0; i<6; i++) {
@@ -533,8 +461,7 @@ settm(tv1,tv2)
  *      -1 if tv1 < tv2
  */
 
-ieqtm(tv1,tv2)
-	short tv1[], tv2[];
+int ieqtm(short tv1[], short tv2[])
 {
 	int i;
 	for (i=0; i<=5; i++) {
@@ -570,9 +497,7 @@ int factor[7][5]	= {   0,   0,   0,1000,   1,
 			   24,   1,   0,   0,   0,
 			    1,   0,   0,   0,   0};
 
-inttm(integer,inttv,units)
-	int integer, units;
-	short inttv[];
+int inttm(int integer, short inttv[], int units)
 {
 	int i, ifactor, rem;
 	ifactor = 0;
@@ -601,6 +526,63 @@ inttm(integer,inttv,units)
 	}
 }
 
+
+int main(int argc, char **argv)
+{
+	int i,month,day,year,dofy;
+	char *name;
+	static int mnum=FALSE;
+
+	if((argc <  2) || (argc > 4)) usage();
+
+	for( argc--,argv++; *argv[0]=='-' && argc; argc--,argv++) {
+		switch (argv[0][1]) {
+		case 'n':			/* output month number */
+			mnum = TRUE;
+			break;
+		default:
+			printf("Unrecognizable option %s\n",*argv);
+			usage();
+			break;
+		}
+	}
+	if (argc < 3) {				/* to month day year */
+		if(argc == 1) {			/* given yeardoy */
+			dofy = year = atoi(*argv);
+			year /= 1000;
+			dofy -= year*1000;
+		}
+		else {				/* given doy year */
+			dofy = atoi(*argv++);
+			year = atoi(*argv);
+		}
+			if(!dom(dofy,&month,&day,year)) usage();
+			if(mnum)
+				printf("%02d %02d %d\n",month,day,year);
+			else
+				printf("%s %02d %d\n",mname[month-1],day,year);
+	}
+	else {					/* to Julian day */
+		if( isalpha(*argv[0]) ) {	/* given month name */
+			name = *argv;		/* get month number */
+			for(i=0; i<3; i++) {
+				name[i] = (isupper(name[i])) ?
+					tolower(name[i]) : name[i];
+			}
+			for (month = 0; month < 12; month++)  {
+				if( !strncmp(name,mname[month],3) )
+					break;
+			}
+			if(++month > 12) usage();
+		}
+		else				/* given month number */
+			month = atoi(*argv);
+		day = atoi(*++argv);
+		year = atoi(*++argv);
+		if( (dofy = doy(month,day,year)) == 0) usage();
+		else printf("day of year = %d\n",dofy);
+	}
+}
 /* $Log: main.c,v $
 /* Revision 1.1  2014/10/29 22:21:23  dechavez
 /* copied from Center for Seismic Studies source tree
