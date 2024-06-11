@@ -99,7 +99,7 @@ struct seed_minipacket {
     REAL64 sint;      /* sample interval                    */
     UINT32 srclen;
     UINT32 order;
-} SEED_MINIPKT;
+};
     
 /* Function prototypes */
 
