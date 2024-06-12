@@ -46,7 +46,7 @@ source env-build/pathrc
 source env-build/aliases
 
 # do build
-make -j 2
+make
 
 # install to nrtsroot, if requested
 if ($doinstall) then
