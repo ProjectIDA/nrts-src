@@ -1,0 +1,24 @@
+#!/bin/csh -f
+
+if ($#argv != 2) then
+	echo "usage: UpdateNrtsLatencyPage Server HtmlFileName"
+	exit 1
+endif
+
+set path = (${HOME}/bin $path)
+
+set isiserver = $argv[1]
+set webserver =  $argv[2]
+
+set webpath = "nrts-status"
+set htdocpath = "${HOME}/www"
+
+mkdir -p ${htdocpath}/${webpath}/${isiserver}
+
+set command = "isiwww isiserver=$isiserver webserver=$webserver webpath=$webpath htdocpath=$htdocpath"
+$command
+
+if $status == 0 then
+    aws s3 sync ${htdocpath}/${webpath}/${isiserver} s3://gsn-status/${webpath}/${isiserver}
+endif
+

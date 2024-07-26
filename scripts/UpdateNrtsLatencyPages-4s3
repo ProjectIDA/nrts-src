@@ -1,0 +1,21 @@
+#!/bin/csh -f
+
+set LockFile = /var/tmp/isiwww.lock
+set filelock = ~nrts/bin/filelock
+if (-e $filelock) then
+    $filelock $LockFile $$
+    if ($status != 0) exit 0
+endif
+
+set webserver = "gsn-status.s3-website.us-east-2.amazonaws.com"
+
+set list = ""
+set list = "$list idahub"
+set list = "$list prihub"
+set list = "$list sechub"
+set list = "$list dmc-pri"
+set list = "$list dmc-sec"
+
+foreach isiserver ($list)
+    ~nrts/scripts/UpdateNrtsLatencyPage-4s3 $isiserver $webserver
+end
