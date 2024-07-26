@@ -1,7 +1,7 @@
 #pragma ident "$Id: main.c,v 1.24 2015/12/08 21:18:22 dechavez Exp $"
 /*======================================================================
  *
- *  Generate IDA latency web pages
+ *  Generate GSN/NRTS latency web pages
  *
  *====================================================================*/
 #include "isi.h"
@@ -410,24 +410,21 @@ static void PrintStatusTrailer(FILE *fp)
 static void PrintStatusHeader(FILE *fp, char *isiserver, char *htdocpath, char *webstuff)
 {
 char *parchstr="parchment.jpg";
-char parchvar[MAXPATHLEN+1];
-parchvar[0]=0;
 
     fprintf(fp, "<!DOCTYPE html>\n<html>\n<HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
-    fprintf(fp, "<title>IDA/NRTS (%s)</title>\n",isiserver);
+    fprintf(fp, "<title>GSN/NRTS Status (%s)</title>\n",isiserver);
 
     fprintf(fp, "<!-- Bootstrap core CSS -->");
     fprintf(fp, "   <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css\" integrity=\"sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4\" crossorigin=\"anonymous\">\n");
     fprintf(fp, "</HEAD>\n");
 
 
-    sprintf(parchvar,"https://%s/%s",webstuff,parchstr);
-    fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
+    fprintf(fp, "<BODY>\n");
     fprintf(fp, "<script src=/web/js/sorttable.js></script>\n");
     fprintf(fp, "<DIV class=\'container-fluid\'> <!-- container -->");
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col-12 \'>\n");
-    fprintf(fp, "<h3 class=\"text-center\">IDA/NRTS Status at %s</h3>\n", isiserver);
+    fprintf(fp, "<h3 class=\"text-center\">GSN/NRTS Status at %s</h3>\n", isiserver);
 
     PrintTimeStamp(fp);
     PrintStatusLegend(fp);
@@ -463,7 +460,8 @@ stahomelink[0]=0;
 chanlink[0]=0;
 
     sprintf(stahomelink, "https://%s/?q=station/%s", webserver, util_lcase(sta));
-    sprintf(chanlink, "https://%s/%s/%s/%s-%s-%s", webserver, webpath, isiserver, util_ucase(sta), util_ucase(loc), str2);
+    sprintf(chanlink, "%s-%s-chan.html", util_ucase(sta), util_ucase(loc));
+    /* sprintf(chanlink, "https://%s/%s/%s/%s-%s-%s", webserver, webpath, isiserver, util_ucase(sta), util_ucase(loc), str2); */
 
     fprintf(fp, "<tr  class=\'text-monospace\'>");
     if (tols != (REAL64) ISI_UNDEFINED_TIMESTAMP) {
@@ -672,7 +670,8 @@ stalocchanfn[0]=0;
     } else {
         prevstaloc = (char *) slist->array[idx-1];
     }
-    sprintf(stalocchanfn,"https://%s/%s/%s-%s",webstuff,isiserver,prevstaloc,str2);
+    sprintf(stalocchanfn,"%s-chan.html",prevstaloc);
+    /* sprintf(stalocchanfn,"https://%s/%s/%s-%s",webstuff,isiserver,prevstaloc,str2); */
     fprintf(fp,"<p  class=\"text-center font-weight-bold\"><A HREF=\"%s\" class=\"working\"><== %s </A> | \n",stalocchanfn, prevstaloc);
     if (idx == ((slist->count)-1)) {
         nextstaloc = (char *) slist->array[0];
@@ -680,7 +679,8 @@ stalocchanfn[0]=0;
         nextstaloc = (char *) slist->array[idx+1];
     }
     stalocchanfn[0] = 0;
-    sprintf(stalocchanfn,"https://%s/%s/%s-%s",webstuff,isiserver,nextstaloc,str2);
+    sprintf(stalocchanfn,"%s-chan.html",nextstaloc);
+    /* sprintf(stalocchanfn,"https://%s/%s/%s-%s",webstuff,isiserver,nextstaloc,str2); */
     fprintf(fp,"<A HREF=\"%s\" class=\"working\"> %s ==></A></p>\n",stalocchanfn, nextstaloc);
 }
 
@@ -689,8 +689,6 @@ static void MakeChanPageHeader(FILE *fp, LNKLST *slist, char *isiserver, char *h
 char *name;
 int i;
 char *parchstr="parchment.jpg";
-char parchvar[MAXPATHLEN+1];
-parchvar[0]=0;
 char *str2 = "chan.html";
 char stalocchanfn[MAXPATHLEN+1];
 char weblink[MAXPATHLEN+1];
@@ -699,20 +697,19 @@ stalocchanfn[0]=0;
 
     sprintf(weblink, "%s/%s",webstuff,isiserver);
     fprintf(fp, "<!DOCTYPE html><html><HEAD><META HTTP-EQUIV=\"Refresh\" CONTENT=\"60\">\n");
-    fprintf(fp, "<title>\nIDA/NRTS (%s)\n</title>\n",isiserver);
+    fprintf(fp, "<title>\nGSN/NRTS (%s)\n</title>\n",isiserver);
     fprintf(fp, "<!-- Bootstrap core CSS -->");
     fprintf(fp, "   <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css\" integrity=\"sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4\" crossorigin=\"anonymous\">\n");
 
     fprintf(fp, "\n</HEAD>\n");
-    sprintf(parchvar,"https://%s/%s",webstuff,parchstr);
-    fprintf(fp, "<BODY background=\"%s\">\n",parchvar);
+    fprintf(fp, "<BODY>\n");
     fprintf(fp, "<script src=/web/js/sorttable.js></script>\n");
     fprintf(fp, "<DIV class=\'container\'> <!-- container -->");
     fprintf(fp, "<div class=\'row\'>\n");
     fprintf(fp, "<div class=\'col\'>\n");
-    fprintf(fp, "<h3 class=\"text-center\">IDA/NRTS Status for %s-%s at %s</h3>\n", sta, loc, isiserver);
+    fprintf(fp, "<h3 class=\"text-center\">GSN/NRTS Status for %s-%s at %s</h3>\n", sta, loc, isiserver);
     PrintTimeStamp(fp);
-    fprintf(fp, "<p class=\"text-center\"><A HREF=\"https://%s/index.html \" class=\"working\">Network Summary Page</A></p>\n", weblink);
+    fprintf(fp, "<p class=\"text-center\"><A HREF=\"index.html \" class=\"working\">Network Summary Page</A></p>\n");
     MakeNextButtons(fp, slist, sta, loc, isiserver, webstuff);
     fprintf(fp, "</div> <!-- end column-->");
     fprintf(fp, "</div> <!-- end upper row -->");
@@ -731,7 +728,8 @@ stalocchanfn[0]=0;
             int ndx = col * rowcnt + row;
             if (ndx < slist->count) {
                 name = (char *) slist->array[ndx];
-                sprintf(stalocchanfn,"https://%s/%s-%s",weblink,name,str2);
+                sprintf(stalocchanfn,"%s-chan.html",name);
+                /* sprintf(stalocchanfn,"https://%s/%s-%s",weblink,name,str2); */
                 fprintf(fp, "<TD><A HREF=\"%s\">%s</A></TD>\n",stalocchanfn,name);
             } else {
                 fprintf(fp, "<td></td>");
@@ -769,7 +767,7 @@ static void MakeChanPageTrailer(FILE *fp, LNKLST *slist, char *sta, char *loc, c
     PrintChnPgLegend(fp);
     /* fprintf(fp,"<BR>\n"); */
     MakeNextButtons(fp, slist, sta, loc, isiserver, webstuff);
-    fprintf(fp, "<p class=\"text-center\"><A HREF=\"https://%s/%s/index.html \" class=\"working\">Network Summary Page</A></p>\n", webstuff, isiserver);
+    fprintf(fp, "<p class=\"text-center\"><A HREF=\"index.html \" class=\"working\">Network Summary Page</A></p>\n");
     PrintTimeStamp(fp);
     fprintf(fp, "</div> <!-- end column-->");
     fprintf(fp, "</div> <!-- main body and footer row -->");
@@ -877,7 +875,7 @@ FILE *ofp;
 
     sprintf(odirname,"%s/%s/%s", htdocpath, webpath, isiserver);
     if (!utilDirectoryExists(odirname)) {
-        fprintf(stdout, "FATAL ERROR:   No output directory exists \n");
+        fprintf(stdout, "FATAL ERROR:   No output directory exists: %s \n", odirname);
         exit(1);
     }
     sprintf(ofname, "%s/%s/%s/%s-%s-%s", htdocpath, webpath, isiserver, sta, loc, str2);
