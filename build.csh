@@ -14,14 +14,13 @@ set builddcc = 0
 set error = 0
 if ($#argv == 0) then
     pass
-else if ($#argv <= 2) then
+else if ($#argv == 1) then
     set doinstall = 1
     set nrtsroot = $argv[1]
-    if ($argv[2] == "dcc") then
-        set builddcc = 1
-    else
-        set error = 2
-    endif
+else if ($#argv == 2) then
+    set doinstall = 1
+    set nrtsroot = $argv[1]
+    set builddcc = 1
 else
     set error = 1
 endif
@@ -64,11 +63,13 @@ if ($doinstall) then
     \cp ../bin/${PLATFORM}/* ${nrtsroot}/bin/ >& /dev/null
     chmod 555 ${nrtsroot}/bin/*  >& /dev/null
 
-    # deploy scripts
-    if (! -d ${nrtsroot}/scripts) mkdir -p ${nrtsroot}/scripts
-    chmod 755 ${nrtsroot}/scripts/*  >& /dev/null
-    \cp scripts/* ${nrtsroot}/scripts/  >& /dev/null
-    chmod 555 ${nrtsroot}/scripts/*  >& /dev/null
+    if ($builddcc != 1) then
+        # deploy scripts
+        if (! -d ${nrtsroot}/scripts) mkdir -p ${nrtsroot}/scripts
+        chmod 755 ${nrtsroot}/scripts/*  >& /dev/null
+        \cp scripts/* ${nrtsroot}/scripts/  >& /dev/null
+        chmod 555 ${nrtsroot}/scripts/*  >& /dev/null
+    endif
 
 endif
 
