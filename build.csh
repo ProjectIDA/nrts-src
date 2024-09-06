@@ -8,13 +8,19 @@ set myname = "build"
 # General setup
 set debug = 0
 set doinstall = 0
+set builddcc = 0
 
 # Command line setup
 set error = 0
 if ($#argv == 0) then
-else if ($#argv == 1) then
-    set nrtsroot = $argv[1]
+else if ($#argv <= 2) then
     set doinstall = 1
+    set nrtsroot = $argv[1]
+    if ($argv[2] =='dcc' then
+        set builddcc = 1
+    else
+        set error = 2
+    endif
 else
     set error = 1
 endif
