@@ -1,4 +1,4 @@
-#!/bin/tcsh -f
+#!/usr/bin/tcsh -f
 #
 # Build and optionally deploy NRTS binaries and scripts
 # MUST BE RUN FROM THE NRTS SRC Root directory where this script lives
@@ -13,6 +13,7 @@ set builddcc = 0
 # Command line setup
 set error = 0
 if ($#argv == 0) then
+    pass
 else if ($#argv <= 2) then
     set doinstall = 1
     set nrtsroot = $argv[1]
