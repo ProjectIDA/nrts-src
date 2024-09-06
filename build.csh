@@ -17,7 +17,7 @@ if ($#argv == 0) then
 else if ($#argv <= 2) then
     set doinstall = 1
     set nrtsroot = $argv[1]
-    if ($argv[2] =='dcc') then
+    if ($argv[2] == "dcc") then
         set builddcc = 1
     else
         set error = 2
