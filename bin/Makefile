@@ -58,7 +58,14 @@ idadcc: \
      jd \
      podir \
      soh_blk
-#     last24 \
+     last24 \
+     AandB \
+	 hex2dec \
+	 dec2hex \
+	 gz_counter
+
+AandB: FORCE
+	cd AandB; $(MAKE) install
 
 aps: FORCE
 	cd aps; $(MAKE) install
@@ -69,11 +76,20 @@ bswap: FORCE
 cssutil: FORCE
 	cd cssutil; $(MAKE) install
 
+dec2hex: FORCE
+	cd dec2hex; $(MAKE) install
+
 fecho: FORCE
 	cd fecho; $(MAKE) install
 
 fresp: FORCE
 	cd fresp; $(MAKE) install
+
+gz_counter: FORCE
+	cd gz_counter; $(MAKE) install
+
+hex2dec: FORCE
+	cd hex2dec; $(MAKE) install
 
 i10dmx: FORCE
 	cd i10dmx; $(MAKE) install
@@ -247,11 +263,15 @@ xfer: FORCE
 	cd xfer; $(MAKE) install
 
 clean: FORCE
+	cd AandB;      $(MAKE) $@
 	cd aps;        $(MAKE) $@
 	cd bswap;      $(MAKE) $@
 	cd cssutil;    $(MAKE) $@
+	cd dec2hex;    $(MAKE) $@
 	cd fecho;      $(MAKE) $@
 	cd fresp;      $(MAKE) $@
+	cd hex2dec;    $(MAKE) $@
+	cd gz_counter; $(MAKE) $@
 	cd i10dmx;     $(MAKE) $@
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
@@ -297,11 +317,15 @@ clean: FORCE
 	cd vhfilt;     $(MAKE) $@
 
 remove: FORCE
+	cd AandB;      $(MAKE) $@
 	cd aps;        $(MAKE) $@
 	cd bswap;      $(MAKE) $@
 	cd cssutil;    $(MAKE) $@
+	cd dec2hex;    $(MAKE) $@
 	cd fecho;      $(MAKE) $@
 	cd fresp;      $(MAKE) $@
+	cd hex2dec;    $(MAKE) $@
+	cd gz_counter; $(MAKE) $@
 	cd i10dmx;     $(MAKE) $@
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
@@ -349,11 +373,15 @@ remove: FORCE
 	rm -rf ../../bin/$(PLATFORM)
 
 REMOVE: FORCE
+	cd AandB;      $(MAKE) $@
 	cd aps;        $(MAKE) $@
 	cd bswap;      $(MAKE) $@
 	cd cssutil;    $(MAKE) $@
+	cd dec2hex;    $(MAKE) $@
 	cd fecho;      $(MAKE) $@
 	cd fresp;      $(MAKE) $@
+	cd hex2dec;    $(MAKE) $@
+	cd gz_counter; $(MAKE) $@
 	cd i10dmx;     $(MAKE) $@
 	cd iboot;      $(MAKE) $@
 	cd ida10;      $(MAKE) $@
