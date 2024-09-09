@@ -57,7 +57,7 @@ idadcc: \
      isiwww \
      jd \
      podir \
-     soh_blk
+     soh_blk \
      last24 \
      AandB \
 	 hex2dec \
