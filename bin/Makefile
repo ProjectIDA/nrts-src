@@ -56,13 +56,13 @@ idadcc: \
      idaresponse \
      isiwww \
      jd \
-     podir \
      soh_blk \
-     last24 \
      AandB \
 	 hex2dec \
 	 dec2hex \
 	 gz_counter
+#C++ compile errors, may just skip and replace with modern approach     last24 \
+#Requires dccdb.h which requires antelope install     podir \
 
 AandB: FORCE
 	cd AandB; $(MAKE) install

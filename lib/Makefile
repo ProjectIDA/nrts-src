@@ -43,7 +43,6 @@ all: \
 idadcc: \
     cssio \
     dbio \
-    dccdb \
     dmc \
     filter \
     iacp \
@@ -55,6 +54,7 @@ idadcc: \
     logio \
     mseed \
     util
+	# for PODIR but requires antelope install: dccdb \
 
 addoss: FORCE
 	cd addoss; $(MAKE)
