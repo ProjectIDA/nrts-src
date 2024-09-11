@@ -20,7 +20,9 @@ else if ($#argv == 1) then
 else if ($#argv == 2) then
     set doinstall = 1
     set nrtsroot = $argv[1]
-    set builddcc = 1
+    if ($argv[2] == "idadcc") then
+        set builddcc = 1
+    endif
 else
     set error = 1
 endif
@@ -36,7 +38,7 @@ endif
 if ($doinstall) then
     if (! -d $nrtsroot) then
         echo "INFO: $nrtsroot does not exist"
-        mkdir -p $nrtsroot >& /dev/null
+        sudo mkdir -p $nrtsroot >& /dev/null
         if ($status != 0) then
             echo "ERROR: can not create the deploy directory: $nrtsroot"
             goto failure
@@ -62,17 +64,17 @@ endif
 if ($doinstall) then
 
     # deploy binaries
-    if (! -d ${nrtsroot}/bin) mkdir -p ${nrtsroot}/bin
-    chmod 755 ${nrtsroot}/bin/* >& /dev/null
-    \cp ../bin/${PLATFORM}/* ${nrtsroot}/bin/ >& /dev/null
-    chmod 555 ${nrtsroot}/bin/*  >& /dev/null
+    if (! -d ${nrtsroot}/bin) sudo mkdir -p ${nrtsroot}/bin
+    sudo chmod 755 ${nrtsroot}/bin/* >& /dev/null
+    sudo \cp ../bin/${PLATFORM}/* ${nrtsroot}/bin/ >& /dev/null
+    sudo chmod 555 ${nrtsroot}/bin/*  >& /dev/null
 
     if ($builddcc != 1) then
         # deploy scripts
-        if (! -d ${nrtsroot}/scripts) mkdir -p ${nrtsroot}/scripts
-        chmod 755 ${nrtsroot}/scripts/*  >& /dev/null
-        \cp scripts/* ${nrtsroot}/scripts/  >& /dev/null
-        chmod 555 ${nrtsroot}/scripts/*  >& /dev/null
+        if (! -d ${nrtsroot}/scripts) sudo mkdir -p ${nrtsroot}/scripts
+        sudo chmod 755 ${nrtsroot}/scripts/*  >& /dev/null
+        sudo \cp scripts/* ${nrtsroot}/scripts/  >& /dev/null
+        sudo chmod 555 ${nrtsroot}/scripts/*  >& /dev/null
     endif
 
 endif
