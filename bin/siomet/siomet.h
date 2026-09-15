@@ -134,6 +134,9 @@ void ToggleReadThreadVerbosity(void);
 void ReadScan(TTYIO *tty, SIOMET_SCAN *scan);
 void StartDeviceReader(SIOMET_INFO *info, LOGIO *lp);
 
+/* signals.c */
+void StartSignalHandler(void);
+
 /* timer.c */
 INT64 CurrentSecond(void);
 INT64 WaitForSampleTime(SIOMET_INFO *info, INT64 tols);

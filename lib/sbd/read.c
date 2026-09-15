@@ -6,7 +6,7 @@
  *====================================================================*/
 #include "sbd.h"
 
-BOOL sbdReadMessage(gzFile *gz, SBD_MESSAGE *message)
+BOOL sbdReadMessage(gzFile gz, SBD_MESSAGE *message)
 {
 UINT8 *ptr;
 static char *fid = "sbdReadMessage";

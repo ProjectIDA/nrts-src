@@ -532,7 +532,7 @@ REAL64 ida10FactMultToSint(INT16 fact, INT16 mult);
 
 /* read.c */
 int ida10ReadRecord(FILE *fp, UINT8 *buffer, int buflen, int *pType, BOOL TSheaders);
-int ida10ReadGz(gzFile *gz, UINT8 *buffer, int buflen, int *pType, BOOL TSheaders);
+int ida10ReadGz(gzFile gz, UINT8 *buffer, int buflen, int *pType, BOOL TSheaders);
 
 /* rename.c */
 char *ida10Cname(char *cname, LNKLST *map);

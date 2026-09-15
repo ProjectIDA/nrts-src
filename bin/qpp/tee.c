@@ -60,7 +60,7 @@ void TeeHLP(QDP_HLP *hlp)
 {
 int trecs = DEFAULT_TRECS, errnum;
 static ISI_SEQNO seqno = {ISI_UNDEF_SEQNO_SIG, 0LL};
-static gzFile *gz = NULL;
+static gzFile gz = NULL;
 char path[MAXPATHLEN+1];
 UINT8 buf[IDA10_FIXEDRECLEN];
 static struct {

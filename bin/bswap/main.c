@@ -22,7 +22,7 @@ static void help(char *myname)
     exit(0);
 }
 
-static void Swap2Bytes(gzFile *gz)
+static void Swap2Bytes(gzFile gz)
 {
 int i, nbyte, nsamp, wordlen=2;
 
@@ -38,7 +38,7 @@ int i, nbyte, nsamp, wordlen=2;
     exit(gzeof(gz) ? 0 : 1);
 }
 
-static void Swap4Bytes(gzFile *gz)
+static void Swap4Bytes(gzFile gz)
 {
 int i, nbyte, nsamp, wordlen=4;
 
@@ -54,7 +54,7 @@ int i, nbyte, nsamp, wordlen=4;
     exit(gzeof(gz) ? 0 : 1);
 }
 
-static void Swap8Bytes(gzFile *gz)
+static void Swap8Bytes(gzFile gz)
 {
 int i, nbyte, nsamp, wordlen=8;
 
@@ -72,7 +72,7 @@ int i, nbyte, nsamp, wordlen=8;
 
 int main(int argc, char **argv)
 {
-gzFile *gz;
+gzFile gz;
 int i, wordsize = -1;
 
     for (i = 1; i < argc; i++) {

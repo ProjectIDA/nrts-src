@@ -26,7 +26,7 @@ if ($error) then
     goto failure
 endif
 
-Check deploy directory exists
+# Check deploy directory exists
 if ($doinstall) then
     if (! -d $nrtsroot) then
         echo "INFO: $nrtsroot does not exist"

@@ -317,7 +317,7 @@ VOID sbdSetRetryFlag(SBD *sbd, BOOL value);
 VOID sbdSetDisabled(SBD *sbd, BOOL value);
 
 /* read.c */
-BOOL sbdReadMessage(gzFile *gz, SBD_MESSAGE *message);
+BOOL sbdReadMessage(gzFile gz, SBD_MESSAGE *message);
 
 /* recv.c */
 BOOL sbdRecvMessage(SBD *sbd, SBD_MESSAGE *message);

@@ -330,7 +330,7 @@ IDA10_TS ts;
 IDA10_LM lm;
 IDA10_CF cf;
 FILE *fp;
-gzFile *gz;
+gzFile gz;
 SANIO_CONFIG config;
 BOOL haveCF = FALSE;
 char msgbuf[1024];

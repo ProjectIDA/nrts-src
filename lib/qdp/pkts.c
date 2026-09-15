@@ -64,7 +64,7 @@ int qdpReadPkt(FILE *fp, QDP_PKT *pkt)
     return QDP_CMNHDR_LEN + pkt->hdr.dlen;
 }
 
-int qdpReadPktgz(gzFile *fp, QDP_PKT *pkt)
+int qdpReadPktgz(gzFile fp, QDP_PKT *pkt)
 {
 int errnum;
 

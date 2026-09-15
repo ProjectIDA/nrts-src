@@ -20,7 +20,7 @@ int i;
     for (i = 0; i < (int) strlen(string); i++) if (string[i] == ' ') string[i] = '_';
 }
 
-int rdrec(gzFile *gz, IDA10_TS *ts, struct counter *count, int verbose)
+int rdrec(gzFile gz, IDA10_TS *ts, struct counter *count, int verbose)
 {
 int status, nread, RecordType;
 static UINT8 buf[IDA10_MAXRECLEN];

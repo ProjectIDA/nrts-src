@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 int i;
 int rev = DEFAULT_REV, reclen=DEFAULT_RECLEN;
 UINT32 in, out;
-gzFile *gz;
+gzFile gz;
 DBIO *db = NULL;
 IDA *ida;
 int nread, unused, seqno;

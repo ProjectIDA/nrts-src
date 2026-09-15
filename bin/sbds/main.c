@@ -12,7 +12,7 @@ static SBD *server;
 
 static void StdinTest()
 {
-gzFile *gz;
+gzFile gz;
 SBD_MESSAGE message;
 static char *fid = "StdinTest";
 

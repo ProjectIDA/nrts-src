@@ -25,7 +25,7 @@ UINT8 *ptr, hdr[QDPLUS_HDRLEN];
 
 }
 
-BOOL qdplusReadgz(gzFile *fp, QDPLUS_PKT *pkt)
+BOOL qdplusReadgz(gzFile fp, QDPLUS_PKT *pkt)
 {
 UINT8 *ptr, hdr[QDPLUS_HDRLEN];
 

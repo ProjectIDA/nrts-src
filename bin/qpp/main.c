@@ -390,7 +390,7 @@ static BOOL first = TRUE;
 int main (int argc, char **argv)
 {
 int i;
-gzFile *gzin;
+gzFile gzin;
 UINT32 skip = 0, in = 0, kept = 0, count = 0xffffffff;;
 QDPLUS_PKT pkt;
 UINT64 keep = 0;

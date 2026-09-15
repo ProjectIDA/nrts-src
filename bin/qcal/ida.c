@@ -8,7 +8,7 @@
 
 #define MY_MOD_ID QCAL_MOD_IDA
 
-static gzFile *gz = Z_NULL;
+static gzFile gz = Z_NULL;
 
 static void Ida10Callback(void *arg, QDP_HLP *hlp)
 {

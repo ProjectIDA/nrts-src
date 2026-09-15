@@ -22,7 +22,7 @@ struct {
     char crnt[MAXPATHLEN+1];
     char this[MAXPATHLEN+1];
 } path;
-gzFile *gz;
+gzFile gz;
 FILE *fp = NULL;
 
     for (i = 1; i < argc; i++) {

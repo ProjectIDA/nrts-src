@@ -5,6 +5,7 @@
  *
  *====================================================================*/
 #include "sbds.h"
+#include "isi/db.h"
 #include "addoss.h"
 
 static DBIO *db;

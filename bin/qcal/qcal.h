@@ -90,6 +90,7 @@ BOOL E300Control(Q330_CALIB *calib);
 /* exit.c */
 void SetWatchdogExitDelay(UINT32 value);
 void SetDeleteFlag(void);
+void SetAbortCalFlag(void);
 void SetExitStatus(INT32 status);
 INT32 ExitStatus(void);
 void Exit(INT32 status);

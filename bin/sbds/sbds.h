@@ -5,6 +5,7 @@
 #include "sbd.h"
 #include "util.h"
 #include "logio.h"
+#define INCLUDE_APP_SUPPLIED_WRITER
 #include "isi/dl.h"
 
 extern char *VersionIdentString;
@@ -128,7 +129,7 @@ void InitDLmgr(PARAM *par);
 
 /* exit.c */
 void BlockShutdown(char *fid);
-void UnlockShutdown(char *fid);
+void UnblockShutdown(char *fid);
 void BlockOnShutdown(void);
 BOOL ShutdownInProgress(void);
 void GracefulExit(INT32 status);

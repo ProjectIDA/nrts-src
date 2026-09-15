@@ -14,7 +14,7 @@ int saveTtags = 0;
 
 int main(int argc, char **argv)
 {
-gzFile *gz;
+gzFile gz;
 int verbose;
 struct counter count;
 IDA10_TS ts;

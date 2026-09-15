@@ -15,7 +15,7 @@ static THREAD_FUNC MainThread(MainThreadParams *cmdline)
 int type, status, len;
 ISI_PUSH *ph;
 UINT8 *buf;
-gzFile *gz;
+gzFile gz;
 
     if ((buf = (UINT8 *) malloc(IDA10_MAXRECLEN)) == NULL) {
         perror("malloc");

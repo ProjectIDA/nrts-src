@@ -117,6 +117,9 @@ struct _modbus {
 void _modbus_init_common(modbus_t *ctx);
 void _error_print(modbus_t *ctx, const char *context);
 
+/* defined in modbus.c, called from modbus-rtu.c and modbus-tcp.c */
+size_t modbus_strlcpy(char *dest, const char *src, size_t dest_size);
+
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dest, const char *src, size_t dest_size);
 #endif

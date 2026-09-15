@@ -99,7 +99,7 @@ else
     echo "ERROR: unsupported operating system.  Update .platform file!"
 endif
 
-if ($machine == i86pc) then
+if ($machine == i86pc || $machine == x86_64 || $machine == amd64 || $machine == aarch64 || $machine == arm64) then
     set order = LTL_ENDIAN_ORDER
 else
     set order = BIG_ENDIAN_ORDER

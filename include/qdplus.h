@@ -173,7 +173,7 @@ void qdplusSetLcqStateFlag(QDPLUS *handle, int value);
 
 /* io.c */
 BOOL qdplusRead(FILE *fp, QDPLUS_PKT *pkt);
-BOOL qdplusReadgz(gzFile *fp, QDPLUS_PKT *pkt);
+BOOL qdplusReadgz(gzFile fp, QDPLUS_PKT *pkt);
 BOOL qdplusWrite(FILE *fp, QDPLUS_PKT *pkt);
 
 /* meta.c */

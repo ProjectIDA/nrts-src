@@ -22,7 +22,7 @@ char *net = "II";
 char qcode = 'R';
 char *sta = NULL;
 char *dbspec = NULL;
-gzFile *gz;
+gzFile gz;
 DBIO *db = NULL;
 IDA *ida;
 char *map = NULL;

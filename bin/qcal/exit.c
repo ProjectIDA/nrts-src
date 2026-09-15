@@ -29,7 +29,7 @@ UINT32 status;
     exit(status);
 }
 
-void SetAbortCalFlag()
+void SetAbortCalFlag(void)
 {
     MUTEX_LOCK(&mutex);
         AbortCalFlag = TRUE;

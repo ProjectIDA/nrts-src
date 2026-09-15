@@ -9,7 +9,7 @@
 
 extern int saveTtags;
 
-void init(int  argc, char **argv, struct counter *count, int *verbose, gzFile **gz)
+void init(int  argc, char **argv, struct counter *count, int *verbose, gzFile *gz)
 {
 FILE *fp = stdin;
 int i, errcode, maxsec = 0;

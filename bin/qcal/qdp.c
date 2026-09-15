@@ -9,7 +9,7 @@
 #define MY_MOD_ID QCAL_MOD_QDP
 
 static MUTEX mutex;
-static gzFile *gz = Z_NULL;
+static gzFile gz = Z_NULL;
 static BOOL CurrentCalibrationState = FALSE;
 static UINT32 ReadySeqno = 0;
 static QDP_TYPE_C1_STAT status;

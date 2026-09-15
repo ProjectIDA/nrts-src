@@ -11,7 +11,7 @@
 
 typedef struct {
     FILE *fp;
-    gzFile *gz;
+    gzFile gz;
 } FPGZ_HANDLE;
 
 #define READ_FPGZ(fpgz, buf, want) ((fpgz->fp == NULL) ? gzread(fpgz->gz, buf, want) : fread(buf, 1, want, fpgz->fp))
@@ -151,7 +151,7 @@ FPGZ_HANDLE fpgz;
     return ReadRecord(&fpgz, buffer, buflen, pType, TSheaders);
 }
 
-int ida10ReadGz(gzFile *gz, UINT8 *buffer, int buflen, int *pType, BOOL TSheaders)
+int ida10ReadGz(gzFile gz, UINT8 *buffer, int buflen, int *pType, BOOL TSheaders)
 {
 FPGZ_HANDLE fpgz;
 

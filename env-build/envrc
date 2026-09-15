@@ -15,7 +15,10 @@ setenv DBIO_DATABASE /usr/nrts
 setenv SRC_ROOT src_root
 setenv SRC_INCLUDE /usr/home/ida/src_root/src/include
 
-setenv CC "gcc"
+# This tree is C17-era: it uses K&R function definitions and relies on ()
+# meaning "unspecified args".  Both were removed in C23, which is the default
+# in gcc 15 (Ubuntu 26.04).  Pin the standard rather than modernize ~70 files.
+setenv CC "gcc -std=gnu17"
 
 if (-e /opt/local) then
     setenv OPTDIR /opt/local
