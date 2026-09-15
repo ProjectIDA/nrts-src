@@ -22,7 +22,7 @@ extern int nsys;
 extern int csys;
 extern char **Systems;
 
-char Hostname[MAXHOSTNAMELEN];
+extern char Hostname[MAXHOSTNAMELEN];
 
 void chsystem(char *site, char *home)
 {

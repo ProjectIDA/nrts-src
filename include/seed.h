@@ -85,7 +85,7 @@ typedef struct seed_b1001 {
 
 /* A mini-seed packet */
 
-struct seed_minipacket {
+typedef struct seed_minipacket {
     SEED_FSDH fsdh;   /* a standard FSDH,                   */
     SEED_B1000 b1000; /* followed by a blockette 1000,      */
     INT32 *data;      /* followed by some decompressed data */

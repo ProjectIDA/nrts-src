@@ -47,6 +47,10 @@ source env-build/aliases
 
 # do build
 make
+if ($status != 0) then
+    echo "ERROR: build failed"
+    goto failure
+endif
 
 # install to nrtsroot, if requested
 if ($doinstall) then

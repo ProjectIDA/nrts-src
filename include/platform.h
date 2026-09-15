@@ -166,6 +166,12 @@
 #   define HAVE_FLOCK
 #   define HAVE_MSYNC
 #   define HAVE_DIRENT
+    /* glibc 2.38 added strlcpy(); before that we supply our own. Note glibc
+     * returns size_t where ours returns char *, but no caller uses the
+     * return value, and SOLARIS/DARWIN/BSD have always used the libc one. */
+#   if defined(__GLIBC__) && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 38))
+#       define HAVE_STRLCPY
+#   endif
 #   define HAVE_RLIMIT
 #   define HAVE_FORK
 // Check for Slate ARM5 cpu with unusual double precision endian setup

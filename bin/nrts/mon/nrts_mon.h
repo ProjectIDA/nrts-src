@@ -28,23 +28,26 @@ int do_cmd(struct nrts_mmap *map, char *home, struct nrts_files *file, struct nr
 int help_win();
 void stat_win();
 void die();
-int Cols, Lines;
-int logwinlen;
-int winswide;
-int logwinarg;
-int statwinlen;
-int statwinbeg_y;
-int statwinlines;
-int flag_y;
-int flag_x;
-long curpos;
-int indices;
-int times;
-int nsys;
-WINDOW *logwin;
-WINDOW *statwin;
-WINDOW *logtitle;
-WINDOW *stattitle;
+/* Declarations only -- the definitions live in main.c. Without extern these
+ * are tentative definitions in every TU that includes this header, which
+ * gcc merged under -fcommon but rejects since gcc 10 defaults to -fno-common. */
+extern int Cols, Lines;
+extern int logwinlen;
+extern int winswide;
+extern int logwinarg;
+extern int statwinlen;
+extern int statwinbeg_y;
+extern int statwinlines;
+extern int flag_y;
+extern int flag_x;
+extern long curpos;
+extern int indices;
+extern int times;
+extern int nsys;
+extern WINDOW *logwin;
+extern WINDOW *statwin;
+extern WINDOW *logtitle;
+extern WINDOW *stattitle;
 
 #endif
 
