@@ -8,8 +8,6 @@
 #include "util.h"
 #include "qdplus.h"
 #include "liss.h"
-#include "sbd.h"
-#include "addoss.h"
 
 extern char *VersionIdentString;
 
@@ -19,8 +17,6 @@ extern char *VersionIdentString;
 #define TYPE_LISS     2
 #define TYPE_REFTEK   3
 #define TYPE_FEMTO    4
-#define TYPE_SBD      5
-#define TYPE_ADDOSS   6
 
 #define DEFAULT_LOG "-"
 
@@ -44,19 +40,11 @@ extern char *VersionIdentString;
 #define DEFAULT_FEMTO_NHIDE   10000 /* also a lot */
 #define DEFAULT_FEMTO_RECLEN IDA10_MAXRECLEN
 
-#define DEFAULT_SBD_NREC   120000 /* a lot */
-#define DEFAULT_SBD_NHIDE    1000 /* also a lot */
-#define DEFAULT_SBD_RECLEN SBD_MAX_MSGLEN
-
-#define DEFAULT_ADDOSS_NREC   120000 /* a lot */
-#define DEFAULT_ADDOSS_NHIDE    1000 /* also a lot */
-#define DEFAULT_ADDOSS_RECLEN ADDOSS_IDA10_PKTLEN
-
 static void help(char *myname)
 {
     printf("%s %s\n", myname, VersionIdentString);
     fprintf(stderr, "\n");
-    fprintf(stderr,"usage: %s type={ ida | qdp | liss | reftek | femto | sbd | addoss } [ options ] name\n", myname);
+    fprintf(stderr,"usage: %s type={ ida | qdp | liss | reftek | femto } [ options ] name\n", myname);
     fprintf(stderr, "\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "db=spec    => database specifier\n");
@@ -114,16 +102,6 @@ char marker[MAXPATHLEN+1];
                 nrec = DEFAULT_FEMTO_NREC;
                 nhide = DEFAULT_FEMTO_NHIDE;
                 reclen = DEFAULT_FEMTO_RECLEN;
-            } else if (strcmp(string, "sbd") == 0) {
-                type = TYPE_SBD;
-                nrec = DEFAULT_SBD_NREC;
-                nhide = DEFAULT_SBD_NHIDE;
-                reclen = DEFAULT_SBD_RECLEN;
-            } else if (strcmp(string, "addoss") == 0 || strcmp(string, "adoss") == 0) {
-                type = TYPE_ADDOSS;
-                nrec = DEFAULT_ADDOSS_NREC;
-                nhide = DEFAULT_ADDOSS_NHIDE;
-                reclen = DEFAULT_ADDOSS_RECLEN;
             } else {
                 fprintf(stderr, "%s: unrecognize type '%s'\n", argv[0], string);
                 help(argv[0]);

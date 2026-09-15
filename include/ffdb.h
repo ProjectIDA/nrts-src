@@ -9,7 +9,10 @@
 
 #include "platform.h"
 #include "ida/limits.h"
-#include "sbd.h"
+
+/* Iridium equipment identifier length. Was SBD_IMEI_LEN from sbd.h, kept
+ * here as its own constant now that the SBD library has been retired. */
+#define IDAFF_IMEI_LEN 15
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,7 +67,7 @@ typedef struct {
 
 typedef struct {
     char site[IDA_SNAMLEN+1];
-    char imei[SBD_IMEI_LEN+1];
+    char imei[IDAFF_IMEI_LEN+1];
     char net[IDA_NNAMLEN+1];
     UINT64 zerotime;
 } IDAFF_IMEI;

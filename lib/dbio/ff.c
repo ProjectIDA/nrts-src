@@ -464,7 +464,7 @@ static char *fid = "idaffInit:LoadIMEI";
             util_log(1, "%s: error at %s line %d", fid, path, lineno);
             return CloseFp(fp, -4);
         }
-        strlcpy(ff->imei[i].imei, token[0], SBD_IMEI_LEN+1);
+        strlcpy(ff->imei[i].imei, token[0], IDAFF_IMEI_LEN+1);
         strlcpy(ff->imei[i].site, token[1], IDA_SNAMLEN+1);
         strlcpy(ff->imei[i].net,  token[2], IDA_NNAMLEN+1);
         ff->imei[i].zerotime = (utilAttodt(token[3]) - SAN_EPOCH_TO_1970_EPOCH) * NANOSEC_PER_SEC;

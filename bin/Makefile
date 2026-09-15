@@ -36,7 +36,6 @@ all: \
      qmon \
      qpp \
      qverify \
-     sbds \
      siomet \
      stripcat \
      substring \
@@ -184,15 +183,6 @@ qverify: FORCE
 qsf: FORCE
 	cd qsf; $(MAKE) install
 
-sbd: FORCE
-	cd sbd; $(MAKE) install
-
-sbds: FORCE
-	cd sbds; $(MAKE) install
-
-sbd10: FORCE
-	cd sbd10; $(MAKE) install
-
 siomet: FORCE
 	cd siomet; $(MAKE) install
 
@@ -213,9 +203,6 @@ tristar: FORCE
 
 tristar10: FORCE
 	cd tristar10; $(MAKE) install
-
-tstsbd: FORCE
-	cd tstsbd; $(MAKE) install
 
 sacutil: FORCE
 	cd sacutil; $(MAKE) install

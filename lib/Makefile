@@ -2,7 +2,6 @@
 # Make all libraries
 
 all: \
-    addoss \
     cssio \
     dali \
     dbio \
@@ -32,7 +31,6 @@ all: \
     qdpxml \
     qio \
     sacio \
-    sbd \
     seed \
     tristar \
     ttyio \
@@ -55,9 +53,6 @@ idadcc: \
     logio \
     mseed \
     util
-
-addoss: FORCE
-	cd addoss; $(MAKE)
 
 cssio: FORCE
 	cd cssio; $(MAKE)
@@ -159,9 +154,6 @@ sacio: FORCE
 	cd sacio; $(MAKE)
 
 
-sbd: FORCE
-	cd sbd; $(MAKE)
-
 
 seed: FORCE
 	cd seed; $(MAKE)
@@ -182,7 +174,6 @@ xfer: FORCE
 	cd xfer; $(MAKE)
 
 clean: FORCE
-	cd addoss;   $(MAKE) $@
 	cd cssio;    $(MAKE) $@
 	cd dali;     $(MAKE) $@
 	cd dbio;     $(MAKE) $@
@@ -213,7 +204,6 @@ clean: FORCE
 	cd qdpxml;   $(MAKE) $@
 	cd qio;      $(MAKE) $@
 	cd sacio;    $(MAKE) $@
-	cd sbd;      $(MAKE) $@
 	cd seed;     $(MAKE) $@
 	cd tristar;  $(MAKE) $@
 	cd ttyio;    $(MAKE) $@
@@ -222,7 +212,6 @@ clean: FORCE
 	cd xfer;     $(MAKE) $@
 
 remove: FORCE
-	cd addoss;   $(MAKE) $@
 	cd cssio;    $(MAKE) $@
 	cd dali;     $(MAKE) $@
 	cd dbio;     $(MAKE) $@
@@ -253,7 +242,6 @@ remove: FORCE
 	cd qdpxml;   $(MAKE) $@
 	cd qio;      $(MAKE) $@
 	cd sacio;    $(MAKE) $@
-	cd sbd;      $(MAKE) $@
 	cd seed;     $(MAKE) $@
 	cd tristar;  $(MAKE) $@
 	cd ttyio;    $(MAKE) $@
@@ -263,7 +251,6 @@ remove: FORCE
 	rm -rf ../../lib/$(PLATFORM)
 
 REMOVE: FORCE
-	cd addoss;   $(MAKE) $@
 	cd cssio;    $(MAKE) $@
 	cd dali;     $(MAKE) $@
 	cd dbio;     $(MAKE) $@
@@ -294,7 +281,6 @@ REMOVE: FORCE
 	cd qdpxml;   $(MAKE) $@
 	cd qio;      $(MAKE) $@
 	cd sacio;    $(MAKE) $@
-	cd sbd;      $(MAKE) $@
 	cd seed;     $(MAKE) $@
 	cd tristar;  $(MAKE) $@
 	cd ttyio;    $(MAKE) $@
