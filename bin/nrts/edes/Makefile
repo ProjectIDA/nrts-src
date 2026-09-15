@@ -65,14 +65,14 @@ OBJS  += transfer.o
 OUTPUT = nrts_edes
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ $(OUTPUT)
 
 release: FORCE
 	vi ReleaseNotes.c; $(MAKE) remove install
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ doinstall 
 
 clean: OBJS/$(PLATFORM) FORCE
@@ -88,7 +88,7 @@ doinstall: $(OUTPUT)
 
 REMOVE: $(BINDIR)
 	rm -rf OBJS
-	cd $(BINDIR); rm -f $(OUTPUT)
+	cd $(BINDIR) && rm -f $(OUTPUT)
 
 $(BINDIR):
 	mkdir -p $@

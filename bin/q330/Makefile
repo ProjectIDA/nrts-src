@@ -56,11 +56,11 @@ OBJS += xml.o
 OUTPUT  = q330
  
 all: OBJS/$(PLATFORM) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	make -f ../../Makefile VPATH=../../ $(OUTPUT)
 
 install: OBJS/$(PLATFORM) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	make -f ../../Makefile VPATH=../../ doinstall
  
 clean: OBJS/$(PLATFORM) FORCE

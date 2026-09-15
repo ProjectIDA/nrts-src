@@ -5,26 +5,26 @@ all: lib bin
 install: all
 
 idadcc: FORCE
-	cd lib; $(MAKE) $@
-	cd bin; $(MAKE) $@
+	cd lib && $(MAKE) $@
+	cd bin && $(MAKE) $@
 
 lib: FORCE
 	date
-	cd lib; $(MAKE)
+	cd lib && $(MAKE)
 	date
 
 bin: FORCE
 	date
-	cd bin; $(MAKE)
+	cd bin && $(MAKE)
 	date
 
 clean: FORCE
-	cd lib; $(MAKE) $@
-	cd bin; $(MAKE) $@
+	cd lib && $(MAKE) $@
+	cd bin && $(MAKE) $@
 
 remove: FORCE
 	rm -f $(PLATFORM).log Build.log
-	cd lib; $(MAKE) REMOVE
-	cd bin; $(MAKE) REMOVE
+	cd lib && $(MAKE) REMOVE
+	cd bin && $(MAKE) REMOVE
 
 FORCE:

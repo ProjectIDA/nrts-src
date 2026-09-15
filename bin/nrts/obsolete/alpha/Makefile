@@ -56,11 +56,11 @@ OBJS   = main.o ReleaseNotes.o init.o exitcode.o read.o
 OUTPUT = nrts_alpha
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ $(OUTPUT)
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ doinstall
 
 clean: OBJS/$(PLATFORM) FORCE
@@ -77,7 +77,7 @@ notes: $(VPATH)ReleaseNotes
 
 REMOVE: $(BINDIR)
 	rm -rf OBJS
-	cd $(BINDIR); rm -f $(OUTPUT)
+	cd $(BINDIR) && rm -f $(OUTPUT)
 
 $(BINDIR):
 	mkdir -p $@

@@ -20,11 +20,11 @@ OBJS      = main.o init.o tapinit.o main_menu.o syslist.o viewer_menu.o\
 OUTPUT = nrts_view
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ $(OUTPUT)
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ doinstall
 
 clean: OBJS/$(PLATFORM) FORCE
@@ -38,7 +38,7 @@ doinstall: $(OUTPUT)
 
 REMOVE: $(BINDIR)
 	rm -rf OBJS
-	cd $(BINDIR); rm -f $(OUTPUT)
+	cd $(BINDIR) && rm -f $(OUTPUT)
 
 $(BINDIR):
 	mkdir -p $@

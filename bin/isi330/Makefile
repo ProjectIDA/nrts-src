@@ -58,11 +58,11 @@ OUTPUT  = isi330
 CC = cc ### -std=c89 ###clang
  
 all: OBJS/$(PLATFORM) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	make -f ../../Makefile VPATH=../../ $(OUTPUT)
 
 install: OBJS/$(PLATFORM) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	make -f ../../Makefile VPATH=../../ doinstall
  
 clean: OBJS/$(PLATFORM) FORCE

@@ -32,7 +32,7 @@ OBJS    = \
 .PRECIOUS : $(OUTPUT)
 
 all: OBJS/$(PLATFORM) $(LIBDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ makestamp
 
 $(OUTPUT): makestamp $(INCDIR)/xfer.h
@@ -66,7 +66,7 @@ INCD = ../../$(INCDIR)
 LIBS = -L$(LIBD) -lxfer -lida -lutil $(SOCKLIBS)
 
 test_ezio: ezio.c
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(CC) -g -o $@ ../../ezio.c -I$(INCD) $(DEFS) -DDEBUG_TEST $(LIBS)
  
 FORCE:

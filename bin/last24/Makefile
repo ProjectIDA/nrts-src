@@ -47,11 +47,11 @@ OBJS  = last24.o
 OUTPUT  = last24
  
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	make -f ../../Makefile VPATH=../../ $(OUTPUT)
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	make -f ../../Makefile VPATH=../../ doinstall
  
 clean: OBJS/$(PLATFORM) FORCE

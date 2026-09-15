@@ -51,7 +51,7 @@ OBJS   += $(OUTPUT)(webpage.o)
 .PRECIOUS : $(OUTPUT)
 
 all: OBJS/$(PLATFORM) $(LIBDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ makestamp
 
 $(OUTPUT): makestamp

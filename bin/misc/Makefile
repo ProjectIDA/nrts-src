@@ -38,26 +38,26 @@ OUTPUT += validate
 #OUTPUT += ydtodmdy
 
 all: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ $(OUTPUT)
 
 install: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); \
+	cd OBJS/$(PLATFORM) && \
 	$(MAKE) -f ../../Makefile VPATH=../../ doinstall
 
 clean: OBJS/$(PLATFORM) FORCE
 	rm -f OBJS/$(PLATFORM)/*.o
 
 remove: OBJS/$(PLATFORM) $(BINDIR) FORCE
-	cd OBJS/$(PLATFORM); rm -f $(OUTPUT)
-	cd $(BINDIR); rm -f $(OUTPUT)
+	cd OBJS/$(PLATFORM) && rm -f $(OUTPUT)
+	cd $(BINDIR) && rm -f $(OUTPUT)
 
 doinstall: $(OUTPUT)
 	$(INSTALL) -c -m 755 $(OUTPUT) $(BINDIR)
 
 REMOVE: $(BINDIR)
 	rm -rf OBJS
-	cd $(BINDIR); rm -f $(OUTPUT)
+	cd $(BINDIR) && rm -f $(OUTPUT)
 
 $(BINDIR):
 	mkdir -p $@

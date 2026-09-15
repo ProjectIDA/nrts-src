@@ -55,238 +55,238 @@ idadcc: \
     util
 
 cssio: FORCE
-	cd cssio; $(MAKE)
+	cd cssio && $(MAKE)
 
 dali: FORCE
-	cd dali; $(MAKE)
+	cd dali && $(MAKE)
 
 dbio: FORCE
-	cd dbio; $(MAKE)
+	cd dbio && $(MAKE)
 
 dccdb: FORCE
-	cd dccdb; $(MAKE)
+	cd dccdb && $(MAKE)
 
 detect: FORCE
-	cd detect; $(MAKE)
+	cd detect && $(MAKE)
 
 dmc: FORCE
-	cd dmc; $(MAKE)
+	cd dmc && $(MAKE)
 
 
 e300: FORCE
-	cd e300; $(MAKE)
+	cd e300 && $(MAKE)
 
 filter: FORCE
-	cd filter; $(MAKE)
+	cd filter && $(MAKE)
 
 iacp: FORCE
-	cd iacp; $(MAKE)
+	cd iacp && $(MAKE)
 
 iboot: FORCE
-	cd iboot; $(MAKE)
+	cd iboot && $(MAKE)
 
 ida: FORCE
-	cd ida; $(MAKE)
+	cd ida && $(MAKE)
 
 ida10: FORCE
-	cd ida10; $(MAKE)
+	cd ida10 && $(MAKE)
 
 isi: FORCE
-	cd isi; $(MAKE)
+	cd isi && $(MAKE)
 
 isidb: FORCE
-	cd isidb; $(MAKE)
+	cd isidb && $(MAKE)
 
 isidl: FORCE
-	cd isidl; $(MAKE)
+	cd isidl && $(MAKE)
 
 
 
 liss: FORCE
-	cd liss; $(MAKE)
+	cd liss && $(MAKE)
 
 logio: FORCE
-	cd logio; $(MAKE)
+	cd logio && $(MAKE)
 
 md5: FORCE
-	cd md5; $(MAKE)
+	cd md5 && $(MAKE)
 
 
 modbus: FORCE
-	cd modbus; $(MAKE)
+	cd modbus && $(MAKE)
 
 mseed: FORCE
-	cd mseed; $(MAKE)
+	cd mseed && $(MAKE)
 
 msgq: FORCE
-	cd msgq; $(MAKE)
+	cd msgq && $(MAKE)
 
 myxml: FORCE
-	cd myxml; $(MAKE)
+	cd myxml && $(MAKE)
 
 
 nrts: FORCE
-	cd nrts; $(MAKE)
+	cd nrts && $(MAKE)
 
 
 
 
 
 paro: FORCE
-	cd paro; $(MAKE)
+	cd paro && $(MAKE)
 
 q330: FORCE
-	cd q330; $(MAKE)
+	cd q330 && $(MAKE)
 
 qdp: FORCE
-	cd qdp; $(MAKE)
+	cd qdp && $(MAKE)
 
 qdplus: FORCE
-	cd qdplus; $(MAKE)
+	cd qdplus && $(MAKE)
 
 qdpxml: FORCE
-	cd qdpxml; $(MAKE)
+	cd qdpxml && $(MAKE)
 
 qio: FORCE
-	cd qio; $(MAKE)
+	cd qio && $(MAKE)
 
 sacio: FORCE
-	cd sacio; $(MAKE)
+	cd sacio && $(MAKE)
 
 
 
 seed: FORCE
-	cd seed; $(MAKE)
+	cd seed && $(MAKE)
 
 tristar: FORCE
-	cd tristar; $(MAKE)
+	cd tristar && $(MAKE)
 
 ttyio: FORCE
-	cd ttyio; $(MAKE)
+	cd ttyio && $(MAKE)
 
 udpio: FORCE
-	cd udpio; $(MAKE)
+	cd udpio && $(MAKE)
 
 util: FORCE
-	cd util; $(MAKE)
+	cd util && $(MAKE)
 
 xfer: FORCE
-	cd xfer; $(MAKE)
+	cd xfer && $(MAKE)
 
 clean: FORCE
-	cd cssio;    $(MAKE) $@
-	cd dali;     $(MAKE) $@
-	cd dbio;     $(MAKE) $@
-	cd dccdb;    $(MAKE) $@
-	cd detect;   $(MAKE) $@
-	cd dmc;      $(MAKE) $@
-	cd e300;     $(MAKE) $@
-	cd filter;   $(MAKE) $@
-	cd iacp;     $(MAKE) $@
-	cd iboot;    $(MAKE) $@
-	cd ida;      $(MAKE) $@
-	cd ida10;    $(MAKE) $@
-	cd isi;      $(MAKE) $@
-	cd isidb;    $(MAKE) $@
-	cd isidl;    $(MAKE) $@
-	cd liss;     $(MAKE) $@
-	cd logio;    $(MAKE) $@
-	cd md5;      $(MAKE) $@
-	cd modbus;   $(MAKE) $@
-	cd mseed;    $(MAKE) $@
-	cd msgq;     $(MAKE) $@
-	cd myxml;    $(MAKE) $@
-	cd nrts;     $(MAKE) $@
-	cd paro;     $(MAKE) $@
-	cd q330;     $(MAKE) $@
-	cd qdp;      $(MAKE) $@
-	cd qdplus;   $(MAKE) $@
-	cd qdpxml;   $(MAKE) $@
-	cd qio;      $(MAKE) $@
-	cd sacio;    $(MAKE) $@
-	cd seed;     $(MAKE) $@
-	cd tristar;  $(MAKE) $@
-	cd ttyio;    $(MAKE) $@
-	cd udpio;    $(MAKE) $@
-	cd util;     $(MAKE) $@
-	cd xfer;     $(MAKE) $@
+	cd cssio &&    $(MAKE) $@
+	cd dali &&     $(MAKE) $@
+	cd dbio &&     $(MAKE) $@
+	cd dccdb &&    $(MAKE) $@
+	cd detect &&   $(MAKE) $@
+	cd dmc &&      $(MAKE) $@
+	cd e300 &&     $(MAKE) $@
+	cd filter &&   $(MAKE) $@
+	cd iacp &&     $(MAKE) $@
+	cd iboot &&    $(MAKE) $@
+	cd ida &&      $(MAKE) $@
+	cd ida10 &&    $(MAKE) $@
+	cd isi &&      $(MAKE) $@
+	cd isidb &&    $(MAKE) $@
+	cd isidl &&    $(MAKE) $@
+	cd liss &&     $(MAKE) $@
+	cd logio &&    $(MAKE) $@
+	cd md5 &&      $(MAKE) $@
+	cd modbus &&   $(MAKE) $@
+	cd mseed &&    $(MAKE) $@
+	cd msgq &&     $(MAKE) $@
+	cd myxml &&    $(MAKE) $@
+	cd nrts &&     $(MAKE) $@
+	cd paro &&     $(MAKE) $@
+	cd q330 &&     $(MAKE) $@
+	cd qdp &&      $(MAKE) $@
+	cd qdplus &&   $(MAKE) $@
+	cd qdpxml &&   $(MAKE) $@
+	cd qio &&      $(MAKE) $@
+	cd sacio &&    $(MAKE) $@
+	cd seed &&     $(MAKE) $@
+	cd tristar &&  $(MAKE) $@
+	cd ttyio &&    $(MAKE) $@
+	cd udpio &&    $(MAKE) $@
+	cd util &&     $(MAKE) $@
+	cd xfer &&     $(MAKE) $@
 
 remove: FORCE
-	cd cssio;    $(MAKE) $@
-	cd dali;     $(MAKE) $@
-	cd dbio;     $(MAKE) $@
-	cd dccdb;    $(MAKE) $@
-	cd detect;   $(MAKE) $@
-	cd dmc;      $(MAKE) $@
-	cd e300;     $(MAKE) $@
-	cd filter;   $(MAKE) $@
-	cd iacp;     $(MAKE) $@
-	cd iboot;    $(MAKE) $@
-	cd ida;      $(MAKE) $@
-	cd ida10;    $(MAKE) $@
-	cd isi;      $(MAKE) $@
-	cd isidb;    $(MAKE) $@
-	cd isidl;    $(MAKE) $@
-	cd liss;     $(MAKE) $@
-	cd logio;    $(MAKE) $@
-	cd md5;      $(MAKE) $@
-	cd modbus;   $(MAKE) $@
-	cd mseed;    $(MAKE) $@
-	cd msgq;     $(MAKE) $@
-	cd myxml;    $(MAKE) $@
-	cd nrts;     $(MAKE) $@
-	cd paro;     $(MAKE) $@
-	cd q330;     $(MAKE) $@
-	cd qdp;      $(MAKE) $@
-	cd qdplus;   $(MAKE) $@
-	cd qdpxml;   $(MAKE) $@
-	cd qio;      $(MAKE) $@
-	cd sacio;    $(MAKE) $@
-	cd seed;     $(MAKE) $@
-	cd tristar;  $(MAKE) $@
-	cd ttyio;    $(MAKE) $@
-	cd udpio;    $(MAKE) $@
-	cd util;     $(MAKE) $@
-	cd xfer;     $(MAKE) $@
+	cd cssio &&    $(MAKE) $@
+	cd dali &&     $(MAKE) $@
+	cd dbio &&     $(MAKE) $@
+	cd dccdb &&    $(MAKE) $@
+	cd detect &&   $(MAKE) $@
+	cd dmc &&      $(MAKE) $@
+	cd e300 &&     $(MAKE) $@
+	cd filter &&   $(MAKE) $@
+	cd iacp &&     $(MAKE) $@
+	cd iboot &&    $(MAKE) $@
+	cd ida &&      $(MAKE) $@
+	cd ida10 &&    $(MAKE) $@
+	cd isi &&      $(MAKE) $@
+	cd isidb &&    $(MAKE) $@
+	cd isidl &&    $(MAKE) $@
+	cd liss &&     $(MAKE) $@
+	cd logio &&    $(MAKE) $@
+	cd md5 &&      $(MAKE) $@
+	cd modbus &&   $(MAKE) $@
+	cd mseed &&    $(MAKE) $@
+	cd msgq &&     $(MAKE) $@
+	cd myxml &&    $(MAKE) $@
+	cd nrts &&     $(MAKE) $@
+	cd paro &&     $(MAKE) $@
+	cd q330 &&     $(MAKE) $@
+	cd qdp &&      $(MAKE) $@
+	cd qdplus &&   $(MAKE) $@
+	cd qdpxml &&   $(MAKE) $@
+	cd qio &&      $(MAKE) $@
+	cd sacio &&    $(MAKE) $@
+	cd seed &&     $(MAKE) $@
+	cd tristar &&  $(MAKE) $@
+	cd ttyio &&    $(MAKE) $@
+	cd udpio &&    $(MAKE) $@
+	cd util &&     $(MAKE) $@
+	cd xfer &&     $(MAKE) $@
 	rm -rf ../../lib/$(PLATFORM)
 
 REMOVE: FORCE
-	cd cssio;    $(MAKE) $@
-	cd dali;     $(MAKE) $@
-	cd dbio;     $(MAKE) $@
-	cd dccdb;    $(MAKE) $@
-	cd detect;   $(MAKE) $@
-	cd dmc;      $(MAKE) $@
-	cd e300;     $(MAKE) $@
-	cd filter;   $(MAKE) $@
-	cd iacp;     $(MAKE) $@
-	cd iboot;    $(MAKE) $@
-	cd ida;      $(MAKE) $@
-	cd ida10;    $(MAKE) $@
-	cd isi;      $(MAKE) $@
-	cd isidb;    $(MAKE) $@
-	cd isidl;    $(MAKE) $@
-	cd liss;     $(MAKE) $@
-	cd logio;    $(MAKE) $@
-	cd md5;      $(MAKE) $@
-	cd modbus;   $(MAKE) $@
-	cd mseed;    $(MAKE) $@
-	cd msgq;     $(MAKE) $@
-	cd myxml;    $(MAKE) $@
-	cd nrts;     $(MAKE) $@
-	cd paro;     $(MAKE) $@
-	cd q330;     $(MAKE) $@
-	cd qdp;      $(MAKE) $@
-	cd qdplus;   $(MAKE) $@
-	cd qdpxml;   $(MAKE) $@
-	cd qio;      $(MAKE) $@
-	cd sacio;    $(MAKE) $@
-	cd seed;     $(MAKE) $@
-	cd tristar;  $(MAKE) $@
-	cd ttyio;    $(MAKE) $@
-	cd udpio;    $(MAKE) $@
-	cd util;     $(MAKE) $@
-	cd xfer;     $(MAKE) $@
+	cd cssio &&    $(MAKE) $@
+	cd dali &&     $(MAKE) $@
+	cd dbio &&     $(MAKE) $@
+	cd dccdb &&    $(MAKE) $@
+	cd detect &&   $(MAKE) $@
+	cd dmc &&      $(MAKE) $@
+	cd e300 &&     $(MAKE) $@
+	cd filter &&   $(MAKE) $@
+	cd iacp &&     $(MAKE) $@
+	cd iboot &&    $(MAKE) $@
+	cd ida &&      $(MAKE) $@
+	cd ida10 &&    $(MAKE) $@
+	cd isi &&      $(MAKE) $@
+	cd isidb &&    $(MAKE) $@
+	cd isidl &&    $(MAKE) $@
+	cd liss &&     $(MAKE) $@
+	cd logio &&    $(MAKE) $@
+	cd md5 &&      $(MAKE) $@
+	cd modbus &&   $(MAKE) $@
+	cd mseed &&    $(MAKE) $@
+	cd msgq &&     $(MAKE) $@
+	cd myxml &&    $(MAKE) $@
+	cd nrts &&     $(MAKE) $@
+	cd paro &&     $(MAKE) $@
+	cd q330 &&     $(MAKE) $@
+	cd qdp &&      $(MAKE) $@
+	cd qdplus &&   $(MAKE) $@
+	cd qdpxml &&   $(MAKE) $@
+	cd qio &&      $(MAKE) $@
+	cd sacio &&    $(MAKE) $@
+	cd seed &&     $(MAKE) $@
+	cd tristar &&  $(MAKE) $@
+	cd ttyio &&    $(MAKE) $@
+	cd udpio &&    $(MAKE) $@
+	cd util &&     $(MAKE) $@
+	cd xfer &&     $(MAKE) $@
 	rm -rf ../../lib/$(PLATFORM)
 
 FORCE:
